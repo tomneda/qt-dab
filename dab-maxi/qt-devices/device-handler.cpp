@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,55 +19,62 @@
  *    along with Qt-DAB-J; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include	"device-handler.h"
+#include  "device-handler.h"
 
-	deviceHandler::deviceHandler	() {
-	lastFrequency	= 100000;
-	vfoOffset	= 0;
-	theGain		= 50;
-	coarseOffset	= 0;
+deviceHandler::deviceHandler()
+{
+  mLastFrequency = 100000;
+  mVfoOffset     = 0;
+  mTheGain       = 50;
+  mCoarseOffset  = 0;
 }
 
-	deviceHandler::~deviceHandler	() {
+
+bool deviceHandler::restartReader(int32_t freq)
+{
+  (void)freq;
+  return true;
 }
 
-bool	deviceHandler::restartReader	(int32_t freq) {
-	(void)freq;
-	return true;
+void deviceHandler::stopReader()
+{
 }
 
-void	deviceHandler::stopReader	() {
+void deviceHandler::setVFOFrequency(int freq)
+{
+  (void)freq;
 }
 
-void	deviceHandler::setVFOFrequency	(int freq) {
-	(void)freq;
+int32_t deviceHandler::getSamples(TIQSmpFlt *v, int32_t amount)
+{
+  (void)v;
+  (void)amount;
+  return amount;
 }
 
-int32_t	deviceHandler::getSamples	(std::complex<float> *v,
-	                                               int32_t amount) {
-	(void)v; 
-	(void)amount; 
-	return amount;
+int32_t deviceHandler::Samples()
+{
+  return 1024;
 }
 
-int32_t	deviceHandler::Samples		() {
-	return 1024;
+void deviceHandler::resetBuffer()
+{
 }
 
-void	deviceHandler::resetBuffer	() {
+void deviceHandler::hide()
+{
 }
 
-void	deviceHandler::hide		() {
+void deviceHandler::show()
+{
 }
 
-void	deviceHandler::show		() {
+bool deviceHandler::isHidden()
+{
+  return false;
 }
 
-bool	deviceHandler::isHidden		() { 
-	return false;
+QString deviceHandler::deviceName()
+{
+  return "";
 }
-
-QString	deviceHandler::deviceName	() {
-	return "";
-}
-

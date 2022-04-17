@@ -346,16 +346,17 @@ int hulp	= index;
 	return hulp;
 }
 
-void    bandHandler::cellSelected (int row, int column) {
-QString s1 = theTable. item (row, 0) ->text ();
-QString s2 = theTable. item (row, 1) ->text ();
-int	amount_P	= 0;
-	(void)column;
-        if (s2 == "-") 
-           theTable. item (row, 1) -> setText ("+");
-	else
-           theTable. item (row, 1) -> setText ("-");
-	selectedBand [row]. skip = s2 != "-";
+void bandHandler::cellSelected(int row, int /*column*/)
+{
+  QString s1 = theTable.item(row, 0)->text();
+  QString s2 = theTable.item(row, 1)->text();
+
+  if (s2 == "-")
+    theTable.item(row, 1)->setText("+");
+  else
+    theTable.item(row, 1)->setText("-");
+
+  selectedBand [row].skip = s2 != "-";
 //	fprintf (stderr, "we zetten voor %s de zaak op %d\n",
 //	              selectedBand [row]. key. toUtf8 (). data (),
 //	              selectedBand [row]. skip);

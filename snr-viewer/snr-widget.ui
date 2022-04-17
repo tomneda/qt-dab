@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>398</width>
-    <height>174</height>
+    <height>195</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>snr widget</string>
+   <string>SNR</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -37,9 +37,15 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="minimumSize">
+        <size>
+         <width>357</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
-         <width>16777215</width>
+         <width>357</width>
          <height>141</height>
         </size>
        </property>
@@ -52,21 +58,21 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
+     <item alignment="Qt::AlignBottom">
       <widget class="QPushButton" name="snrDumpButton">
        <property name="text">
         <string>dump</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignBottom">
       <widget class="QSpinBox" name="snrCompressionSelector">
        <property name="minimum">
         <number>1</number>
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignBottom">
       <widget class="QSpinBox" name="snrLengthSelector">
        <property name="minimum">
         <number>100</number>

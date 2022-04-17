@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,51 +19,50 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include	"backend-driver.h"
-#include        "mp2processor.h"
-#include        "mp4processor.h"
-#include	"data-processor.h"
-//
+
+#include  "backend-driver.h"
+#include  "mp2processor.h"
+#include  "mp4processor.h"
+#include  "data-processor.h"
+
 //	Driver program for the selected backend. Embodying that in a
 //	separate class makes the "Backend" class simpler.
 
-	backendDriver::backendDriver (RadioInterface *mr,
-	                              descriptorType *d,
-	                              RingBuffer<int16_t> *audioBuffer,
-	                              RingBuffer<uint8_t> *dataBuffer,
-	                              RingBuffer<uint8_t> *frameBuffer) {
-	if (d -> type == AUDIO_SERVICE) {
-	   if (((audiodata *)d) -> ASCTy != 077) {
-              theProcessor = new mp2Processor (mr,
-	                                       d -> bitRate,
-                                               audioBuffer,
-	                                       frameBuffer);
-	   }
-           else
-           if (((audiodata *)d) -> ASCTy == 077) {
-              theProcessor =  new mp4Processor (mr,
-	                                        d -> bitRate,
-                                                audioBuffer,
-	                                        frameBuffer,
-	                                        d -> procMode);
-	   }
-	}
-	else
-	if (d -> type == PACKET_SERVICE)
-	   theProcessor = new dataProcessor (mr,
-	                                     (packetdata *)d,
-	                                      dataBuffer);
-	else
-	   theProcessor = new frameProcessor ();	// should not happen
+backendDriver::backendDriver (RadioInterface *mr, descriptorType *d,
+                              RingBuffer<int16_t> *audioBuffer,
+                              RingBuffer<uint8_t> *dataBuffer,
+                              RingBuffer<uint8_t> *frameBuffer)
+{
+  if (d->type == AUDIO_SERVICE)
+  {
+    if (((audiodata *)d)->ASCTy != 077)
+    {
+      theProcessor = new mp2Processor(mr, d->bitRate, audioBuffer, frameBuffer);
+    }
+    else if (((audiodata *)d)->ASCTy == 077)
+    {
+      theProcessor = new mp4Processor(mr, d->bitRate, audioBuffer, frameBuffer, d->procMode);
+    }
+  }
+  else if (d->type == PACKET_SERVICE)
+  {
+    theProcessor = new dataProcessor(mr, (packetdata *)d, dataBuffer);
+  }
+  else
+  {
+    theProcessor = new frameProcessor();    // should not happen
+  }
 }
 
 
-    backendDriver::~backendDriver() {
-	delete theProcessor;
+backendDriver::~backendDriver()
+{
+  delete theProcessor;
 }
 
-	
-void	backendDriver::addtoFrame (std::vector<uint8_t>	theData) {
-	theProcessor	-> addtoFrame (theData);
+
+void backendDriver::addtoFrame(std::vector<uint8_t> theData)
+{
+  theProcessor->addtoFrame(theData);
 }
 

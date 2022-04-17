@@ -26,102 +26,113 @@
 #include	"mot-object.h"
 #include	"radio.h"
 
-	   motObject::motObject (RadioInterface *mr,
-	                         bool		dirElement,
-	                         uint16_t	transportId,
-	                         uint8_t	*segment,
-	                         int32_t	segmentSize,
-	                         bool		lastFlag) {
-int32_t pointer = 7;
-uint16_t	rawContentType = 0;
+motObject::motObject (RadioInterface *mr,
+                      bool dirElement,
+                      uint16_t transportId,
+                      uint8_t  *segment,
+                      int32_t segmentSize,
+                      bool lastFlag)
+{
+  int32_t  pointer        = 7;
+  uint16_t rawContentType = 0;
 
-	this	-> dirElement	= dirElement;
-	connect (this, SIGNAL (handle_motObject (QByteArray, QString,
-	                                         int, bool)),
-	         mr,   SLOT   (handle_motObject (QByteArray, QString,
-	                                         int, bool)));
-	this	-> transportId		= transportId;
-	this	-> numofSegments	= -1;
-	this	-> segmentSize		= -1;
+  this->dirElement = dirElement;
+  connect(this, SIGNAL(handle_motObject(QByteArray,QString,
+                                        int,bool)),
+          mr, SLOT(handle_motObject(QByteArray,QString,
+                                    int,bool)));
+  this->transportId   = transportId;
+  this->numofSegments = -1;
+  this->segmentSize   = -1;
 
-	headerSize     =
+  headerSize =
 //	   ((segment [3] & 0x0F) << 9) |
-                   (segment [4] << 1) | ((segment [5] >> 7) & 0x01);
-	bodySize       =
-              (segment [0] << 20) | (segment [1] << 12) |
-                            (segment [2] << 4 ) | ((segment [3] & 0xF0) >> 4);
+    (segment [4] << 1) | ((segment [5] >> 7) & 0x01);
+  bodySize =
+    (segment [0] << 20) | (segment [1] << 12) |
+    (segment [2] << 4) | ((segment [3] & 0xF0) >> 4);
 
-// Extract the content type
-	int b	= (segment [5] >> 1) & 0x3F;
-	rawContentType  |= ((segment [5] >> 1) & 0x3F) << 8;
-	rawContentType	|= ((segment [5] & 0x01) << 8) | segment [6];
-	contentType = static_cast<MOTContentType>(rawContentType);
+  // Extract the content type
+  //int b = (segment [5] >> 1) & 0x3F;
+
+  rawContentType |= ((segment [5] >> 1) & 0x3F) << 8;
+  rawContentType |= ((segment [5] & 0x01) << 8) | segment [6];
+  contentType     = static_cast<MOTContentType>(rawContentType);
 
 //	fprintf (stderr, "headerSize %d, bodySize %d. contentType %d, transportId %d\n",
 //	                  headerSize, bodySize, b, transportId);
 //	we are actually only interested in the name, if any
 
-        while ((uint16_t)pointer < headerSize) {
-           uint8_t PLI	= (segment [pointer] & 0300) >> 6;
-           uint8_t paramId = (segment [pointer] & 077);
-           uint16_t     length;
-           switch (PLI) {
-              case 00:
-                 pointer += 1;
-                 break;
+  while ((uint16_t)pointer < headerSize)
+  {
+    uint8_t  PLI     = (segment [pointer] & 0300) >> 6;
+    uint8_t  paramId = (segment [pointer] & 077);
+    uint16_t length;
+    switch (PLI)
+    {
+    case 00:
+      pointer += 1;
+      break;
 
-              case 01:
-                 pointer += 2;
-                 break;
+    case 01:
+      pointer += 2;
+      break;
 
-	      case 02:
-                 pointer += 5;
-                 break;
+    case 02:
+      pointer += 5;
+      break;
 
-              case 03:
-                 if ((segment [pointer + 1] & 0200) != 0) {
-                    length = (segment [pointer + 1] & 0177) << 8 |
-                              segment [pointer + 2];
-                    pointer += 3;
-                 }
-                 else {
-                    length = segment [pointer + 1] & 0177;
-                    pointer += 2;
-                 }
-	         switch (paramId) {
-	            case 12: {
-                       int16_t i;
-                       for (i = 0; i < length - 1; i ++)
-                          name. append (segment [pointer + i + 1]);
-                       }
-                       pointer += length;
-	               break;
+    case 03:
+      if ((segment [pointer + 1] & 0200) != 0)
+      {
+        length = (segment [pointer + 1] & 0177) << 8 |
+                 segment [pointer + 2];
+        pointer += 3;
+      }
+      else
+      {
+        length   = segment [pointer + 1] & 0177;
+        pointer += 2;
+      }
+      switch (paramId)
+      {
+      case 12: {
+        int16_t i;
+        for (i = 0; i < length - 1; i++)
+          name.append(segment [pointer + i + 1]);
+      }
+        pointer += length;
+        break;
 
-	            case 2:	// creation time
-	            case 3:	// start validity
-	            case 4:	// expiretime
-	            case 5:	// triggerTime
-	            case 6:	// version number
-	            case 7: 	// retransmission distance
-	            case 8:	// group reference
-	            case 10:	// priority
-	            case 11:	// label
-	            case 15:	// content description
-                       pointer += length;
-	               break;
+      case 2: // creation time
+      case 3: // start validity
+      case 4: // expiretime
+      case 5: // triggerTime
+      case 6: // version number
+      case 7: // retransmission distance
+      case 8: // group reference
+      case 10:// priority
+      case 11:// label
+      case 15:// content description
+        pointer += length;
+        break;
 
-	            default:
-	               pointer += headerSize;	// this is so wrong!!!
-	               break;
-	         }
-              }
-	}
+      default:
+        pointer += headerSize;         // this is so wrong!!!
+        break;
+      }
+    }
+  }
+
+//	fprintf (stderr, "creating mot object %x\n", transportId);
 }
 
-	motObject::~motObject() {
+motObject::~motObject()
+{
 }
 
-uint16_t	motObject::get_transportId() {
+uint16_t motObject::get_transportId()
+{
 	return transportId;
 }
 
@@ -173,7 +184,8 @@ void	motObject::handleComplete	() {
 QByteArray result;
 	for (const auto &it : motMap)
 	   result. append (it. second);
-//	fprintf (stderr, "Handling complete\n");
+//	fprintf (stderr, "Handling complete %s, type %d\n", name,
+//	                                                  (int)contentType);
 	handle_motObject (result, name, (int)contentType, dirElement);
 }
 

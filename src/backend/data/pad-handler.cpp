@@ -275,87 +275,101 @@ std::vector<uint8_t> data;		// for the local addition
 //
 //	A dynamic label is created from a sequence of (dynamic) xpad
 //	fields, starting with CI = 2, continuing with CI = 3
-void	padHandler::dynamicLabel (uint8_t *data, int16_t length, uint8_t CI) {
-static int16_t segmentno	   = 0;
-static int16_t remainDataLength    = 0;
-static bool    isLastSegment       = false;
-static bool    moreXPad            = false;
-int16_t  dataLength                = 0;
+void padHandler::dynamicLabel(uint8_t *data, int16_t length, uint8_t CI)
+{
+  //static int16_t segmentno        = 0;
+  static int16_t remainDataLength = 0;
+  static bool    isLastSegment    = false;
+  static bool    moreXPad         = false;
+  int16_t        dataLength       = 0;
 
-	if ((CI & 037) == 02) {	// start of segment
-	   uint16_t prefix = (data [0] << 8) | data [1];
-	   uint8_t field_1 = (prefix >> 8) & 017;
-	   uint8_t Cflag   = (prefix >> 12) & 01;
-	   uint8_t first   = (prefix >> 14) & 01;
-	   uint8_t last    = (prefix >> 13) & 01;
-	   dataLength	   = length - 2; // The length with header removed
+  if ((CI & 037) == 02)   // start of segment
+  {
+    uint16_t prefix  = (data [0] << 8) | data [1];
+    uint8_t  field_1 = (prefix >> 8) & 017;
+    uint8_t  Cflag   = (prefix >> 12) & 01;
+    uint8_t  first   = (prefix >> 14) & 01;
+    uint8_t  last    = (prefix >> 13) & 01;
+    dataLength = length - 2;     // The length with header removed
 
-	   if (first) { 
-	      segmentno = 1;
-	      charSet = (prefix >> 4) & 017;
-	      dynamicLabelText. clear();
-	   }
-	   else 
-	      segmentno = ((prefix >> 4) & 07) + 1;
+    if (first)
+    {
+      //segmentno = 1;
+      charSet   = (prefix >> 4) & 017;
+      dynamicLabelText.clear();
+    }
+    else
+    {
+      //segmentno = ((prefix >> 4) & 07) + 1;
+    }
 
-	   if (Cflag) {		// special dynamic label command
-	      // the only specified command is to clear the display
-	      dynamicLabelText. clear();
-	   }
-	   else {		// Dynamic text length
-	      int16_t totalDataLength = field_1 + 1;
-	      if (length - 2 < totalDataLength) {
-	         dataLength = length - 2; // the length is shortened by header
-	         moreXPad   = true;
-	      }
-	      else {
-	         dataLength = totalDataLength;  // no more xpad app's 3
-	         moreXPad   = false;
-	      }
+    if (Cflag)      // special dynamic label command
+    // the only specified command is to clear the display
+    {
+      dynamicLabelText.clear();
+    }
+    else      // Dynamic text length
+    {
+      int16_t totalDataLength = field_1 + 1;
+      if (length - 2 < totalDataLength)
+      {
+        dataLength = length - 2;    // the length is shortened by header
+        moreXPad   = true;
+      }
+      else
+      {
+        dataLength = totalDataLength;     // no more xpad app's 3
+        moreXPad   = false;
+      }
 
 //	convert dynamic label
-	      QString segmentText = toQStringUsingCharset (
-	                                 (const char *)&data [2],
-	                                 (CharacterSet) charSet,
-	                                 dataLength);
+      QString segmentText = toQStringUsingCharset(
+        (const char *)&data [2],
+        (CharacterSet)charSet,
+        dataLength);
 
-	      dynamicLabelText. append (segmentText);
+      dynamicLabelText.append(segmentText);
 
 //	if at the end, show the label
-	      if (last) {
-	         if (!moreXPad) {
-	            showLabel (dynamicLabelText);
-	                              
-	         }
-	         else
-	            isLastSegment = true;
-	      }
-	      else 
-	         isLastSegment = false;
+      if (last)
+      {
+        if (!moreXPad)
+        {
+          showLabel(dynamicLabelText);
+        }
+        else
+          isLastSegment = true;
+      }
+      else
+        isLastSegment = false;
 //	calculate remaining data length
-	      remainDataLength = totalDataLength - dataLength;
-	   }
-	}
-	else 
-	if (((CI & 037) == 03) && moreXPad) {
-	   if (remainDataLength > length) {
-	      dataLength = length;
-	      remainDataLength -= length;
-	   }
-	   else {
-	      dataLength = remainDataLength;
-	      moreXPad   = false;
-	   }
-	   
-	   QString segmentText = toQStringUsingCharset (
-	                              (const char *) data,
-	                              (CharacterSet) charSet,
-	                              dataLength);
-	   dynamicLabelText. append (segmentText);
-	   if (!moreXPad && isLastSegment) {
-	      showLabel (dynamicLabelText);
-	   }
-	}
+      remainDataLength = totalDataLength - dataLength;
+    }
+  }
+  else
+  if (((CI & 037) == 03) && moreXPad)
+  {
+    if (remainDataLength > length)
+    {
+      dataLength        = length;
+      remainDataLength -= length;
+    }
+    else
+    {
+      dataLength = remainDataLength;
+      moreXPad   = false;
+    }
+
+    QString segmentText = toQStringUsingCharset(
+      (const char *)data,
+      (CharacterSet)charSet,
+      dataLength);
+    dynamicLabelText.append(segmentText);
+    if (!moreXPad && isLastSegment)
+    {
+      showLabel(dynamicLabelText);
+    }
+  }
 }
 
 //

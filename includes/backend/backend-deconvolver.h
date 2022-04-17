@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -19,20 +18,23 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef	__BACKEND_DECONVOLVER__
-#define	__BACKEND_DECONVOLVER__
-#include	"dab-constants.h"
-class	protection;
+#ifndef __BACKEND_DECONVOLVER__
+#define __BACKEND_DECONVOLVER__
 
-class	backendDeconvolver {
+#include  "dab-constants.h"
+
+class protection;
+
+class backendDeconvolver
+{
 public:
-	backendDeconvolver (descriptorType *d);
-	~backendDeconvolver();
-void	deconvolve	(int16_t	*rawBits_in,
-	                 int32_t	length,
-	                 uint8_t	*outData);
+  backendDeconvolver(descriptorType *d);
+  ~backendDeconvolver();
+
+  void deconvolve(int16_t  *rawBits_in, int32_t length, uint8_t  *outData);
+
 private:
-	protection	* protectionHandler;
+  protection * protectionHandler;
 };
 
 #endif

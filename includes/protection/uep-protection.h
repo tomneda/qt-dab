@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -19,7 +18,7 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#
+
 #ifndef	__UEP_PROTECTION__
 #define	__UEP_PROTECTION__
 
@@ -28,11 +27,13 @@
 #include	<cstdint>
 #include	"protection.h"
 
-	class uep_protection: public protection {
+class uep_protection: public protection
+{
 public:
-		uep_protection (int16_t, int16_t);
-		~uep_protection();
-bool		deconvolve	(int16_t *, int32_t, uint8_t *);
+  uep_protection(int16_t, int16_t);
+  ~uep_protection() = default;
+
+  bool deconvolve(int16_t *, int32_t, uint8_t *);
 };
 
 #endif

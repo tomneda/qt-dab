@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,34 +19,39 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef	__RAW_READER__
-#define	__RAW_READER__
+#ifndef __RAW_READER__
+#define __RAW_READER__
 
-#include	<QThread>
-#include	"dab-constants.h"
-#include	"ringbuffer.h"
-#include	<atomic>
-class	rawFiles;
+#include  <QThread>
+#include  "dab-constants.h"
+#include  "ringbuffer.h"
+#include  <atomic>
 
-class	rawReader:public QThread {
-Q_OBJECT
+class rawFiles;
+
+class	rawReader:public QThread
+{
+  Q_OBJECT
 public:
-			rawReader	(rawFiles *,
-	                                 FILE *, RingBuffer<std::complex<float>> *); 
-			~rawReader();
-	void		startReader();
-	void		stopReader();
+  rawReader(rawFiles *, FILE *, RingBuffer<TIQSmpFlt> *);
+  ~rawReader() override;
+
+  void startReader();
+  void stopReader();
+
 private:
-virtual void		run();
-	FILE		*filePointer;
-	RingBuffer<std::complex<float>>	*_I_Buffer;
-	uint64_t	period;
-	std::atomic<bool>	running;
-	uint8_t		*bi;
-	rawFiles	*parent;
-	int64_t		fileLength;
+  virtual void run() override;
+
+  FILE                  *mpFilePointer;
+  RingBuffer<TIQSmpFlt> *mp_I_Buffer;
+  uint64_t              mPeriod;
+  std::atomic<bool>     mRunning;
+  uint8_t               *mpBi;
+  rawFiles              *mpParent;
+  int64_t               mFileLength;
+
 signals:
-	void		setProgress	(int, float);
+  void setProgress(int, float);
 };
 
 #endif

@@ -44,7 +44,7 @@ public:
 
 			rawFiles	(QString);
  	               ~rawFiles	();
-	int32_t		getSamples	(std::complex<float> *, int32_t);
+  int32_t		getSamples	(TIQSmpFlt *, int32_t);
 	uint8_t		myIdentity	();
 	int32_t		Samples		();
 	bool		restartReader	(int32_t);
@@ -55,7 +55,7 @@ public:
 private:
 	QFrame		myFrame;
 	QString		fileName;
-	RingBuffer<std::complex<float>>	_I_Buffer;
+  RingBuffer<TIQSmpFlt>	_I_Buffer;
 	FILE		*filePointer;
 	rawReader	*readerTask;
 	std::atomic<bool>	running;

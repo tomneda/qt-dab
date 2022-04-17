@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>624</width>
+    <width>629</width>
     <height>464</height>
    </rect>
   </property>
@@ -17,7 +17,7 @@
    </sizepolicy>
   </property>
   <property name="windowTitle">
-   <string>Qt-DAB-4.3</string>
+   <string>Qt-DAB-4.35</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout_11">
    <item>
@@ -61,6 +61,9 @@
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Presets are short cuts to services - possibly in ensembles in different channels - that are obtained by clicking with the &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;right &lt;/span&gt;mouse button on the name of the service &lt;span style=&quot; font-weight:600; font-style:italic;&quot;&gt;in the list of services when selected&lt;/span&gt;.&lt;/p&gt;&lt;p&gt;Removing a name from the presets is by selecting the service in this combobox and pressing the shift+delete combination.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
+          <property name="currentText">
+           <string>Presets</string>
+          </property>
           <item>
            <property name="text">
             <string>Presets</string>
@@ -99,6 +102,9 @@
        <widget class="smallComboBox" name="channelSelector">
         <property name="toolTip">
          <string>Channel selector.</string>
+        </property>
+        <property name="currentText">
+         <string>channels</string>
         </property>
         <item>
          <property name="text">
@@ -208,7 +214,7 @@ it is definitely not the time on your clock.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
           <item>
            <widget class="smallPushButton" name="muteButton">
             <property name="text">
-             <string>mute</string>
+             <string>Mute</string>
             </property>
            </widget>
           </item>
@@ -226,7 +232,7 @@ it is definitely not the time on your clock.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
                </font>
               </property>
               <property name="text">
-               <string>SNR: </string>
+               <string>SNR [dB]: </string>
               </property>
              </widget>
             </item>
@@ -298,7 +304,7 @@ it is definitely not the time on your clock.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
             <item row="0" column="0">
              <widget class="QLabel" name="label_2">
               <property name="text">
-               <string>Frequency:</string>
+               <string>Frequency [MHz]:</string>
               </property>
              </widget>
             </item>
@@ -348,7 +354,7 @@ it is definitely not the time on your clock.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
             <item row="1" column="0">
              <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>CPU load (%):</string>
+               <string>CPU load [%]:</string>
               </property>
              </widget>
             </item>
@@ -510,7 +516,7 @@ it is definitely not the time on your clock.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
         <item>
          <widget class="verySmallPushButton" name="hideButton">
           <property name="text">
-           <string>hide</string>
+           <string>Hide</string>
           </property>
          </widget>
         </item>
@@ -554,7 +560,7 @@ it is definitely not the time on your clock.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
       <item>
        <widget class="QLabel" name="distanceLabel">
         <property name="text">
-         <string>   </string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -618,7 +624,7 @@ it is definitely not the time on your clock.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Push this button to reset, i.e. restart synchronization.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>reset</string>
+              <string>Reset</string>
              </property>
             </widget>
            </item>
@@ -662,7 +668,7 @@ it is definitely not the time on your clock.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;show or hide the widget for controlling the device.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>device</string>
+              <string>Device</string>
              </property>
             </widget>
            </item>
@@ -689,7 +695,7 @@ More than one peak shows more than one transmitter within
 the reach &lt;br /&gt;of this receiver.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>corr-result</string>
+              <string>Correlation</string>
              </property>
             </widget>
            </item>
@@ -711,7 +717,7 @@ the reach &lt;br /&gt;of this receiver.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</str
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The spectrum and the constellation of the DAB signal is shown when pressing this button. &lt;br /&gt;&lt;br /&gt;Pressing it again will cause the spectrum and constellation to be invisible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>spectrum</string>
+              <string>Spectrum</string>
              </property>
             </widget>
            </item>
@@ -721,7 +727,7 @@ the reach &lt;br /&gt;of this receiver.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</str
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;show or hide the widget for showing the tii spectrum&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>tii</string>
+              <string>TII</string>
              </property>
             </widget>
            </item>
@@ -779,7 +785,7 @@ the reach &lt;br /&gt;of this receiver.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</str
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;There are three different scan modes.&lt;/p&gt;&lt;p&gt;A scan over the channels until one with a detectable DAB content is detected,&lt;/p&gt;&lt;p&gt;a second mode is to scan all channels in the current band once and then stop, &lt;/p&gt;&lt;p&gt;a third mode is to continuously scan over the channels in the current band.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>scan</string>
+              <string>Scan</string>
              </property>
             </widget>
            </item>
@@ -789,7 +795,7 @@ the reach &lt;br /&gt;of this receiver.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</str
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;history feature. The software maintains a list of all services encountered. Touching this button will show (hide) the list. By clicking with the left mouse button the software will try to select the service pointed to, by clicking with the ruight mouse button the lit will be deleted.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>list</string>
+              <string>List</string>
              </property>
             </widget>
            </item>
@@ -811,7 +817,7 @@ the reach &lt;br /&gt;of this receiver.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</str
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Push this button to save the raw input. Pushing will cause a menu to appear where a filename can be selected. Please note the big filesizes!&lt;/p&gt;&lt;p&gt;Push again to stop recording. You can reload it by using the file input (*.sdr) option. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>Raw dump</string>
+              <string>Dump Raw</string>
              </property>
             </widget>
            </item>
@@ -833,7 +839,7 @@ the reach &lt;br /&gt;of this receiver.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</str
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The snrViewer button controls a widget that - when enabled - will show the development of SNR over time. Parameters of the screen, height (the Y-axis) and the number of measurements (X-axis) can be set in the configuration widget.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>snr viewer</string>
+              <string>SNR Viewer</string>
              </property>
             </widget>
            </item>
@@ -855,7 +861,7 @@ the reach &lt;br /&gt;of this receiver.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</str
               <string>&lt;html&gt;&lt;head /&gt;&lt;body&gt;&lt;p&gt;Touching this button will show/hide a widget where some configuration settings can be changed. &lt;br /&gt;&lt;br /&gt;The config widget also contains a posisbility for setting an alarm like signal.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="text">
-              <string>config</string>
+              <string>Config</string>
              </property>
             </widget>
            </item>

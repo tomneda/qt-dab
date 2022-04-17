@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C)  2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,40 +20,44 @@
  */
 
 #ifndef __AUDIO_BASE__
-#define	__AUDIO_BASE__
-#include	"dab-constants.h"
-#include	<cstdio>
-#include	<samplerate.h>
-#include	<sndfile.h>
-#include	<QMutex>
-#include	<QObject>
-#include	"newconverter.h"
-#include	"ringbuffer.h"
+#define __AUDIO_BASE__
+#include  "dab-constants.h"
+#include  <cstdio>
+#include  <samplerate.h>
+#include  <sndfile.h>
+#include  <QMutex>
+#include  <QObject>
+#include  "newconverter.h"
+#include  "ringbuffer.h"
 
 
-class	audioBase: public QObject {
-Q_OBJECT
+class	audioBase: public QObject
+{
+  Q_OBJECT
 public:
-			audioBase();
-virtual			~audioBase();
-virtual	void		stop			(void);
-virtual	void		restart();
-//
-	void		audioOut		(int16_t *, int32_t, int);
-	void		startDumping		(SNDFILE *);
-	void		stopDumping();
+  audioBase();
+  virtual ~audioBase();
+  virtual void stop(void);
+  virtual void restart();
+
+  void audioOut(int16_t *, int32_t, int);
+  void startDumping(SNDFILE *);
+  void stopDumping();
+
 private:
-	void		audioOut_16000		(int16_t *, int32_t);
-	void		audioOut_24000		(int16_t *, int32_t);
-	void		audioOut_32000		(int16_t *, int32_t);
-	void		audioOut_48000		(int16_t *, int32_t);
-	newConverter	converter_16;
-	newConverter	converter_24;
-	newConverter	converter_32;
-	SNDFILE		*dumpFile;
-	QMutex		myLocker;
+  void audioOut_16000(int16_t *, int32_t);
+  void audioOut_24000(int16_t *, int32_t);
+  void audioOut_32000(int16_t *, int32_t);
+  void audioOut_48000(int16_t *, int32_t);
+
+  newConverter converter_16;
+  newConverter converter_24;
+  newConverter converter_32;
+  SNDFILE      *dumpFile;
+  QMutex       myLocker;
+
 protected:
-virtual	void		audioOutput		(float *, int32_t);
+  virtual void audioOutput(float *, int32_t);
 };
 #endif
 

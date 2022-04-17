@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>345</width>
-    <height>227</height>
+    <height>228</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>sync correlation</string>
+   <string>Sync Correlation</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -39,8 +39,14 @@
        </property>
       </widget>
      </item>
-     <item>
+     <item alignment="Qt::AlignRight">
       <widget class="QSpinBox" name="correlationLength">
+       <property name="maximumSize">
+        <size>
+         <width>159</width>
+         <height>16777215</height>
+        </size>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>

@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013, 2014, 2015, 2016, 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -27,62 +26,71 @@
 #include	<QVBoxLayout>
 #include	<QSettings>
 
-	coordinates::coordinates	(QSettings *dabSettings) {
-	this	-> dabSettings = dabSettings;
-	latitudeText	= new QLabel (this);
-	latitudeText	-> setText ("latitude (decimal)");
-	QDoubleValidator *la = new QDoubleValidator (-90.0, 9.0, 5);
-	latitude	= new QLineEdit (this);	
-	latitude	-> setValidator (la);
-	longitudeText	= new QLabel (this);
-	longitudeText	-> setText ("longitude (decimal)");
-	QDoubleValidator *lo = new QDoubleValidator (-180.0, 180.0, 5);
-	longitude	= new QLineEdit (this);
-	longitude	-> setValidator (lo);
-	QFormLayout	*layout = new QFormLayout;
-	layout		-> addWidget (latitudeText);
-	layout		-> addWidget (latitude);
-	layout		-> addWidget (longitudeText);
-	layout		-> addWidget (longitude);
-	setWindowTitle ("select coordinates");
-	acceptButton	= new QPushButton ("accept");
-	QVBoxLayout	*total = new QVBoxLayout;
-	total		-> addItem (layout);
-	total		-> addWidget (acceptButton);
-	setLayout (total);
-	connect (latitude, SIGNAL (returnPressed ()),
-	         this, SLOT (set_latitude ()));
-	connect (longitude, SIGNAL (returnPressed ()),
-	         this, SLOT (set_longitude ()));
-	connect (acceptButton, SIGNAL (clicked ()),
-	         this, SLOT (handle_acceptButton ()));
-	show ();
-	latitudeValue	= false;	
-	longitudeValue	= false;
+coordinates::coordinates(QSettings *dabSettings)
+{
+  this->mpDabSettings = dabSettings;
+  mpLatitudeText      = new QLabel(this);
+  mpLatitudeText->setText("latitude (decimal)");
+  QDoubleValidator *la = new QDoubleValidator(-90.0, 9.0, 5);
+
+  mpLatitude = new QLineEdit(this);
+  mpLatitude->setValidator(la);
+  mpLongitudeText = new QLabel(this);
+  mpLongitudeText->setText("longitude (decimal)");
+  QDoubleValidator *lo = new QDoubleValidator(-180.0, 180.0, 5);
+
+  mpLongitude = new QLineEdit(this);
+  mpLongitude->setValidator(lo);
+  QFormLayout *layout = new QFormLayout;
+
+  layout->addWidget(mpLatitudeText);
+  layout->addWidget(mpLatitude);
+  layout->addWidget(mpLongitudeText);
+  layout->addWidget(mpLongitude);
+  setWindowTitle("select coordinates");
+  mpAcceptButton = new QPushButton("accept");
+  QVBoxLayout *total = new QVBoxLayout;
+
+  total->addItem(layout);
+  total->addWidget(mpAcceptButton);
+  setLayout(total);
+
+  connect(mpLatitude,     SIGNAL(returnPressed()), this, SLOT(set_latitude()));
+  connect(mpLongitude,    SIGNAL(returnPressed()), this, SLOT(set_longitude()));
+  connect(mpAcceptButton, SIGNAL(clicked()),       this, SLOT(handle_acceptButton()));
+
+  show();
+  mLatitudeValue  = false;
+  mLongitudeValue = false;
 }
 
-	coordinates::~coordinates	() {
-	hide ();
-	delete	acceptButton;
-	delete	latitudeText;
-	delete	longitudeText;	
-	delete	latitude;
-	delete	longitude;	
+coordinates::~coordinates()
+{
+  hide();
+  delete  mpAcceptButton;
+  delete  mpLatitudeText;
+  delete  mpLongitudeText;
+  delete  mpLatitude;
+  delete  mpLongitude;
 }
 
-void	coordinates::set_latitude () {
-	latitudeValue	= true;
+void coordinates::set_latitude()
+{
+  mLatitudeValue = true;
 }
 
-void	coordinates::set_longitude () {
-	longitudeValue = true;
+void coordinates::set_longitude()
+{
+  mLongitudeValue = true;
 }
 
-void	coordinates::handle_acceptButton () {
-	if (!latitude || !longitude)
-	   return;
-	dabSettings	-> setValue ("latitude", latitude -> text ());
-	dabSettings	-> setValue ("longitude", longitude -> text ());
-	QDialog::done (0);
+void coordinates::handle_acceptButton()
+{
+  if (!mpLatitude || !mpLongitude)
+    return;
+
+  mpDabSettings->setValue("latitude", mpLatitude->text());
+  mpDabSettings->setValue("longitude", mpLongitude->text());
+  QDialog::done(0);
 }
 

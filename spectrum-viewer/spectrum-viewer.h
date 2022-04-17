@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -23,83 +22,89 @@
 
 //
 //	Simple spectrum scope object
-//	Shows the spectrum of the incoming data stream 
+//	Shows the spectrum of the incoming data stream
 //	If made invisible, it is a "do nothing"
 //
-#ifndef		__SPECTRUM_VIEWER__
-#define		__SPECTRUM_VIEWER__
+#ifndef   __SPECTRUM_VIEWER__
+#define   __SPECTRUM_VIEWER__
 
-#include        "dab-constants.h"
-#include	<QFrame>
-#include	<QObject>
-#include	<fftw3.h>
-#include	"ui_scopewidget.h"
-#include	"ringbuffer.h"
-#include	<qwt.h>
-#include	<qwt_plot.h>
-#include	<qwt_plot_marker.h>
-#include	<qwt_plot_grid.h>
-#include	<qwt_plot_curve.h>
-#include        <qwt_color_map.h>
-#include        <qwt_plot_zoomer.h>
-#include        <qwt_plot_textlabel.h>
-#include        <qwt_plot_panner.h>
-#include        <qwt_plot_layout.h>
-#include	<qwt_picker_machine.h>
-#include        <qwt_scale_widget.h>
-#include        <QBrush>
-#include        <QTimer>
+#include "dab-constants.h"
+#include <QFrame>
+#include <QObject>
+#include <fftw3.h>
+#include "ui_scopewidget.h"
+#include "ringbuffer.h"
+#include <qwt.h>
+#include <qwt_plot.h>
+#include <qwt_plot_marker.h>
+#include <qwt_plot_grid.h>
+#include <qwt_plot_curve.h>
+#include <qwt_color_map.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_plot_textlabel.h>
+#include <qwt_plot_panner.h>
+#include <qwt_plot_layout.h>
+#include <qwt_picker_machine.h>
+#include <qwt_scale_widget.h>
+#include <QBrush>
+#include <QTimer>
 
 
-class	RadioInterface;
-class	QSettings;
-class	IQDisplay;
-class	spectrumViewer: public QObject, Ui_scopeWidget {
+class RadioInterface;
+class QSettings;
+class IQDisplay;
+
+class spectrumViewer : public QObject, Ui_scopeWidget
+{
 Q_OBJECT
 public:
-			spectrumViewer	(RadioInterface *,
-	                                 QSettings	*,
-	                                 RingBuffer<std::complex<float>> *,
-	                                 RingBuffer<std::complex<float>> *);
-			~spectrumViewer();
-	void		showSpectrum	(int32_t, int32_t);
-	void		showIQ		(int32_t);
-	void		showQuality	(float, float, float, float);
-	void		show_clockErr	(int);
-	void		setBitDepth	(int16_t);
-	void		show();
-	void		hide();
-	bool		isHidden();
+  spectrumViewer  (RadioInterface * const,
+                   QSettings * const,
+                   RingBuffer<TIQSmpFlt> * const,
+                   RingBuffer<TIQSmpFlt> * const);
+  ~spectrumViewer();
+
+  void showSpectrum(int32_t, int32_t);
+  void showIQ(int32_t);
+  void showQuality(float, float, float, float);
+  void show_clockErr(int);
+  void setBitDepth(int16_t);
+  void show();
+  void hide();
+  bool isHidden();
+
 private:
-	RadioInterface	*myRadioInterface;
-	QSettings	*dabSettings;
-	RingBuffer<std::complex<float>>	*spectrumBuffer;
-	RingBuffer<std::complex<float>>	*iqBuffer;
-	QwtPlotPicker	*lm_picker;
-	QColor		displayColor;
-	QColor		gridColor;
-	QColor		curveColor;
+  RadioInterface *mpMyRadioInterface;
+  QSettings *mpDabSettings;
+  RingBuffer<TIQSmpFlt> *mpSpectrumBuffer;
+  RingBuffer<TIQSmpFlt> *mpIQBuffer;
+  QwtPlotPicker *mpLm_picker;
+  QColor mDisplayColor;
+  QColor mGridColor;
+  QColor mCurveColor;
 
-	int16_t		displaySize;
-	int16_t		spectrumSize;
-	std::complex<float>	*spectrum;
-	std::vector<double>	displayBuffer;
-	std::vector<float>	Window;
-	fftwf_plan	plan;
-	QFrame		*myFrame;
-	QwtPlotMarker	*Marker;
-	QwtPlot		*plotgrid;
-	QwtPlotGrid	*grid;
-	QwtPlotCurve	*spectrumCurve;
-	QBrush		*ourBrush;
-	int32_t		indexforMarker;
-	void		ViewSpectrum		(double *, double *, double, int);
-	float		get_db 			(float);
-	int32_t		normalizer;
+  int16_t mDisplaySize;
+  int16_t mSpectrumSize;
+  TIQSmpFlt *mpSpectrum;
+  std::vector<double> mDisplayBuffer;
+  std::vector<float> mWindow;
+  fftwf_plan mPlan;
+  QFrame *mpMyFrame;
+  QwtPlotMarker *mpMarker;
+  QwtPlot *mpPlotgrid;
+  QwtPlotGrid *mpGrid;
+  QwtPlotCurve *mpSpectrumCurve;
+  QBrush *mpOurBrush;
+  int32_t mIndexforMarker;
+  IQDisplay *mpMyIQDisplay;
+  float mNormalizer;
 
-	IQDisplay	*myIQDisplay;
+private:
+  void ViewSpectrum(double *, double *, double, int);
+  float get_db(float);
+
 private slots:
-	void		rightMouseClick		(const QPointF &);
+  void rightMouseClick(const QPointF &);
 };
 
 #endif

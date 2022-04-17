@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013, 2014, 2015, 2016, 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -26,32 +25,34 @@
 
 #include	<cstdint>
 
-class	dabParams {
+class	dabParams
+{
 public:
-			dabParams	(uint8_t);
-			~dabParams();
-	int16_t		get_dabMode();
-	int16_t		get_L();
-	int16_t		get_carriers();
-	int16_t		get_T_null();
-	int16_t		get_T_s();
-	int16_t		get_T_u();
-	int16_t		get_T_g();
-	int32_t		get_T_F();
-	int32_t		get_carrierDiff();
-	int16_t		get_CIFs();
+  explicit dabParams(uint8_t);
+  ~dabParams() = default;
+
+  int16_t get_dabMode()     const { return dabMode; }
+  int16_t get_L()           const { return L; }        // blocks per frame
+  int16_t get_carriers()    const { return K; }        // number OFDM carriers
+  int16_t get_T_null()      const { return T_null; }   // samples null length
+  int16_t get_T_s()         const { return T_s; }      // samples block length
+  int16_t get_T_u()         const { return T_u; }      // samples useful part
+  int16_t get_T_g()         const { return T_g; }
+  int32_t get_T_F()         const { return T_F; }      // samples per frame
+  int32_t get_carrierDiff() const { return carrierDiff; }
+  int16_t get_CIFs()        const { return CIFs; }
+
 private:
-	uint8_t		dabMode;
-	int16_t		L;
-	int16_t		K;
-	int16_t		T_null;
-	int32_t		T_F;
-	int16_t		T_s;
-	int16_t		T_u;
-	int16_t		T_g;
-	int16_t		carrierDiff;
-	int16_t		CIFs;
+  uint8_t dabMode;
+  int16_t L;
+  int16_t K;
+  int16_t T_null;
+  int32_t T_F;
+  int16_t T_s;
+  int16_t T_u;
+  int16_t T_g;
+  int16_t carrierDiff;
+  int16_t CIFs;
 };
 
 #endif
-

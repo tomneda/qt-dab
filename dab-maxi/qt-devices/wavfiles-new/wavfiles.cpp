@@ -94,7 +94,7 @@ void	wavFiles::stopReader() {
 }
 
 //	size is in I/Q pairs
-int32_t	wavFiles::getSamples	(std::complex<float> *V, int32_t size) {
+int32_t	wavFiles::getSamples	(TIQSmpFlt *V, int32_t size) {
 int32_t	amount;
 	
 	if (filePointer == nullptr)

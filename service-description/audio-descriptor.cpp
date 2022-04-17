@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -19,45 +18,46 @@
  *    along with Qt-DAB if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include	"dab-tables.h"
-#include	"audio-descriptor.h"
+
+#include  "dab-tables.h"
+#include  "audio-descriptor.h"
 
 
-	audioDescriptor::audioDescriptor (audiodata *ad):
-	                                       myFrame (nullptr) {
-        setupUi (&myFrame);
-        myFrame. show();
-	serviceLabel    -> setText
-                      (QString().number (ad -> SId, 16). toUpper());
-        QFont font      = serviceLabel -> font();
-        font. setBold (true);
-        serviceLabel    -> setFont (font);
+audioDescriptor::audioDescriptor(audiodata *ad) : Ui_audioDescription(),
+  mMyFrame(nullptr)
+{
+  setupUi(&mMyFrame);
+  mMyFrame.show();
+  serviceLabel->setText(QString().number(ad->SId, 16).toUpper());
+  QFont font = serviceLabel->font();
 
-	serviceName  -> setText (ad -> serviceName);
-	subChannelId -> setText (QString::number (ad -> subchId));
-	startAddress -> setText (QString::number (ad -> startAddr));
-	Length       -> setText (QString::number (ad -> length));
-	bitrate      -> setText (QString::number (ad -> bitRate));
-	QString protL	= getProtectionLevel (ad -> shortForm,
-	                                      ad -> protLevel);
-	protectionLevel   -> setText (protL);
-	dabType      -> setText (ad -> ASCTy == 077 ? "DAB+" : "DAB");
-	Language     -> setText (getLanguage (ad -> language));
-	programType  ->
-	   setText (the_textMapper.
-	               get_programm_type_string (ad -> programType));
-	if (ad -> fmFrequency == -1) {
-	   fmLabel	-> hide();
-	   fmFrequency	-> hide();
-	}
-	else {
-	   fmLabel	-> show();
-	   QString f	= QString::number (ad -> fmFrequency);
-	   f. append (" Khz");
-	   fmFrequency	-> setText (f);
-	}
+  font.setBold(true);
+  serviceLabel->setFont(font);
+
+  serviceName->setText(ad->serviceName);
+  subChannelId->setText(QString::number(ad->subchId));
+  startAddress->setText(QString::number(ad->startAddr));
+  Length->setText(QString::number(ad->length));
+  bitrate->setText(QString::number(ad->bitRate));
+  QString protL = getProtectionLevel(ad->shortForm, ad->protLevel);
+
+  protectionLevel->setText(protL);
+  dabType->setText(ad->ASCTy == 077 ? "DAB+" : "DAB");
+  Language->setText(getLanguage(ad->language));
+  programType->setText(mThe_textMapper.get_programm_type_string(ad->programType));
+
+  if (ad->fmFrequency == -1)
+  {
+    fmLabel->hide();
+    fmFrequency->hide();
+  }
+  else
+  {
+    fmLabel->show();
+    QString f = QString::number(ad->fmFrequency);
+    f.append(" Khz");
+    fmFrequency->setText(f);
+  }
 }
 
-	audioDescriptor::~audioDescriptor() {
-}
 

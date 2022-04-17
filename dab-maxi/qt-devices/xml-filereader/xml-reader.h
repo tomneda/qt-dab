@@ -1,10 +1,9 @@
-#
 /*
  *    Copyright (C) 2014 .. 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
  *    Lazy Chair Computing
  *
- *    This file is part of the Qt-DAB 
+ *    This file is part of the Qt-DAB
  *
  *    Qt-DAB is free software; you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
@@ -21,65 +20,64 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#ifndef	__XML_READER__
-#define	__XML_READER__
+#ifndef __XML_READER__
+#define __XML_READER__
 
-#include	<QThread>
-#include	<QMessageBox>
-#include	<stdio.h>
-#include	"ringbuffer.h"
-#include	<stdint.h>
-#include	<complex>
-#include	<vector>
-#include	<atomic>
+#include  "dab-constants.h"
+#include  "ringbuffer.h"
+#include  <QMessageBox>
+#include  <QThread>
+#include  <atomic>
+#include  <complex>
+#include  <stdint.h>
+#include  <stdio.h>
+#include  <vector>
 
-class	xml_fileReader;
-class	xmlDescriptor;
+class xml_fileReader;
+class xmlDescriptor;
 
-class	xml_Reader:public QThread {
+class	xml_Reader:public QThread
+{
 Q_OBJECT
 public:
-			xml_Reader (xml_fileReader	*mr,
-	                            FILE		*f,
-	                            xmlDescriptor	*fd,
-	                            uint32_t		filePointer,
-	                            RingBuffer<std::complex<float>> *b);
-			~xml_Reader	();
-	void		stopReader	();
-	void		handle_continuousButton	();
+  xml_Reader(xml_fileReader * mr,
+             FILE * f,
+             xmlDescriptor * fd,
+             uint32_t filePointer,
+             RingBuffer<TIQSmpFlt> *b);
+  ~xml_Reader ();
+  void stopReader();
+  void handle_continuousButton();
+
 private:
-	std::atomic<bool>	continuous;
-	FILE		*file;
-	xmlDescriptor	*fd;
-	uint32_t	filePointer;
-	RingBuffer<std::complex<float>> *sampleBuffer;
-	xml_fileReader	*parent;
-	int		nrElements;
-	int		samplesToRead;
-	std::atomic<bool> running;
-	void		run ();
-	int		compute_nrSamples 	(FILE *f, int blockNumber);
-	int		readSamples		(FILE *f, 
-	                                       void(xml_Reader::*)(FILE *,
-	                                          std::complex<float> *, int));
-	void		readElements_IQ		(FILE *f,
-	                                         std::complex<float> *, int amount);
-	void		readElements_QI		(FILE *f, 
-	                                         std::complex<float> *, int amount);
-	void		readElements_I		(FILE *f, 
-	                                         std::complex<float> *, int amount);
-	void		readElements_Q		(FILE *f, 
-	                                         std::complex<float> *, int amount);
-//
-//	for the conversion - if any
-	int16_t         convBufferSize;
-        int16_t         convIndex;
-        std::vector <std::complex<float> >   convBuffer;
-        int16_t         mapTable_int   [2048];
-        float           mapTable_float [2048];
+  std::atomic<bool>      continuous;
+  FILE                   *file;
+  xmlDescriptor          *fd;
+  uint32_t               filePointer;
+  RingBuffer<TIQSmpFlt> *sampleBuffer;
+  xml_fileReader         *parent;
+  int                    nrElements;
+  int                    samplesToRead;
+  std::atomic<bool>      running;
+
+  void run() override;
+
+  int compute_nrSamples(FILE *f, int blockNumber);
+  int readSamples(FILE * f, void (xml_Reader::*)(FILE *, TIQSmpFlt *, int));
+  void readElements_IQ(FILE *f, TIQSmpFlt *, int amount);
+  void readElements_QI(FILE *f, TIQSmpFlt *, int amount);
+  void readElements_I(FILE *f, TIQSmpFlt *, int amount);
+  void readElements_Q(FILE *f, TIQSmpFlt *, int amount);
+
+  // for the conversion - if any
+  int16_t                convBufferSize;
+  int16_t                convIndex;
+  std::vector<TIQSmpFlt> convBuffer;
+  int16_t                mapTable_int[2048];
+  float                  mapTable_float[2048];
 
 signals:
-	void		setProgress		(int, int);
+  void setProgress(int, int);
 };
 
 #endif

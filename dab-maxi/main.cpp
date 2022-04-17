@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -22,175 +21,188 @@
  *
  *      Main program
  */
-#include        <QApplication>
-#include        <QSettings>
-#include	<QTranslator>
-#include	<QString>
-#include        <QDir>
-#include	<QDebug>
-#include        <unistd.h>
-#include        "dab-constants.h"
-#include        "radio.h"
+#include  <QApplication>
+#include  <QSettings>
+#include  <QTranslator>
+#include  <QString>
+#include  <QDir>
+#include  <QDebug>
+#include  <unistd.h>
+#include  "dab-constants.h"
+#include  "radio.h"
 
-#define DEFAULT_INI     ".qt-dab.ini"
-#define	PRESETS		".qt-dab-presets.xml"
-#define	SCHEDULE	".qt-dab-schedule"
-#ifndef	GITHASH
-#define	GITHASH	"      "
+#define DEFAULT_INI    ".qt-dab.ini"
+#define PRESETS        ".qt-dab-presets.xml"
+#define SCHEDULE       ".qt-dab-schedule"
+#ifndef GITHASH
+#define GITHASH        "      "
 #endif
 
-QString fullPathfor (QString v) {
-QString fileName;
+QString fullPathfor(const QString & v)
+{
+  QString fileName;
 
-	if (v == QString (""))
-	   return QString ("/tmp/xxx");
+  if (v == QString(""))
+  {
+    return QString("/tmp/xxx");
+  }
 
-	if (v. at (0) == QChar ('/'))           // full path specified
-	   return v;
+  if (v.at(0) == QChar('/'))              // full path specified
+  {
+    return v;
+  }
 
-#ifdef	OSX_INIT_FILE
-	char *PathFile;
-	PathFile = getenv ("HOME");
-	fileName = PathFile;
-	fileName.append("/.qt-dab.ini");
-	qDebug() << fileName;
+#ifdef  OSX_INIT_FILE
+  char *PathFile;
+  PathFile = getenv("HOME");
+  fileName = PathFile;
+  fileName.append("/.qt-dab.ini");
+  qDebug() << fileName;
 #else
-	fileName = QDir::homePath();
-	fileName. append ("/");
-	fileName. append (v);
-	fileName = QDir::toNativeSeparators (fileName);
+  fileName = QDir::homePath();
+  fileName.append("/");
+  fileName.append(v);
+  fileName = QDir::toNativeSeparators(fileName);
 #endif
-	if (!fileName. endsWith (".ini"))
-	   fileName. append (".ini");
+  if (!fileName.endsWith(".ini"))
+  {
+    fileName.append(".ini");
+  }
 
-	return fileName;
+  return fileName;
 }
 
-void    setTranslator (QString Language);
+void setTranslator(QString Language);
 
-int     main (int argc, char **argv) {
-QString initFileName = fullPathfor (QString (DEFAULT_INI));
-RadioInterface  *MyRadioInterface;
+int main(int argc, char **argv)
+{
+  QString initFileName = fullPathfor(QString(DEFAULT_INI));
 
-// Default values
-QSettings       *dabSettings;           // ini file
-QString		presetName	= PRESETS;
-int32_t		dataPort	= 8888;
-int32_t		clockPort	= 8889;
-int     opt;
-QString freqExtension		= "";
-bool	error_report		= false;
-int	fmFrequency		= 110000;
-QString	scheduleFile		= fullPathfor (SCHEDULE);
+  // Default values
+  QString presetName = PRESETS;
+  int32_t dataPort   = 8888;
+  int32_t clockPort  = 8889;
+  int     opt;
+  QString freqExtension = "";
+  bool    error_report  = false;
+  int     fmFrequency   = 110000;
+  QString scheduleFile  = fullPathfor(SCHEDULE);
 
-	QCoreApplication::setOrganizationName ("Lazy Chair Computing");
-	QCoreApplication::setOrganizationDomain ("Lazy Chair Computing");
-	QCoreApplication::setApplicationName ("qt-dab");
-	QCoreApplication::setApplicationVersion (QString (CURRENT_VERSION) + " Git: " + GITHASH);
+  QCoreApplication::setOrganizationName("Lazy Chair Computing");
+  QCoreApplication::setOrganizationDomain("Lazy Chair Computing");
+  QCoreApplication::setApplicationName("qt-dab");
+  QCoreApplication::setApplicationVersion(QString(CURRENT_VERSION) + " Git: " + GITHASH);
 
-	while ((opt = getopt (argc, argv, "C:i:P:Q:A:TMF:s:")) != -1) {
-	   switch (opt) {
-	      case 'i':
-	         initFileName = fullPathfor (QString (optarg));
-	         break;
+  while ((opt = getopt(argc, argv, "C:i:P:Q:A:TMF:s:")) != -1)
+  {
+    switch (opt)
+    {
+    case 'i':
+      initFileName = fullPathfor(QString(optarg));
+      break;
 
-	      case 'P':
-	         dataPort	= atoi (optarg);
-	         break;
+    case 'P':
+      dataPort = atoi(optarg);
+      break;
 
-	      case 'C':
-	         clockPort	= atoi (optarg);
-	         break;
+    case 'C':
+      clockPort = atoi(optarg);
+      break;
 
-	      case 'A':
-	         freqExtension	= optarg;
-	         break;
-	
-	      case 'T':
-	         error_report	= true;
-	         break;
+    case 'A':
+      freqExtension = optarg;
+      break;
 
-	      case 'M':
-	         break;
+    case 'T':
+      error_report = true;
+      break;
 
-	      case 'F':
-	         fmFrequency	= atoi (optarg);
-	         break;
+    case 'M':
+      break;
 
-	      case 's':
-	         break;
+    case 'F':
+      fmFrequency = atoi(optarg);
+      break;
 
-	      default:
-	         break;
-	   }
-	}
+    case 's':
+      break;
 
-	dabSettings =  new QSettings (initFileName, QSettings::IniFormat);
+    default:
+      break;
+    }
+  }
 
-	QString presets = QDir::homePath();
-	presets. append ("/");
-	presets. append (presetName);
-	presets = QDir::toNativeSeparators (presets);
+  QSettings * const dabSettings = new QSettings(initFileName, QSettings::IniFormat);
+
+  QString presets = QDir::homePath();
+  presets.append("/");
+  presets.append(presetName);
+  presets = QDir::toNativeSeparators(presets);
 
 /*
  *      Before we connect control to the gui, we have to
  *      instantiate
  */
 #if QT_VERSION >= 0x050600
-	QGuiApplication::setAttribute (Qt::AA_EnableHighDpiScaling);
+  QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
-	QApplication a (argc, argv);
-//	setting the language
-	QString locale = QLocale::system(). name();
-	qDebug() << "main:" <<  "Detected system language" << locale;
-	setTranslator (locale);
+  QApplication a(argc, argv);
+  // setting the language
+  QString      locale = QLocale::system().name();
+  qDebug() << "main:" << "Detected system language" << locale;
+  setTranslator(locale);
 
-	a. setWindowIcon (QIcon (":/qt-dab.ico"));
+  a.setWindowIcon(QIcon(":/qt-dab.ico"));
 
-	MyRadioInterface = new RadioInterface (dabSettings,
-	                                       presets,
-	                                       freqExtension,
-	                                       scheduleFile,
-	                                       error_report,
-	                                       dataPort,
-	                                       clockPort,
-	                                       fmFrequency
-                                               );
-	MyRadioInterface -> show();
-	qRegisterMetaType<QVector<int> >("QVector<int>");
-        a. exec();
+  RadioInterface * const MyRadioInterface = new RadioInterface(dabSettings,
+                                                               presets,
+                                                               freqExtension,
+                                                               scheduleFile,
+                                                               error_report,
+                                                               dataPort,
+                                                               clockPort,
+                                                               fmFrequency
+                                                               );
+  MyRadioInterface->show();
+  qRegisterMetaType<QVector<int> >("QVector<int>");
+  a.exec();
 /*
  *      done:
  */
-	fprintf (stderr, "back in main program\n");
-	fflush (stdout);
-	fflush (stderr);
-	qDebug ("It is done\n");
-	delete MyRadioInterface;
-	delete dabSettings;
-	return 1;
+  fprintf(stderr, "back in main program\n");
+  fflush(stdout);
+  fflush(stderr);
+  qDebug("It is done\n");
+  delete MyRadioInterface;
+  delete dabSettings;
+  return 1;
 }
 
-void	setTranslator (QString Language) {
-QTranslator *Translator = new QTranslator;
+void setTranslator(QString Language)
+{
+  QTranslator * const Translator = new QTranslator;
 
 //	German is special (as always)
-	if ((Language == "de_AT") || (Language ==  "de_CH"))
-	   Language = "de_DE";
+  if ((Language == "de_AT") || (Language == "de_CH"))
+  {
+    Language = "de_DE";
+  }
 //
 //	what about Dutch?
-	bool TranslatorLoaded =
-	             Translator -> load (QString(":/i18n/") + Language);
-	qDebug() << "main:" <<  "Set language" << Language;
-	QCoreApplication::installTranslator (Translator);
+  bool TranslatorLoaded =
+    Translator->load(QString(":/i18n/") + Language);
 
-	if (!TranslatorLoaded) {
-	   qDebug() << "main:" <<  "Error while loading language specifics" << Language << "use English \"en_GB\" instead";
-	   Language = "en_GB";
-	}
+  qDebug() << "main:" << "Set language" << Language;
+  QCoreApplication::installTranslator(Translator);
 
-	QLocale curLocale (QLocale ((const QString&)Language));
-	QLocale::setDefault (curLocale);
+  if (!TranslatorLoaded)
+  {
+    qDebug() << "main:" << "Error while loading language specifics" << Language << "use English \"en_GB\" instead";
+    Language = "en_GB";
+  }
+
+  QLocale curLocale(QLocale((const QString&)Language));
+
+  QLocale::setDefault(curLocale);
 }
-

@@ -36,7 +36,7 @@ struct timeval  tv;
 
 	wavReader::wavReader	(wavFiles	*mr,
 	                         SNDFILE	*filePointer,
-	                         RingBuffer<std::complex<float> > *theBuffer) {
+	                         RingBuffer<TIQSmpFlt> *theBuffer) {
 	this	-> parent	= mr;
 	this	-> filePointer	= filePointer;
 	this	-> theBuffer	= theBuffer;
@@ -65,7 +65,7 @@ void	wavReader::run	() {
 int32_t	bufferSize	= 32768;
 int64_t	nextStop;
 int	teller		= 0;
-std::complex<float> bi [bufferSize];
+TIQSmpFlt bi [bufferSize];
 
 	connect (this, SIGNAL (setProgress (int, float)),
                  parent,   SLOT (setProgress (int, float)));

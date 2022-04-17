@@ -1,5 +1,3 @@
-#
-#
 /* -*- c++ -*- */
 /*
  * Copyright 2004,2010 Free Software Foundation, Inc.
@@ -25,72 +23,84 @@
 //	This is a (partial) rewrite of the GNU radio code, for use
 //	within the DAB/DAB+ sdr-j receiver software
 //	all rights are acknowledged.
-//
+
 #include "firecode-checker.h"
 #include <cstring>
-#include	<cstdio>
+#include  <cstdio>
 
 //	g(x)=(x^11+1)(x^5+x^3+x^2+x+1)=1+x+x^2+x^3+x^5+x^11+x^12+x^13+x^14+x^16
-const uint8_t firecode_checker::g[16]={1,1,1,1,0,1,0,0,0,0,0,1,1,1,1,0};
+const uint8_t firecode_checker::g[16] = { 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0 };
 
-	firecode_checker::firecode_checker() {
+firecode_checker::firecode_checker()
+{
 // prepare the table
-uint8_t regs [16];
-int16_t i,j;
-uint16_t itab [8];
+  uint8_t  regs[16];
+  uint16_t itab[8];
 
-	for (i = 0; i < 8; i++) {
-	   memset (regs, 0, 16);
-	   regs [8 + i] = 1;
-	   itab [i] = run8 (regs);
-	}
-	for (i = 0; i < 256; i++) {
-	   tab [i] = 0;
-	   for (j = 0; j < 8; j++) {
-	      if (i & (1 << j))
-	         tab [i] = tab [i] ^ itab [j];
-	   }
-	}
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    memset(regs, 0, 16);
+    regs [8 + i] = 1;
+    itab [i] = run8(regs);
+  }
+
+  for (uint16_t i = 0; i < 256; i++)
+  {
+    tab [i] = 0;
+
+    for (uint16_t j = 0; j < 8; j++)
+    {
+      if (i & (1U << j))
+      {
+        tab [i] = tab [i] ^ itab [j];
+      }
+    }
+  }
 }
 
-	firecode_checker::~firecode_checker() {
+uint16_t firecode_checker::run8(uint8_t regs[])
+{
+  uint16_t z;
+  uint16_t v = 0;
+
+  for (uint16_t i = 0; i < 8; i++)
+  {
+    z = regs [15];
+
+    for (int16_t j = 15; j > 0; j--)
+    {
+      regs [j] = regs [j - 1] ^ (z & g[j]);
+    }
+    regs [0] = z;
+  }
+
+  for (int16_t i = 15; i >= 0; i--)
+  {
+    v = (v << 1) | regs[i];
+  }
+
+  return v;
 }
 
-uint16_t firecode_checker::run8 (uint8_t regs[]) {
-int16_t i,j;
-uint16_t z;
-uint16_t v = 0;
+bool firecode_checker::check(const uint8_t *x)
+{
+  uint16_t state = (x[2] << 8) | x[3];
+  uint16_t istate;
 
-	for (i = 0; i < 8; i++) {
-	   z = regs [15];
-	   for (j = 15; j > 0; j--)
-	      regs [j] = regs [j-1] ^ (z & g[j]);
-	   regs [0] = z;
-	}
+  for (uint16_t i = 4; i < 11; i++)
+  {
+    istate = tab [state >> 8U];
+    state  = ((istate & 0x00ff) ^ x[i]) |
+             ((istate ^ state << 8) & 0xff00);
+  }
 
-	for (i = 15; i >= 0; i--)
-	   v = (v << 1) | regs[i];
+  for (uint16_t i = 0; i < 2; i++)
+  {
+    istate = tab [state >> 8U];
+    state  = ((istate & 0x00ff) ^ x [i]) |
+             ((istate ^ state << 8) & 0xff00);
+  }
 
-	return v;
-}
-
-bool	firecode_checker::check (const uint8_t *x) {
-int16_t i;
-uint16_t state = (x[2] << 8) | x[3];
-uint16_t istate;
-
-	for (i = 4; i < 11; i++) {
-	   istate = tab [state >> 8];
-	   state = ((istate & 0x00ff) ^ x[i]) |
-	           ((istate ^ state << 8) & 0xff00);
-	}
-
-	for (i = 0; i < 2; i++) {
-	   istate = tab [state >> 8];
-	   state = ((istate & 0x00ff) ^ x [i]) |
-	           ((istate ^ state << 8) & 0xff00);
-	}
-
-	return state == 0;
+  return state == 0;
 }
 

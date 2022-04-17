@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -24,66 +23,68 @@
 //
 //	Simple viewer for correlation
 //
-#ifndef		__CORRELATION_VIEWER__
-#define		__CORRELATION_VIEWER__
+#ifndef   __CORRELATION_VIEWER__
+#define   __CORRELATION_VIEWER__
 
-#include        "dab-constants.h"
-#include	<QFrame>
-#include	<QSettings>
-#include	"ringbuffer.h"
-#include	<QObject>
-#include	"ui_correlation-widget.h"
-#include	<qwt.h>
-#include	<qwt_plot.h>
-#include	<qwt_plot_marker.h>
-#include	<qwt_plot_grid.h>
-#include	<qwt_plot_curve.h>
-#include        <qwt_color_map.h>
-#include        <qwt_plot_zoomer.h>
-#include        <qwt_plot_textlabel.h>
-#include        <qwt_plot_panner.h>
-#include        <qwt_plot_layout.h>
-#include        <qwt_picker_machine.h>
-#include        <qwt_scale_widget.h>
-#include        <QBrush>
-#include	<QVector>
+#include  "dab-constants.h"
+#include  <QFrame>
+#include  <QSettings>
+#include  "ringbuffer.h"
+#include  <QObject>
+#include  "ui_correlation-widget.h"
+#include  <qwt.h>
+#include  <qwt_plot.h>
+#include  <qwt_plot_marker.h>
+#include  <qwt_plot_grid.h>
+#include  <qwt_plot_curve.h>
+#include  <qwt_color_map.h>
+#include  <qwt_plot_zoomer.h>
+#include  <qwt_plot_textlabel.h>
+#include  <qwt_plot_panner.h>
+#include  <qwt_plot_layout.h>
+#include  <qwt_picker_machine.h>
+#include  <qwt_scale_widget.h>
+#include  <QBrush>
+#include  <QVector>
 
 
 class	RadioInterface;
-class	correlationViewer: public QObject, Ui_correlationWidget {
-Q_OBJECT
+
+class	correlationViewer: public QObject, Ui_correlationWidget
+{
+  Q_OBJECT
 public:
-			correlationViewer	(RadioInterface *,
-	                                         QSettings	*,
-	                                         RingBuffer<float> *);
-			~correlationViewer	();
-	void		showCorrelation		(int32_t, int32_t,
-	                                                QVector<int> &);
-	void		showIndex		(int32_t);
-	void		show			();
-	void		hide			();
-	bool		isHidden		();
+  correlationViewer(RadioInterface *, QSettings  *, RingBuffer<float> *);
+  ~correlationViewer();
+  void showCorrelation(int32_t, int32_t, QVector<int> &);
+  void showIndex(int32_t);
+  void show();
+  void hide();
+  bool isHidden();
 
 private:
-	RadioInterface	*myRadioInterface;
-	QSettings	*dabSettings;
-	QFrame		myFrame;
-	QwtPlotCurve	spectrumCurve;
-	QwtPlotGrid	grid;
-	std::vector<int> indexVector;
-	float		get_db			(float);
-	RingBuffer<float> *responseBuffer;
-	int16_t		displaySize;
-	QwtPlot		*plotgrid;
-	QwtPlotPicker   *lm_picker;
-        QColor          displayColor;
-        QColor          gridColor;
-        QColor          curveColor;
-	int		plotLength;
+  float get_db(float);
+
+private:
+  RadioInterface    *myRadioInterface = nullptr;
+  QSettings         *dabSettings      = nullptr;
+  QFrame            myFrame;
+  QwtPlotCurve      spectrumCurve;
+  QwtPlotGrid       grid;
+  std::vector<int>  indexVector;
+
+  int16_t           displaySize     = 0;
+  int               plotLength      = 0;
+  RingBuffer<float> *responseBuffer = nullptr;
+  QwtPlot           *plotgrid       = nullptr;
+  QwtPlotPicker     *lm_picker      = nullptr;
+  QColor            displayColor;
+  QColor            gridColor;
+  QColor            curveColor;
+
 private slots:
-        void            rightMouseClick			(const QPointF &);
-	void		handle_correlationLength	(int);
+  void rightMouseClick(const QPointF &);
+  void handle_correlationLength(int);
 };
 
 #endif
-

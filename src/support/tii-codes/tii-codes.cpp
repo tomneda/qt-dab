@@ -45,15 +45,11 @@
 #ifdef  __LOAD_TABLES__
 #include        <curl/curl.h>
 #endif
-		tiiHandler::tiiHandler	(QSettings *s) {
-	(void)s;
+		tiiHandler::tiiHandler	() {
 }
 		tiiHandler::~tiiHandler	() {
 }
 
-void	tiiHandler::updateHome	(float l1, float l2) {
-	(void)l1; (void)l2;
-}
 //
 bool	tiiHandler::tiiFile	(const QString &s) {
 	(void)s;
@@ -62,9 +58,9 @@ bool	tiiHandler::tiiFile	(const QString &s) {
 	
 	QString tiiHandler::
 	        get_transmitterName (const QString &channel,
-	                             const QString &country, uint16_t Eid,
+	                             uint16_t Eid,
                                      uint8_t mainId, uint8_t subId) {
-	(void)channel; (void)country;
+	(void)channel;
 	(void)Eid; (void)mainId; (void)subId;
 	return "";
 }
@@ -123,13 +119,17 @@ int	tiiHandler::readColumns (std::vector<QString> &v, char *b, int N) {
 //	en
 //	https://www.movable-type.co.uk/scripts/latlong.html
 //	Haversine formula applied
-int	tiiHandler::distance (float latitude, float longitude) {
+int	tiiHandler::distance (float latitude, float longitude,
+	                      float homeLatitude, float homeLongitude) {
 	(void)latitude; (void)longitude;
+	(void)homeLatitude; (void)homeLongitude;
 	return 0;
 }
 
-int	tiiHandler::corner (float latitude, float longitude) {
+int	tiiHandler::corner (float latitude, float longitude,
+	                    float homeLatitude, float homeLongitude) {
 	(void)latitude; (void)longitude;
+	(void)homeLatitude; (void)homeLongitude;
 	return 0;
 }
 

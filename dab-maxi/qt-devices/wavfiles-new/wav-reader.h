@@ -35,14 +35,14 @@ Q_OBJECT
 public:
 			wavReader	(wavFiles *,
 	                                 SNDFILE *,
-	                                 RingBuffer<std::complex<float>> *); 
+                                   RingBuffer<TIQSmpFlt> *);
 			~wavReader();
 	void		startReader();
 	void		stopReader();
 private:
 virtual void		run		();
 	SNDFILE		*filePointer;
-	RingBuffer<std::complex<float> >	*theBuffer;
+  RingBuffer<TIQSmpFlt>	*theBuffer;
 	uint64_t	period;
 	std::atomic<bool>	running;
 	wavFiles	*parent;

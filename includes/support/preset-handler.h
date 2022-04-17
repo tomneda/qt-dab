@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,34 +19,37 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef	__PRESET_HANDLER__
-#define	__PRESET_HANDLER__
-#include	<QString>
-#include	<QtXml>
-#include	<QFile>
-#include	<vector>
-#include        <QStringList>
-#include        <QObject>
-#include        <QString>
+#ifndef __PRESET_HANDLER__
+#define __PRESET_HANDLER__
+#include  <QString>
+#include  <QtXml>
+#include  <QFile>
+#include  <vector>
+#include  <QStringList>
+#include  <QObject>
+#include  <QString>
 
-class   RadioInterface;
-class	QComboBox;
+class RadioInterface;
+class QComboBox;
 
-typedef struct presetData_ {
-	QString serviceName;
-	QString channel;
-} presetData;
+typedef struct presetData_
+{
+  QString serviceName;
+  QString channel;
+}
+presetData;
 
-class	presetHandler: public QObject {
-Q_OBJECT
+class	presetHandler: public QObject
+{
+  Q_OBJECT
 public:
-		presetHandler	(RadioInterface *);
-		~presetHandler	();
-	void	loadPresets	(QString, QComboBox *);
-	void	savePresets	(QComboBox *);
+  presetHandler(RadioInterface *);
+  ~presetHandler();
+  void loadPresets(QString, QComboBox *);
+  void savePresets(QComboBox *);
 private:
-	RadioInterface	*radio;
-	QString	fileName;
+  RadioInterface *radio;
+  QString        fileName;
 };
 
 #endif

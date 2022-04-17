@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -32,23 +31,23 @@
 class	RadioInterface;
 class	descriptorType;
 
-class	historyHandler:public QListView {
-Q_OBJECT
+class	historyHandler:public QListView
+{
+  Q_OBJECT
 public:
-		historyHandler	(RadioInterface *radio,
-	                                 QString fileName);
-		~historyHandler	();
-	void	addElement	(const QString &, const QString &);
-	void	clearHistory	();
+  historyHandler(RadioInterface * radio, QString fileName);
+  ~historyHandler ();
+  void addElement(const QString &, const QString &);
+  void clearHistory();
 public slots:
-	void	selectElement	(QModelIndex);
+  void selectElement(QModelIndex);
 signals:
-	void	handle_historySelect (const QString &);
+  void handle_historySelect(const QString &);
 private:
-	QStringList	historyList;
-	QStringListModel	displayList;
-	RadioInterface	*radio;
-	QString		fileName;
+  QStringList      historyList;
+  QStringListModel displayList;
+  RadioInterface   *radio;
+  QString          fileName;
 };
 
 #endif

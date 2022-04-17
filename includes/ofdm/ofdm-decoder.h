@@ -41,10 +41,10 @@ public:
 		ofdmDecoder		(RadioInterface *,
 	                                 uint8_t,
 	                                 int16_t,
-	                                 RingBuffer<std::complex<float>> * iqBuffer = nullptr);
+	                                 RingBuffer<TIQSmpFlt> * iqBuffer = nullptr);
 		~ofdmDecoder();
-	void	processBlock_0		(std::vector<std::complex<float> >);
-	void	decode			(std::vector<std::complex<float> >,
+	void	processBlock_0		(std::vector<TIQSmpFlt>);
+	void	decode			(std::vector<TIQSmpFlt>,
 	                                 int32_t n, int16_t *);
 	void	stop			();
 	void	reset			();
@@ -54,23 +54,23 @@ private:
 	fftHandler	my_fftHandler;
 	interLeaver     myMapper;
 
-	RingBuffer<std::complex<float>> *iqBuffer;
-	float		computeQuality	(std::complex<float> *);
-        float		compute_timeOffset      (std::complex<float> *,
-                                                 std::complex<float> *);
-        float		compute_clockOffset     (std::complex<float> *,
-                                                 std::complex<float> *);
-        float		compute_frequencyOffset (std::complex<float> *,
-                                                 std::complex<float> *);
+	RingBuffer<TIQSmpFlt> *iqBuffer;
+	float		computeQuality	(TIQSmpFlt *);
+        float		compute_timeOffset      (TIQSmpFlt *,
+                                                 TIQSmpFlt *);
+        float		compute_clockOffset     (TIQSmpFlt *,
+                                                 TIQSmpFlt *);
+        float		compute_frequencyOffset (TIQSmpFlt *,
+                                                 TIQSmpFlt *);
 	int32_t		T_s;
 	int32_t		T_u;
 	int32_t		T_g;
 	int32_t		nrBlocks;
 	int32_t		carriers;
 	int16_t		getMiddle();
-	std::vector<complex<float>>	phaseReference;
+	std::vector<TIQSmpFlt>	phaseReference;
 	std::vector<int16_t>		ibits;
-	std::complex<float>	*fft_buffer;
+	TIQSmpFlt	*fft_buffer;
 	phaseTable	*phasetable;
 
 signals:

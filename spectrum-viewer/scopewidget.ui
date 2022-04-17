@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>556</width>
-    <height>187</height>
+    <height>243</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>spectrumscope</string>
+   <string>Spectrum / Constellation</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>

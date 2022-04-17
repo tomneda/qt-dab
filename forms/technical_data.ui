@@ -55,7 +55,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;DAB+ audio services are encoded in an AAC format. &lt;/p&gt;&lt;p&gt;Touching this button will show a menu to store the AAC frames into a file.&lt;/p&gt;&lt;p&gt;As usual, touching the button again will close the output file. Programs like vlc can handle such files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>frame dump</string>
+        <string>Dump Frame</string>
        </property>
       </widget>
      </item>
@@ -65,7 +65,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The audio output can be saved as a file in uncompressed PCM format. &lt;/p&gt;&lt;p&gt;Touching this button will show a menu to save the PCM data into a file.&lt;/p&gt;&lt;p&gt;The output is a regular &amp;quot;.wav&amp;quot; file which can be handled by many other audio programs.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>dump audio</string>
+        <string>Dump Audio</string>
        </property>
       </widget>
      </item>
@@ -76,7 +76,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>serviceId</string>
+        <string>Service ID</string>
        </property>
       </widget>
      </item>
@@ -147,7 +147,7 @@
      <item row="4" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>rs corrections/100</string>
+        <string>RS corr. [%]</string>
        </property>
       </widget>
      </item>
@@ -167,7 +167,7 @@
      <item row="5" column="0">
       <widget class="QLabel" name="l6">
        <property name="text">
-        <string>Bitrate in kBit/s</string>
+        <string>Bitrate [kBit/s]</string>
        </property>
       </widget>
      </item>
@@ -238,7 +238,7 @@
      <item row="5" column="0">
       <widget class="QLabel" name="label_11">
        <property name="text">
-        <string>audio:</string>
+        <string>Audio:</string>
        </property>
       </widget>
      </item>
@@ -278,7 +278,7 @@
      <item row="1" column="0">
       <widget class="QLabel" name="label_12">
        <property name="text">
-        <string>code rate:</string>
+        <string>Code rate:</string>
        </property>
       </widget>
      </item>
@@ -302,6 +302,9 @@
        </property>
        <property name="text">
         <string>mono</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>

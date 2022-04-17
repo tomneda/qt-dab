@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -24,37 +23,40 @@
  *	want the interface with different devices (including  filehandling)
  *	to be transparent
  */
-#ifndef	__DEVICE_HANDLER__
-#define	__DEVICE_HANDLER__
+#ifndef __DEVICE_HANDLER__
+#define __DEVICE_HANDLER__
 
-#include	<cstdint>
-#include	"dab-constants.h"
-#include	<QObject>
-#include	<QThread>
-#include	<QFrame>
+#include  <cstdint>
+#include  "dab-constants.h"
+#include  <QObject>
+#include  <QThread>
+#include  <QFrame>
 
-class	deviceHandler {
+class	deviceHandler
+{
 public:
-			deviceHandler	();
-virtual			~deviceHandler	();
-virtual		bool	restartReader	(int32_t freq);
-virtual		void	stopReader	();
-virtual		void	setVFOFrequency	(int32_t);
-virtual		int32_t	getVFOFrequency() {return 0;}
-virtual		int32_t	getSamples	(std::complex<float> *, int32_t);
-virtual		int32_t	Samples		();
-virtual		void	resetBuffer	();
-virtual		int16_t	bitDepth	() { return 10;}
-virtual		void	hide		();
-virtual		void	show		();
-virtual		bool	isHidden	();
-virtual		QString deviceName	();
-//
-protected:
-		int32_t	lastFrequency;
-	        int32_t	vfoOffset;
-	        int	theGain;
-		int32_t	coarseOffset;
+  deviceHandler();
+  virtual ~deviceHandler() = default;
+
+  virtual bool restartReader(int32_t freq);
+  virtual void stopReader();
+  virtual void setVFOFrequency(int32_t);
+  virtual int32_t getVFOFrequency() { return 0; }
+  virtual int32_t getSamples(TIQSmpFlt *, int32_t);
+  virtual int32_t Samples();
+  virtual void resetBuffer();
+  virtual int16_t bitDepth() { return 10; }
+  virtual void hide();
+  virtual void show();
+  virtual bool isHidden();
+  virtual QString deviceName();
+
+private:
+    int32_t mLastFrequency;
+    int32_t mVfoOffset;
+    int     mTheGain;
+    int32_t mCoarseOffset;
 };
+
 #endif
 

@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C)  2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,344 +20,409 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include	"tii-viewer.h"
-#include	"iqdisplay.h"
-#include	<QColor>
-#include	<QPen>
-#include	"color-selector.h"
+#include  "tii-viewer.h"
+#include  "iqdisplay.h"
+#include  <QColor>
+#include  <QPen>
+#include  "color-selector.h"
 
-	tiiViewer::tiiViewer	(RadioInterface	*mr,
-	                         QSettings	*dabSettings,
-	                         RingBuffer<std::complex<float>> *sbuffer):
-	                              myFrame (nullptr),
-	                              spectrumCurve ("") {
-int16_t	i;
-QString	colorString	= "black";
-bool	brush;
+tiiViewer::tiiViewer(RadioInterface * mr, QSettings * dabSettings, RingBuffer<TIQSmpFlt> * sbuffer)
+  : mMyFrame(nullptr)
+  , mSpectrumCurve("")
+{
+  QString colorString = "black";
+  bool    brush;
 
-	this	-> myRadioInterface	= mr;
-	this	-> dabSettings		= dabSettings;
-	this	-> tiiBuffer		= sbuffer;
+  mpMyRadioInterface = mr;
+  mpDabSettings      = dabSettings;
+  mpTiiBuffer        = sbuffer;
 
-	dabSettings	-> beginGroup ("tiiViewer");
-	colorString	= dabSettings -> value ("displayColor",
-	                                                 "black"). toString();
-	displayColor	= QColor (colorString);
-	colorString	= dabSettings -> value ("gridColor",
-	                                                 "black"). toString();
-	gridColor	= QColor (colorString);
-	colorString	= dabSettings -> value ("curveColor",
-	                                                 "white"). toString();
-	curveColor	= QColor (colorString);
+  dabSettings->beginGroup("tiiViewer");
+  colorString = dabSettings->value("displayColor", "black").toString();
+  mDisplayColor = QColor(colorString);
+  colorString  = dabSettings->value("gridColor", "black").toString();
+  mGridColor   = QColor(colorString);
+  colorString = dabSettings->value("curveColor", "white").toString();
+  mCurveColor = QColor(colorString);
 
-	brush		= dabSettings -> value ("brush", 0). toInt () == 1;
-	displaySize	= dabSettings -> value ("displaySize",
-	                                                   512).toInt();
-	dabSettings	-> endGroup ();
-	if ((displaySize & (displaySize - 1)) != 0)
-	   displaySize = 1024;
+  brush = (dabSettings->value("brush", 0).toInt() == 1);
+  mDisplaySize = dabSettings->value("displaySize", 512).toInt();
+  dabSettings->endGroup();
 
-	setupUi (&myFrame);
+  if ((mDisplaySize & (mDisplaySize - 1)) != 0)
+  {
+    mDisplaySize = 1024;
+  }
 
-	myFrame. hide();
-	displayBuffer. resize (displaySize);
-	memset (displayBuffer. data (), 0, displaySize * sizeof (double));
-	this	-> spectrumSize	= 2 * displaySize;
-	spectrum		= (std::complex<float> *)fftwf_malloc (sizeof (fftwf_complex) * spectrumSize);
-        plan    = fftwf_plan_dft_1d (spectrumSize,
-                                    reinterpret_cast <fftwf_complex *>(spectrum),
-                                    reinterpret_cast <fftwf_complex *>(spectrum),
-                                    FFTW_FORWARD, FFTW_ESTIMATE);
-	
-	plotgrid	= tiiGrid;
-	plotgrid	-> setCanvasBackground (displayColor);
-//	grid		= new QwtPlotGrid;
+  setupUi(&mMyFrame);
+
+  mMyFrame.hide();
+  mDisplayBuffer.resize(mDisplaySize);
+  memset(mDisplayBuffer.data(), 0, mDisplaySize * sizeof(double));
+  mSpectrumSize = 2 * mDisplaySize;
+  mpSpectrum = (TIQSmpFlt *)fftwf_malloc(sizeof(fftwf_complex) * mSpectrumSize);
+  mPlan = fftwf_plan_dft_1d(mSpectrumSize,
+                            reinterpret_cast <fftwf_complex *>(mpSpectrum),
+                            reinterpret_cast <fftwf_complex *>(mpSpectrum),
+                            FFTW_FORWARD, FFTW_ESTIMATE);
+
+  mpPlotgrid = tiiGrid;
+  mpPlotgrid->setCanvasBackground(mDisplayColor);
+  //grid = new QwtPlotGrid;
+
 #if defined QWT_VERSION && ((QWT_VERSION >> 8) < 0x0601)
-	grid. setMajPen (QPen(gridColor, 0, Qt::DotLine));
+  grid.setMajPen(QPen(gridColor, 0, Qt::DotLine));
 #else
-	grid. setMajorPen (QPen(gridColor, 0, Qt::DotLine));
+  mGrid.setMajorPen(QPen(mGridColor, 0, Qt::DotLine));
 #endif
-	grid. enableXMin (true);
-	grid. enableYMin (true);
+
+  mGrid.enableXMin(true);
+  mGrid.enableYMin(true);
+
 #if defined QWT_VERSION && ((QWT_VERSION >> 8) < 0x0601)
-	grid. setMinPen (QPen(gridColor, 0, Qt::DotLine));
+  grid.setMinPen(QPen(gridColor, 0, Qt::DotLine));
 #else
-	grid. setMinorPen (QPen(gridColor, 0, Qt::DotLine));
+  mGrid.setMinorPen(QPen(mGridColor, 0, Qt::DotLine));
 #endif
-	grid. attach (plotgrid);
 
-	lm_picker       = new QwtPlotPicker (plotgrid -> canvas ());
-        QwtPickerMachine *lpickerMachine =
-                             new QwtPickerClickPointMachine ();
+  mGrid.attach(mpPlotgrid);
 
-        lm_picker       -> setStateMachine (lpickerMachine);
-        lm_picker       -> setMousePattern (QwtPlotPicker::MouseSelect1,
-                                            Qt::RightButton);
-        connect (lm_picker, SIGNAL (selected (const QPointF&)),
-                 this, SLOT (rightMouseClick (const QPointF &)));
+  mpLm_picker = new QwtPlotPicker(mpPlotgrid->canvas());
+  QwtPickerMachine *lpickerMachine = new QwtPickerClickPointMachine();
 
-//	spectrumCurve	= new QwtPlotCurve ("");
-   	spectrumCurve. setPen (QPen(curveColor, 2.0));
-	spectrumCurve. setOrientation (Qt::Horizontal);
-	spectrumCurve.  setBaseline	(get_db (0));
-//	ourBrush	= new QBrush (curveColor);
-//	ourBrush	-> setStyle (Qt::Dense3Pattern);
-	if (brush) {
-	   QBrush ourBrush (curveColor);
-	   ourBrush. setStyle (Qt::Dense3Pattern);
-	   spectrumCurve. setBrush (ourBrush);
-	}
-	spectrumCurve. attach (plotgrid);
-	
-	Marker		= new QwtPlotMarker();
-	Marker		-> setLineStyle (QwtPlotMarker::VLine);
-	Marker		-> setLinePen (QPen (Qt::red));
-	Marker		-> attach (plotgrid);
-	plotgrid	-> enableAxis (QwtPlot::yLeft);
+  mpLm_picker->setStateMachine(lpickerMachine);
+  mpLm_picker->setMousePattern(QwtPlotPicker::MouseSelect1, Qt::RightButton);
 
-	Window. resize (spectrumSize);
-	for (i = 0; i < spectrumSize; i ++) 
-	   Window [i] =
-	        0.42 - 0.5 * cos ((2.0 * M_PI * i) / (spectrumSize - 1)) +
-	              0.08 * cos ((4.0 * M_PI * i) / (spectrumSize - 1));
-	setBitDepth	(12);
+  connect(mpLm_picker, SIGNAL(selected(const QPointF&)), this, SLOT(rightMouseClick(const QPointF&)));
+
+  //spectrumCurve	= new QwtPlotCurve("");
+  mSpectrumCurve.setPen(QPen(mCurveColor, 2.0));
+  mSpectrumCurve.setOrientation(Qt::Horizontal);
+  mSpectrumCurve.setBaseline(get_db(0));
+  //ourBrush = new QBrush (curveColor);
+  //ourBrush->setStyle(Qt::Dense3Pattern);
+
+  if (brush)
+  {
+    QBrush ourBrush(mCurveColor);
+    ourBrush.setStyle(Qt::Dense3Pattern);
+    mSpectrumCurve.setBrush(ourBrush);
+  }
+
+  mSpectrumCurve.attach(mpPlotgrid);
+
+  mpMarker = new QwtPlotMarker();
+  mpMarker->setLineStyle(QwtPlotMarker::VLine);
+  mpMarker->setLinePen(QPen(Qt::red));
+  mpMarker->attach(mpPlotgrid);
+  mpPlotgrid->enableAxis(QwtPlot::yLeft);
+
+  // generate Blackman window
+  mWindow.resize(mSpectrumSize);
+
+  for (int16_t i = 0; i < mSpectrumSize; i++)
+  {
+    mWindow [i] = 0.42 - 0.50 * cos((2.0 * M_PI * i) / (mSpectrumSize - 1)) +
+                         0.08 * cos((4.0 * M_PI * i) / (mSpectrumSize - 1));
+  }
+
+  setBitDepth(12);
 }
 
-    tiiViewer::~tiiViewer() {
-	fftwf_destroy_plan (plan);
-	fftwf_free	(spectrum);
-	myFrame. hide();
-	delete		Marker;
-//	delete		ourBrush;
+tiiViewer::~tiiViewer()
+{
+  fftwf_destroy_plan(mPlan);
+  fftwf_free(mpSpectrum);
+  mMyFrame.hide();
+  delete    mpMarker;
+  //delete		ourBrush;
 }
 
-void	tiiViewer::clear() {
-	transmitterDisplay	-> setText (" ");
+void tiiViewer::clear()
+{
+  transmitterDisplay->setText(" ");
 }
 
-static
-QString tiiNumber (int n) {
-	if (n >= 10)
-	   return QString::number (n);
-	return QString ("0") + QString::number (n);
+static QString tiiNumber(int n)
+{
+  if (n >= 10)
+  {
+    return QString::number(n);
+  }
+
+  return QString("0") + QString::number(n);
 }
 
-void	tiiViewer::showTransmitters	(QByteArray transmitters) {
-	if (myFrame. isHidden())
-	   return;
+void tiiViewer::showTransmitters(const QByteArray & transmitters)
+{
+  if (mMyFrame.isHidden())
+  {
+    return;
+  }
 
-	if (transmitters. size () == 0) {
-	   transmitterDisplay	-> setText (" ");
-	   return;
-	}
+  if (transmitters.size() == 0)
+  {
+    transmitterDisplay->setText(" ");
+    return;
+  }
 
-	QString t	= "transmitter IDs ";
-	for (int i = 0; i < transmitters. size (); i += 2) {
-	   uint8_t mainId	= transmitters. at (i);
-	   uint8_t subId	= transmitters. at (i + 1);
-	   t = t + " (" + tiiNumber (mainId) +
-                    "+" + tiiNumber (subId) + ")";
-        }
-	transmitterDisplay	-> setText (t);
+  QString t = "Transmitter IDs ";
+
+  for (int i = 0; i < transmitters.size(); i += 2)
+  {
+    uint8_t mainId = transmitters.at(i);
+    uint8_t subId  = transmitters.at(i + 1);
+    t = t + " (" + tiiNumber(mainId) + "+" + tiiNumber(subId) + ")";
+  }
+
+  transmitterDisplay->setText(t);
 }
 
-void	tiiViewer::showSpectrum	(int32_t amount) {
-double	X_axis [displaySize];
-double	Y_values [displaySize];
-int16_t	i, j;
-double	temp	= (double)INPUT_RATE / 2 / displaySize;
-int16_t	averageCount	= 3;
+void tiiViewer::showSpectrum(int32_t amount)
+{
+  (void)amount;
+  double  X_axis[mDisplaySize];
+  double  Y_values[mDisplaySize];
+  int16_t i, j;
+  double  temp = (double)INPUT_RATE / 2 / mDisplaySize;
+  int16_t averageCount = 3;
 
-	(void)amount;
-	if (tiiBuffer -> GetRingBufferReadAvailable() < spectrumSize) {
-	   return;
-	}
+  if (mpTiiBuffer->GetRingBufferReadAvailable() < mSpectrumSize)
+  {
+    return;
+  }
 
-	tiiBuffer	-> getDataFromBuffer (spectrum, spectrumSize);
-	tiiBuffer	-> FlushRingBuffer ();
-	if (myFrame. isHidden ())
-	   return;
-//	and window it
-//	first X axis labels
-	for (i = 0; i < displaySize; i ++)
-	   X_axis [i] = 
-	         ((double)0 - (double)(INPUT_RATE / 2) +
-	          (double)((i) * (double) 2 * temp)) / ((double)1000);
-//
-//	get the buffer data
-	for (i = 0; i < spectrumSize; i ++)
-	   spectrum [i] = cmul (spectrum [i], Window [i]);
+  mpTiiBuffer->getDataFromBuffer(mpSpectrum, mSpectrumSize);
+  mpTiiBuffer->FlushRingBuffer();
 
-	fftwf_execute (plan);
-//
-//	and map the spectrumSize values onto displaySize elements
-	for (i = 0; i < displaySize / 2; i ++) {
-	   double f	= 0;
-	   for (j = 0; j < spectrumSize / displaySize; j ++)
-	      f += abs (spectrum [spectrumSize / displaySize * i + j]);
+  if (mMyFrame.isHidden())
+  {
+    return;
+  }
 
-	   Y_values [displaySize / 2 + i] = 
-                                 f / (spectrumSize / displaySize);
-	   f = 0;
-	   for (j = 0; j < spectrumSize / displaySize; j ++)
-	      f += abs (spectrum [spectrumSize / 2 +
-	                             spectrumSize / displaySize * i + j]);
-	   Y_values [i] = f / (spectrumSize / displaySize);
-	}
-//
-//	average the image a little.
-	for (i = 0; i < displaySize; i ++) {
-	   if (std::isnan (Y_values [i]) || std::isinf (Y_values [i]))
-	      continue;
-	   displayBuffer [i] = 
-	          (double)(averageCount - 1) /averageCount * displayBuffer [i] +
-	           1.0f / averageCount * Y_values [i];
-	}
+  //	and window it
+  //	first X axis labels
+  for (i = 0; i < mDisplaySize; i++)
+  {
+    X_axis[i] = ((double)0 - (double)(INPUT_RATE / 2) + (double)((i) * (double)2 * temp)) / ((double)1000);
+  }
 
-	memcpy (Y_values,
-	        displayBuffer. data(), displaySize * sizeof (double));
-	ViewSpectrum (X_axis, Y_values,
-	              AmplificationSlider -> value(),
-	              0 / 1000);
+  //	get the buffer data
+  for (i = 0; i < mSpectrumSize; i++)
+  {
+    mpSpectrum [i] = cmul(mpSpectrum[i], mWindow[i]);
+  }
+
+  fftwf_execute(mPlan);
+
+  const int16_t noSubElem = mSpectrumSize / mDisplaySize;
+
+  //	and map the spectrumSize values onto displaySize elements
+  for (i = 0; i < mDisplaySize / 2; i++)
+  {
+    double f = 0;
+
+    for (j = 0; j < noSubElem; j++)
+    {
+      f += abs(mpSpectrum [noSubElem * i + j]);
+    }
+
+    Y_values [mDisplaySize / 2 + i] = f / noSubElem;
+    f = 0;
+
+    for (j = 0; j < noSubElem; j++)
+    {
+      f += abs(mpSpectrum [mSpectrumSize / 2 + noSubElem * i + j]);
+    }
+
+    Y_values [i] = f / noSubElem;
+  }
+
+  // average the image a little.
+  for (i = 0; i < mDisplaySize; i++)
+  {
+    if (std::isnan(Y_values [i]) || std::isinf(Y_values [i]))
+    {
+      continue;
+    }
+
+    mDisplayBuffer[i] = (double)(averageCount - 1) / averageCount * mDisplayBuffer[i] + 1.0f / averageCount * Y_values [i];
+  }
+
+  memcpy(Y_values, mDisplayBuffer.data(), mDisplaySize * sizeof(double));
+
+  ViewSpectrum(X_axis, Y_values, AmplificationSlider->value(), 0 / 1000);
 }
 
-void	tiiViewer::ViewSpectrum (double *X_axis,
-		                       double *Y1_value,
-	                               double amp,
-	                               int32_t marker) {
-uint16_t	i;
-float	amp1	= amp / 100;
+void tiiViewer::ViewSpectrum(double *X_axis,
+                             double *Y1_value,
+                             double amp,
+                             int32_t marker)
+{
+  float amp1 = amp / 100;
 
-	amp		= amp / 50.0 * (-get_db (0));
-	plotgrid	-> setAxisScale (QwtPlot::xBottom,
-				         (double)X_axis [0],
-				         X_axis [displaySize - 1]);
-	plotgrid	-> enableAxis (QwtPlot::xBottom);
-	plotgrid	-> setAxisScale (QwtPlot::yLeft,
-				         get_db (0), get_db (0) + amp1 * 40);
-//				         get_db (0), get_db (0) + amp);
-//				         get_db (0), 0);
+  amp = amp / 50.0 * (-get_db(0));
+  mpPlotgrid->setAxisScale(QwtPlot::xBottom, (double)X_axis [0],X_axis [mDisplaySize - 1]);
+  mpPlotgrid->enableAxis(QwtPlot::xBottom);
+  mpPlotgrid->setAxisScale(QwtPlot::yLeft, get_db(0), get_db(0) + amp1 * 40);
 
-	for (i = 0; i < displaySize; i ++) 
-	   Y1_value [i] = get_db (amp1 * Y1_value [i]); 
+  for (int16_t i = 0; i < mDisplaySize; i++)
+  {
+    Y1_value[i] = get_db(amp1 * Y1_value[i]);
+  }
 
-	spectrumCurve. setBaseline (get_db (0));
-	Y1_value [0]		= get_db (0);
-	Y1_value [displaySize - 1] = get_db (0);
+  mSpectrumCurve.setBaseline(get_db(0));
+  Y1_value[0]               = get_db(0);
+  Y1_value[mDisplaySize - 1] = get_db(0);
 
-	spectrumCurve. setSamples (X_axis, Y1_value, displaySize);
-	Marker		-> setXValue (marker);
-	plotgrid	-> replot(); 
+  mSpectrumCurve.setSamples(X_axis, Y1_value, mDisplaySize);
+  mpMarker->setXValue(marker);
+  mpPlotgrid->replot();
 }
 
-float	tiiViewer::get_db (float x) {
-	return 20 * log10 ((x + 1) / (float)(normalizer));
+float tiiViewer::get_db(float x)
+{
+  return 20 * log10((x + 1) / mNormalizer);
 }
 
-void	tiiViewer::setBitDepth	(int16_t d) {
+void tiiViewer::setBitDepth(int16_t d)
+{
+  if (d < 0 || d > 32)
+  {
+    d = 24;
+  }
 
-	if (d < 0 || d > 32)
-	   d = 24;
+  mNormalizer = 1.0f;
 
-	normalizer	= 1;
-	while (-- d > 0) 
-	   normalizer <<= 1;
+  while (--d > 0)
+  {
+    mNormalizer *= 2.0;
+  }
 }
 
-void	tiiViewer::show () {
-	myFrame. show ();
+void tiiViewer::show()
+{
+  mMyFrame.show();
 }
 
-void	tiiViewer::hide () {
-	myFrame. hide ();
+void tiiViewer::hide()
+{
+  mMyFrame.hide();
 }
 
-bool	tiiViewer::isHidden () {
-	return myFrame. isHidden ();
+bool tiiViewer::isHidden()
+{
+  return mMyFrame.isHidden();
 }
 
-void	tiiViewer::rightMouseClick	(const QPointF &point) {
-colorSelector *selector;
-int	index;
-	(void)point;
-	selector		= new colorSelector ("display color");
-	index			= selector -> QDialog::exec ();
-	QString displayColor	= selector -> getColor (index);
-	delete selector;
-	if (index == 0)
-	   return;
-	selector		= new colorSelector ("grid color");
-	index			= selector	-> QDialog::exec ();
-	QString gridColor	= selector	-> getColor (index);
-	delete selector;
-	if (index == 0)
-	   return;
-	selector		= new colorSelector ("curve color");
-	index			= selector	-> QDialog::exec ();
-	QString curveColor	= selector	-> getColor (index);
-	delete selector;
-	if (index == 0)
-	   return;
+void tiiViewer::rightMouseClick(const QPointF &point)
+{
+  (void)point;
+  colorSelector *selector;
+  int           index;
 
-	dabSettings	-> beginGroup ("tiiViewer");
-	dabSettings	-> setValue ("displayColor", displayColor);
-	dabSettings	-> setValue ("gridColor", gridColor);
-	dabSettings	-> setValue ("curveColor", curveColor);
-	dabSettings	-> endGroup ();
-	this		-> displayColor	= QColor (displayColor);
-	this		-> gridColor	= QColor (gridColor);
-	this		-> curveColor	= QColor (curveColor);
-	spectrumCurve. setPen (QPen (this -> curveColor, 2.0));
+  selector = new colorSelector("display color");
+  index    = selector->QDialog::exec();
+  QString displayColor = selector->getColor(index);
+  delete selector;
+
+  if (index == 0)
+  {
+    return;
+  }
+
+  selector = new colorSelector("grid color");
+  index    = selector->QDialog::exec();
+  QString gridColor = selector->getColor(index);
+  delete selector;
+
+  if (index == 0)
+  {
+    return;
+  }
+
+  selector = new colorSelector("curve color");
+  index    = selector->QDialog::exec();
+  QString curveColor = selector->getColor(index);
+  delete selector;
+
+  if (index == 0)
+  {
+    return;
+  }
+
+  mpDabSettings->beginGroup("tiiViewer");
+  mpDabSettings->setValue("displayColor", displayColor);
+  mpDabSettings->setValue("gridColor", gridColor);
+  mpDabSettings->setValue("curveColor", curveColor);
+  mpDabSettings->endGroup();
+
+  this->mDisplayColor = QColor(displayColor);
+  this->mGridColor    = QColor(gridColor);
+  this->mCurveColor   = QColor(curveColor);
+  mSpectrumCurve.setPen(QPen(this->mCurveColor, 2.0));
+
 #if defined QWT_VERSION && ((QWT_VERSION >> 8) < 0x0601)
-	grid. setMajPen (QPen(this -> gridColor, 0, Qt::DotLine));
+  grid.setMajPen(QPen(this->gridColor, 0, Qt::DotLine));
 #else
-	grid. setMajorPen (QPen(this -> gridColor, 0, Qt::DotLine));
+  mGrid.setMajorPen(QPen(this->mGridColor, 0, Qt::DotLine));
 #endif
-	grid. enableXMin (true);
-	grid. enableYMin (true);
+
+  mGrid.enableXMin(true);
+  mGrid.enableYMin(true);
+
 #if defined QWT_VERSION && ((QWT_VERSION >> 8) < 0x0601)
-	grid. setMinPen (QPen(this -> gridColor, 0, Qt::DotLine));
+  grid.setMinPen(QPen(this->gridColor, 0, Qt::DotLine));
 #else
-	grid. setMinorPen (QPen(this -> gridColor, 0, Qt::DotLine));
+  mGrid.setMinorPen(QPen(this->mGridColor, 0, Qt::DotLine));
 #endif
-	plotgrid	-> setCanvasBackground (this -> displayColor);
+
+  mpPlotgrid->setCanvasBackground(this->mDisplayColor);
 }
 
-static
-double	Y_values [2000] = {0};
-void	tiiViewer::show_nullPeriod (const QVector<float> &v, double  amp2) {
-double	X_axis [displaySize];
-double	amp	= AmplificationSlider -> value();
+static double Y_values[2000] = { 0 };
+
+void tiiViewer::show_nullPeriod(const QVector<float> &v, double amp2)
+{
+  (void)amp2;
+  double X_axis[mDisplaySize];
+  //double amp = AmplificationSlider->value();
 
 
-	for (int i = 0; i < displaySize; i ++) {
-	   X_axis [i] = i * v. size () / displaySize;;
-	   double x = 0;
-	   for (int j = 0; j < v. size () / displaySize; j ++)
-	      x = abs (v [i * v. size () / displaySize + j]);
-	   Y_values [i] = x;
-	}
+  for (int i = 0; i < mDisplaySize; i++)
+  {
+    X_axis [i] = i * v.size() / mDisplaySize;;
+    double x = 0;
 
-	float Max	= 0;
-	for (int i = 0; i < displaySize; i ++)
-	   if (Y_values [i] > Max)
-	      Max = Y_values [i];
+    for (int j = 0; j < v.size() / mDisplaySize; j++)
+    {
+      x = abs(v [i * v.size() / mDisplaySize + j]);
+    }
 
-	plotgrid        -> setAxisScale (QwtPlot::xBottom,
-                                         (double)X_axis [0],
-                                         X_axis [displaySize - 1]);
-        plotgrid        -> enableAxis (QwtPlot::xBottom);
-        plotgrid        -> setAxisScale (QwtPlot::yLeft,
-                                         0, Max * 2);
-//                                       get_db (0), 0);
-//	for (int i = 0; i < displaySize; i ++) 
-//	   Y_values [i] = get_db (amp * Y_values [i]); 
+    Y_values [i] = x;
+  }
 
-	spectrumCurve. setBaseline (0);
-	Y_values [0]		= 0;
-	Y_values [displaySize - 1] = 0;
+  float Max = 0;
 
-	spectrumCurve. setSamples (X_axis, Y_values, displaySize);
-	plotgrid	-> replot(); 
+  for (int i = 0; i < mDisplaySize; i++)
+  {
+    if (Y_values [i] > Max)
+    {
+      Max = Y_values [i];
+    }
+  }
+
+  mpPlotgrid->setAxisScale(QwtPlot::xBottom, (double)X_axis [0], X_axis [mDisplaySize - 1]);
+  mpPlotgrid->enableAxis(QwtPlot::xBottom);
+  mpPlotgrid->setAxisScale(QwtPlot::yLeft, 0, Max * 2);
+  //for (int i = 0; i < displaySize; i ++)
+  //   Y_values [i] = get_db (amp * Y_values [i]);
+
+  mSpectrumCurve.setBaseline(0);
+  Y_values[0]                = 0;
+  Y_values[mDisplaySize - 1] = 0;
+
+  mSpectrumCurve.setSamples(X_axis, Y_values, mDisplaySize);
+  mpPlotgrid->replot();
 }
 

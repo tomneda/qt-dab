@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -23,27 +22,30 @@
 #ifndef	__ELEMENT_SELECTOR__
 #define	__ELEMENT_SELECTOR__
 #
-#include	<QDialog>
-#include	<QLabel>
-#include	<QTime>
-#include	<QSpinBox>
 #include	<QCheckBox>
 #include	<QComboBox>
+#include	<QDialog>
+#include	<QLabel>
+#include	<QSpinBox>
+#include	<QTime>
 #include	<cstdint>
 
-class	elementSelector: public QDialog {
-Q_OBJECT
+class	elementSelector: public QDialog
+{
+  Q_OBJECT
 public:
-			elementSelector		(const QString &);
-			~elementSelector	();
+  explicit elementSelector(const QString &);
+  ~elementSelector() override = default;
+
 private:
-	QLabel		theService;
-	QComboBox	dayBox;
-	QSpinBox	hourBox;
-	QSpinBox	minuteBox;
-	QCheckBox	readyBox;
+  QLabel    mTheService;
+  QComboBox mDayBox;
+  QSpinBox  mHourBox;
+  QSpinBox  mMinuteBox;
+  QCheckBox mReadyBox;
+
 private slots:
-	void		collectData		();
+  void collectData();
 };
 
 #endif

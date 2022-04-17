@@ -60,7 +60,7 @@ float	*temp 	= (float *)alloca (firsize * sizeof (float));
 	}
 
 	for (int i = 0; i < filterSize; i ++)
-	   filterKernel [i] = std::complex<float> (temp [i] / sum, 0);
+	   filterKernel [i] = TIQSmpFlt (temp [i] / sum, 0);
 }
 
 	LowPassFIR::~LowPassFIR () {
@@ -95,14 +95,14 @@ float	sum = 0;
 	}
 
 	for (int i = 0; i < filterSize; i ++)
-	   filterKernel [i] = std::complex<float> (temp [i] / sum, 0);
+	   filterKernel [i] = TIQSmpFlt (temp [i] / sum, 0);
 }
 //
 //	we process the samples backwards rather than reversing
 //	the kernel
-std::complex<float>	LowPassFIR::Pass (std::complex<float> z) {
+TIQSmpFlt	LowPassFIR::Pass (TIQSmpFlt z) {
 int16_t	i;
-std::complex<float>	tmp	= 0;
+TIQSmpFlt	tmp	= 0;
 
 	Buffer [ip]	= z;
 	for (i = 0; i < filterSize; i ++) {
@@ -120,7 +120,7 @@ float LowPassFIR::Pass (float v) {
 int16_t		i;
 float	tmp	= 0;
 
-	Buffer [ip] = std::complex<float> (v, 0);
+	Buffer [ip] = TIQSmpFlt (v, 0);
 	for (i = 0; i < filterSize; i ++) {
 	   int16_t index = ip - i;
 	   if (index < 0)

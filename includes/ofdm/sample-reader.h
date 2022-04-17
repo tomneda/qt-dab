@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013 .. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -35,49 +34,50 @@
 #include	<vector>
 #include	"device-handler.h"
 #include	"ringbuffer.h"
-//
+
 //      Note:
 //      It was found that enlarging the buffersize to e.g. 8192
 //      cannot be handled properly by the underlying system.
+
 #define DUMPSIZE                4096
 
 class	RadioInterface;
-class	sampleReader : public QObject {
-Q_OBJECT
+class	sampleReader : public QObject
+{
+  Q_OBJECT
 public:
-			sampleReader	(RadioInterface *mr,
-	                         	deviceHandler *theRig,
-	                         	RingBuffer<std::complex<float>> *spectrumBuffer = nullptr);
+  sampleReader(RadioInterface * mr, deviceHandler * theRig, RingBuffer<TIQSmpFlt> *spectrumBuffer = nullptr);
+  ~sampleReader() override = default;
 
-			~sampleReader();
-		void	setRunning	(bool b);
-		float	get_sLevel	();
-		std::complex<float> getSample	(int32_t);
-	        void	getSamples	(std::complex<float> *v,
-	                                 int32_t n, int32_t phase);
-	        void	startDumping	(SNDFILE *);
-	        void	stopDumping();
+  void setRunning(bool b);
+  float get_sLevel();
+  TIQSmpFlt getSample(int32_t);
+  void getSamples(TIQSmpFlt *v, int32_t n, int32_t phase);
+  void startDumping(SNDFILE *);
+  void stopDumping();
+
 private:
-		RadioInterface	*myRadioInterface;
-		deviceHandler	*theRig;
-		RingBuffer<std::complex<float>> *spectrumBuffer;
-		std::vector<std::complex<float>> localBuffer;
-		int32_t		localCounter;
-		int32_t		bufferSize;
-		int32_t		currentPhase;
-		std::atomic<bool>	running;
-		int32_t		bufferContent;
-		float		sLevel;
-		int32_t		sampleCount;
-	        int32_t		corrector;
-		bool		dumping;
-		int16_t         dumpIndex;
-		int16_t         dumpScale;
-		int16_t         dumpBuffer [DUMPSIZE];
-		std::atomic<SNDFILE *>	dumpfilePointer;
+  RadioInterface                    *mpMyRadioInterface{};
+  deviceHandler                     *mpTheRig;
+  RingBuffer<TIQSmpFlt>  *mpSpectrumBuffer;
+  std::vector<TIQSmpFlt> mLocalBuffer;
+  int32_t                           mLocalCounter;
+  int32_t                           mBufferSize;
+  int32_t                           mCurrentPhase;
+  std::atomic<bool>                 mRunning{};
+  int32_t                           mBufferContent;
+  float                             mSLevel;
+  int32_t                           mSampleCount;
+  int32_t                           mCorrector;
+  //bool                              mDumping{};
+  int16_t                           mDumpIndex;
+  int16_t                           mDumpScale;
+  int16_t                           mDumpBuffer[DUMPSIZE]{};
+  std::atomic<SNDFILE *>            mDumpfilePointer{};
+
 signals:
-		void		show_Spectrum (int);
-	        void		show_Corrector (int);
+  void show_Spectrum(int);
+  void show_Corrector(int);
 };
 
 #endif

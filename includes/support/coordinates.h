@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013, 2014, 2015, 2016, 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -29,26 +28,27 @@
 
 class	QSettings;
 
-class	coordinates: public QDialog {
+class	coordinates: public QDialog
+{
 Q_OBJECT
-	public:
-		coordinates	(QSettings *);
-		~coordinates	();
-	private:
-	QSettings	*dabSettings;
-	QLabel		*latitudeText;
-        QLineEdit	*latitude;
-        QLabel		*longitudeText;
-        QLineEdit	*longitude;
-	QPushButton	*acceptButton;
-	bool		latitudeValue;
-	bool		longitudeValue;
+public:
+  coordinates(QSettings *);
+  ~coordinates  ();
+
+private:
+  QSettings   *mpDabSettings;
+  QLabel      *mpLatitudeText;
+  QLineEdit   *mpLatitude;
+  QLabel      *mpLongitudeText;
+  QLineEdit   *mpLongitude;
+  QPushButton *mpAcceptButton;
+  bool        mLatitudeValue;
+  bool        mLongitudeValue;
+
 private slots:
-	void		set_latitude 	();
-	void		set_longitude	();
-	void		handle_acceptButton () ;
+  void set_latitude();
+  void set_longitude();
+  void handle_acceptButton();
 };
 
 #endif
-
-

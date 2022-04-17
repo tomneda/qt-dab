@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,67 +20,85 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include	"preset-handler.h"
-#include	"radio.h"
-#include	<QComboBox>
+#include  "preset-handler.h"
+#include  "radio.h"
+#include  <QComboBox>
 
-	presetHandler::presetHandler	(RadioInterface *radio) {
-	this	-> radio	= radio;
-	this	-> fileName	= "";
+presetHandler::presetHandler(RadioInterface *radio)
+{
+  this->radio    = radio;
+  this->fileName = "";
 }
 
-        presetHandler::~presetHandler   () {
+presetHandler::~presetHandler()
+{
 }
 
-void	presetHandler::loadPresets (QString fileName, QComboBox *cb) {
-QDomDocument xmlBOM;
-QFile f (fileName);
+void presetHandler::loadPresets(QString fileName, QComboBox *cb)
+{
+  QDomDocument xmlBOM;
+  QFile        f(fileName);
 
-	this	-> fileName = fileName;
-	if (!f. open (QIODevice::ReadOnly)) 
-	   return;
+  this->fileName = fileName;
 
-	xmlBOM. setContent (&f);
-	f. close ();
-	QDomElement root	= xmlBOM. documentElement ();
-	QDomElement component	= root. firstChild (). toElement ();
-	while (!component. isNull ()) {
-	   if (component. tagName () == "PRESET_ELEMENT") {
-	      presetData pd;
-	      pd. serviceName = component. attribute ("SERVICE_NAME", "???");
-	      pd. channel     = component. attribute ("CHANNEL", "5A");
-	      cb -> addItem (pd. channel + ":" + pd. serviceName);
-	   }
-	   component = component. nextSibling (). toElement ();
-	}
+  if (!f.open(QIODevice::ReadOnly))
+  {
+    return;
+  }
+
+  xmlBOM.setContent(&f);
+  f.close();
+  QDomElement root      = xmlBOM.documentElement();
+  QDomElement component = root.firstChild().toElement();
+
+  while (!component.isNull())
+  {
+    if (component.tagName() == "PRESET_ELEMENT")
+    {
+      presetData pd;
+      pd.serviceName = component.attribute("SERVICE_NAME", "???");
+      pd.channel     = component.attribute("CHANNEL", "5A");
+      cb->addItem(pd.channel + ":" + pd.serviceName);
+    }
+
+    component = component.nextSibling().toElement();
+  }
 }
 
-void	presetHandler::savePresets (QComboBox *cb) {
-QDomDocument the_presets;
-QDomElement root = the_presets. createElement ("preset_db");
+void presetHandler::savePresets(QComboBox *cb)
+{
+  QDomDocument the_presets;
+  QDomElement  root = the_presets.createElement("preset_db");
 
-	the_presets. appendChild (root);
+  the_presets.appendChild(root);
 
-	for (int i = 1; i < cb -> count (); i ++) {
-	   QStringList list = cb -> itemText (i).
-	                        split (":", QString::SkipEmptyParts);
-           if (list. length () != 2)
-	      continue;
-           QString channel = list. at (0);
-           QString serviceName = list. at (1);
-	   QDomElement presetService = the_presets.
-	                            createElement ("PRESET_ELEMENT");
-	   presetService. setAttribute ("SERVICE_NAME", serviceName);
-	   presetService. setAttribute ("CHANNEL", channel);
-	   root. appendChild (presetService);
-	}
+  for (int i = 1; i < cb->count(); i++)
+  {
+    QStringList list = cb->itemText(i).split(":", QString::SkipEmptyParts);
 
-	QFile file (this -> fileName);
-	if (!file. open (QIODevice::WriteOnly | QIODevice::Text))
-	   return;
+    if (list.length() != 2)
+    {
+      continue;
+    }
 
-	QTextStream stream (&file);
-	stream << the_presets. toString ();
-	file. close ();
+    QString channel     = list.at(0);
+    QString serviceName = list.at(1);
+    QDomElement presetService = the_presets.createElement("PRESET_ELEMENT");
+    presetService.setAttribute("SERVICE_NAME", serviceName);
+    presetService.setAttribute("CHANNEL", channel);
+    root.appendChild(presetService);
+  }
+
+  QFile file(this->fileName);
+
+  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+  {
+    return;
+  }
+
+  QTextStream stream(&file);
+
+  stream << the_presets.toString();
+  file.close();
 }
 

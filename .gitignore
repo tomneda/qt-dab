@@ -3,15 +3,6 @@ dab-maxi/linux-bin
 dab-maxi/build
 dab-maxi/Makefile
 dab-maxi/Output
-dab-mini/linux-bin
-dab-mini/Output
-dab-mini/build
-dab-mini/Makefile
-dab-2/linux-bin
-dab-2/Output
-dab-2/build
-dab-2/Makefile
-
-
-
+dab-maxi/CMakeLists.txt.user
+build*
 

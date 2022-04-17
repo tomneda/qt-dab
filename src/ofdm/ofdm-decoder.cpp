@@ -44,7 +44,7 @@
 	ofdmDecoder::ofdmDecoder	(RadioInterface *mr,
 	                                 uint8_t	dabMode,
 	                                 int16_t	bitDepth,
-	                                 RingBuffer<std::complex<float>> *iqBuffer) :
+	                                 RingBuffer<TIQSmpFlt> *iqBuffer) :
 	                                    params (dabMode),
 	                                    my_fftHandler (dabMode),
 	                                    myMapper (dabMode) {
@@ -77,9 +77,9 @@ void	ofdmDecoder::reset() {
 /**
   */
 void	ofdmDecoder::processBlock_0 (
-	                std::vector <std::complex<float> > buffer) {
+	                std::vector <TIQSmpFlt> buffer) {
 	memcpy (fft_buffer, buffer. data(),
-	                             T_u * sizeof (std::complex<float>));
+	                             T_u * sizeof (TIQSmpFlt));
 
 	my_fftHandler. do_FFT();
 /**
@@ -87,7 +87,7 @@ void	ofdmDecoder::processBlock_0 (
   *	as coming from the FFT as phase reference.
   */
 	memcpy (phaseReference. data (), fft_buffer,
-	                   T_u * sizeof (std::complex<float>));
+	                   T_u * sizeof (TIQSmpFlt));
 }
 //
 //	Just interested. In the ideal case the constellation of the
@@ -99,11 +99,11 @@ float square (float v) {
 	return v * v;
 }
 
-float	ofdmDecoder::computeQuality (std::complex<float> *v) {
+float	ofdmDecoder::computeQuality (TIQSmpFlt *v) {
 int16_t i;
-std::complex<float>	avgPoint	= std::complex<float> (0, 0);
+TIQSmpFlt	avgPoint	= TIQSmpFlt (0, 0);
 float		absVal			= 0;
-std::complex<float>	x [T_u];
+TIQSmpFlt	x [T_u];
 float	nominator	= 0;
 float	denominator	= 0;
 //
@@ -112,7 +112,7 @@ float	denominator	= 0;
 //	is (x, x, where x = abs (I, Q) / sqrt (2);
 
 	for (i = 0; i < carriers; i ++) {
-	   x [i]	= std::complex<float> (abs (real (v [T_u / 2 - carriers / 2 + i])), abs (imag (v [T_u / 2 - carriers / 2 + i])));
+	   x [i]	= TIQSmpFlt (abs (real (v [T_u / 2 - carriers / 2 + i])), abs (imag (v [T_u / 2 - carriers / 2 + i])));
 	   avgPoint	+= x [i];
 	}
 
@@ -135,13 +135,13 @@ float	denominator	= 0;
   */
 
 static	int	cnt	= 0;
-void	ofdmDecoder::decode (std::vector <std::complex<float>> buffer,
+void	ofdmDecoder::decode (std::vector <TIQSmpFlt> buffer,
 	                     int32_t blkno, int16_t *ibits) {
 int16_t	i;
-std::complex<float> conjVector [T_u];
+TIQSmpFlt conjVector [T_u];
 
 	memcpy (fft_buffer, &((buffer. data()) [T_g]),
-	                               T_u * sizeof (std::complex<float>));
+	                               T_u * sizeof (TIQSmpFlt));
 
 //fftlabel:
 /**
@@ -168,7 +168,7 @@ std::complex<float> conjVector [T_u];
   *	The carrier of a block is the reference for the carrier
   *	on the same position in the next block
   */
-	   std::complex<float>	r1 = fft_buffer [index] *
+	   TIQSmpFlt	r1 = fft_buffer [index] *
 	                                    conj (phaseReference [index]);
 	   conjVector [index] = r1;
 	   float ab1	= abs (r1);
@@ -198,7 +198,7 @@ std::complex<float> conjVector [T_u];
 	}
 
 	memcpy (phaseReference. data(), fft_buffer,
-	                            T_u * sizeof (std::complex<float>));
+	                            T_u * sizeof (TIQSmpFlt));
 }
 
 //
@@ -210,22 +210,22 @@ std::complex<float> conjVector [T_u];
 //	so, with that in mind we experiment with formula 5.39
 //	and 5.40 from "OFDM Baseband Receiver Design for Wireless
 //	Communications (Chiueh and Tsai)"
-float	ofdmDecoder::compute_timeOffset (std::complex<float> *r,
-	                                      std::complex<float> *v) {
-std::complex<float> leftTerm;
-std::complex<float> rightTerm;
-std::complex<float> sum	= std::complex<float> (0, 0);
+float	ofdmDecoder::compute_timeOffset (TIQSmpFlt *r,
+	                                      TIQSmpFlt *v) {
+TIQSmpFlt leftTerm;
+TIQSmpFlt rightTerm;
+TIQSmpFlt sum	= TIQSmpFlt (0, 0);
 
 	for (int i = -carriers / 2; i < carriers / 2; i += 6) {
 	   int index_1 = i < 0 ? i + T_u : i;
 	   int index_2 = (i + 1) < 0 ? (i + 1) + T_u : (i + 1);
-	   std::complex<float> s = r [index_1] * conj (v [index_2]);
-	   s = std::complex<float> (abs (real (s)), abs (imag (s)));
-	   leftTerm	= s * conj (std::complex<float> (abs (s) / sqrt (2),
+	   TIQSmpFlt s = r [index_1] * conj (v [index_2]);
+	   s = TIQSmpFlt (abs (real (s)), abs (imag (s)));
+	   leftTerm	= s * conj (TIQSmpFlt (abs (s) / sqrt (2),
 	                                                 abs (s) / sqrt (2)));
 	   s = r [index_2] * conj (v [index_2]);
-	   s = std::complex<float> (abs (real (s)), abs (imag (s)));
-	   rightTerm	= s * conj (std::complex<float> (abs (s) / sqrt (2),
+	   s = TIQSmpFlt (abs (real (s)), abs (imag (s)));
+	   rightTerm	= s * conj (TIQSmpFlt (abs (s) / sqrt (2),
 	                                                 abs (s) / sqrt (2)));
 	   sum += conj (leftTerm) * rightTerm;
 	}
@@ -233,35 +233,35 @@ std::complex<float> sum	= std::complex<float> (0, 0);
 	return arg (sum);
 }
 
-float	ofdmDecoder::compute_frequencyOffset (std::complex<float> *r,
-	                                      std::complex<float> *c) {
+float	ofdmDecoder::compute_frequencyOffset (TIQSmpFlt *r,
+	                                      TIQSmpFlt *c) {
 
-std::complex<float> theta = std::complex<float> (0, 0);
+TIQSmpFlt theta = TIQSmpFlt (0, 0);
 
 	for (int i = - carriers / 2; i < carriers / 2; i += 6) {
 	   int index = i < 0 ? i + T_u : i;
-	   std::complex<float> val = r [index] * conj (c [index]);
-	   val		= std::complex<float> (abs (real (val)),
+	   TIQSmpFlt val = r [index] * conj (c [index]);
+	   val		= TIQSmpFlt (abs (real (val)),
 	                                       abs (imag (val)));
-	   theta	+= val * std::complex<float> (1, -1);
+	   theta	+= val * TIQSmpFlt (1, -1);
 	}
 
 	return arg (theta) / (2 * M_PI) * 2048000 / T_u;
 }
 
-float	ofdmDecoder::compute_clockOffset (std::complex<float> *r,
-	                                  std::complex<float> *v) {
+float	ofdmDecoder::compute_clockOffset (TIQSmpFlt *r,
+	                                  TIQSmpFlt *v) {
 float	offsa	= 0;
 int	offsb	= 0;
 
 	for (int i = - carriers / 2; i < carriers / 2; i += 6) {
 	   int index = i < 0 ? (i + T_u) : i;
 	   int index_2 = i + carriers / 2;
-	   std::complex<float> a1 =
-	              std::complex<float> (abs (real (r [index])),
+	   TIQSmpFlt a1 =
+	              TIQSmpFlt (abs (real (r [index])),
 	                                   abs (imag (r [index])));
-	   std::complex<float> a2 =
-	              std::complex<float> (abs (real (v [index])),
+	   TIQSmpFlt a2 =
+	              TIQSmpFlt (abs (real (v [index])),
 	                                   abs (imag (v [index])));
 	   float s = abs (arg (a1 * conj (a2)));
 	   offsa += index * s;

@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,65 +19,64 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include	"element-selector.h"
-#include	<cstdio>
-#include	<QVBoxLayout>
-#include	<QTime>
-//
-	elementSelector::elementSelector (const QString &serviceName):
-	                                   theService (serviceName),
-	                                   dayBox (),
-	                                   hourBox (),
-	                                   minuteBox (),
-	                                   readyBox ("ready") {
-	                                   
-QTime currentTime = QTime::currentTime ();
-QHBoxLayout	*layOut = new QHBoxLayout ();
-QDate currentDate	= QDate::currentDate ();
-QDate workingDate	= currentDate;
+#include  "element-selector.h"
+#include  <QTime>
+#include  <QVBoxLayout>
+#include  <cstdio>
 
-	dayBox. addItem ("today");
-	workingDate = workingDate. addDays (1);
-	dayBox. addItem (QDate::shortDayName (workingDate. dayOfWeek ()));
-	workingDate = workingDate. addDays (1);
-	dayBox. addItem (QDate::shortDayName (workingDate. dayOfWeek ()));
-	workingDate = workingDate. addDays (1);
-	dayBox. addItem (QDate::shortDayName (workingDate. dayOfWeek ()));
-	workingDate = workingDate. addDays (1);
-	dayBox. addItem (QDate::shortDayName (workingDate. dayOfWeek ()));
-	workingDate = workingDate. addDays (1);
-	dayBox. addItem (QDate::shortDayName (workingDate. dayOfWeek ()));
-	workingDate = workingDate. addDays (1);
-	dayBox. addItem (QDate::shortDayName (workingDate. dayOfWeek ()));
-	dayBox. setToolTip ("days ahead");
-	hourBox. setToolTip ("select the hour in the range 0 .. 23");
-	hourBox. setMaximum (23);
-	hourBox. setValue (currentTime. hour ());
-	minuteBox. setToolTip ("select the minute");
-	minuteBox. setMaximum (59);
-	minuteBox. setValue (currentTime. minute ());
-	readyBox. setToolTip ("click here when time is set");
-	layOut	-> addWidget (&theService);
-	layOut	-> addWidget (&dayBox);
-	layOut	-> addWidget (&hourBox);
-	layOut	-> addWidget (&minuteBox);
-	layOut	-> addWidget (&readyBox);
-	setWindowTitle (tr("time select"));
-	setLayout (layOut);
+elementSelector::elementSelector (const QString &serviceName) :
+  mTheService(serviceName),
+  mDayBox(),
+  mHourBox(),
+  mMinuteBox(),
+  mReadyBox("ready")
+{
+  QTime       currentTime = QTime::currentTime();
+  QHBoxLayout *layOut     = new QHBoxLayout();
+  QDate       currentDate = QDate::currentDate();
+  QDate       workingDate = currentDate;
 
-	connect (&readyBox, SIGNAL (stateChanged (int)),
-	         this, SLOT (collectData ()));
+  mDayBox.addItem("today");
+  workingDate = workingDate.addDays(1);
+  mDayBox.addItem(QDate::shortDayName(workingDate.dayOfWeek()));
+  workingDate = workingDate.addDays(1);
+  mDayBox.addItem(QDate::shortDayName(workingDate.dayOfWeek()));
+  workingDate = workingDate.addDays(1);
+  mDayBox.addItem(QDate::shortDayName(workingDate.dayOfWeek()));
+  workingDate = workingDate.addDays(1);
+  mDayBox.addItem(QDate::shortDayName(workingDate.dayOfWeek()));
+  workingDate = workingDate.addDays(1);
+  mDayBox.addItem(QDate::shortDayName(workingDate.dayOfWeek()));
+  workingDate = workingDate.addDays(1);
+  mDayBox.addItem(QDate::shortDayName(workingDate.dayOfWeek()));
+  mDayBox.setToolTip("days ahead");
+  mHourBox.setToolTip("select the hour in the range 0 .. 23");
+  mHourBox.setMaximum(23);
+  mHourBox.setValue(currentTime.hour());
+  mMinuteBox.setToolTip("select the minute");
+  mMinuteBox.setMaximum(59);
+  mMinuteBox.setValue(currentTime.minute());
+  mReadyBox.setToolTip("click here when time is set");
+  layOut->addWidget(&mTheService);
+  layOut->addWidget(&mDayBox);
+  layOut->addWidget(&mHourBox);
+  layOut->addWidget(&mMinuteBox);
+  layOut->addWidget(&mReadyBox);
+  setWindowTitle(tr("time select"));
+  setLayout(layOut);
+
+  connect(&mReadyBox, &QCheckBox::stateChanged, this, &elementSelector::collectData);
 }
 
-	elementSelector::~elementSelector () {
-}
+void elementSelector::collectData()
+{
+  int val = mHourBox.value() * 60 + mMinuteBox.value();
+  int x   = mDayBox.currentIndex();
 
-void	elementSelector::collectData () {
-int	val	= hourBox. value () * 60 + minuteBox. value ();
-int	x	= dayBox. currentIndex ();
-
-	val	|= x << 16;
-	if (readyBox. isChecked ())
-	   QDialog::done (val);
+  val |= x << 16;
+  if (mReadyBox.isChecked())
+  {
+    QDialog::done(val);
+  }
 }
 

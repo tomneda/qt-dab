@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,60 +19,65 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#
-#ifndef	__PHASEREFERENCE__
-#define	__PHASEREFERENCE__
-#include	<QObject>
-#include	<cstdio>
-#include	<cstdint>
-#include	<vector>
-#include	"fft-handler.h"
-#include	"phasetable.h"
-#include	"dab-constants.h"
-#include	"dab-params.h"
-#include	"process-params.h"
-#include	"ringbuffer.h"
-class	RadioInterface;
-#ifdef	__WITH_JAN__
-class	channel;
+
+#ifndef __PHASEREFERENCE__
+#define __PHASEREFERENCE__
+#include  <QObject>
+#include  <cstdio>
+#include  <cstdint>
+#include  <vector>
+#include  "fft-handler.h"
+#include  "phasetable.h"
+#include  "dab-constants.h"
+#include  "dab-params.h"
+#include  "process-params.h"
+#include  "ringbuffer.h"
+
+class RadioInterface;
+#ifdef  __WITH_JAN__
+class channel;
 #endif
 
-class phaseReference : public QObject, public phaseTable {
-Q_OBJECT
+class phaseReference : public QObject, public phaseTable
+{
+  Q_OBJECT
 public:
-			phaseReference 		(RadioInterface *,
-	                                         processParams *);
-			~phaseReference();
-	int32_t		findIndex		(std::vector<std::complex<float>>, int);
-	int16_t		estimate_CarrierOffset	(std::vector<std::complex<float>>);
-	float		estimate_FrequencyOffset (std::vector<std::complex<float>>);
-//
-	float		phase			(std::vector<std::complex<float>>, int);
-#ifdef	__WITH_JAN__
-	void		estimate		(std::vector<std::complex<float>>&);
-#endif
-//	This one is used in the ofdm decoder
-	std::vector<std::complex<float>> refTable;
-private:
-	dabParams	params;
-	fftHandler	my_fftHandler;
-#ifdef	__WITH_JAN__
-	channel		*theEstimator;
-#endif
-	RingBuffer<float> *response;
-	std::vector<float> phaseDifferences;
-	int16_t		diff_length;
-	int16_t		depth;
-	int32_t		T_u;
-	int32_t		T_g;
-	int16_t		carriers;
+  phaseReference(RadioInterface *, processParams *);
+  ~phaseReference();
 
-	std::complex<float>	*fft_buffer;
-	int32_t		fft_counter;
-	int32_t		framesperSecond;	
-	int32_t		displayCounter;
+  int32_t findIndex(std::vector<TIQSmpFlt>, int);
+  int16_t estimate_CarrierOffset(std::vector<TIQSmpFlt>);
+  float estimate_FrequencyOffset(std::vector<TIQSmpFlt>);
+
+  float phase(std::vector<TIQSmpFlt>, int);
+#ifdef  __WITH_JAN__
+  void estimate(std::vector<TIQSmpFlt>&);
+#endif
+
+  //	This one is used in the ofdm decoder
+  std::vector<TIQSmpFlt> refTable;
+
+private:
+  dabParams           params;
+  fftHandler          my_fftHandler;
+#ifdef  __WITH_JAN__
+  channel             *theEstimator;
+#endif
+  RingBuffer<float>   *response;
+  std::vector<float>  phaseDifferences;
+  int16_t             diff_length;
+  int16_t             depth;
+  int32_t             T_u;
+  int32_t             T_g;
+  int16_t             carriers;
+
+  TIQSmpFlt *fft_buffer;
+  int32_t             fft_counter;
+  int32_t             framesperSecond;
+  int32_t             displayCounter;
+
 signals:
-	void		showCorrelation	(int, int, QVector<int>);
+  void showCorrelation(int, int, QVector<int>);
 };
 #endif
 

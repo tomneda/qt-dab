@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,37 +20,55 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef	__TII_DETECTOR__
-#define	__TII_DETECTOR__
+#ifndef __TII_DETECTOR__
+#define __TII_DETECTOR__
 
-#include	<cstdint>
-#include	"dab-params.h"
-#include	"fft-handler.h"
-#include	<vector>
+#include <cstdint>
+#include "dab-params.h"
+#include "fft-handler.h"
+#include <vector>
 
-class	TII_Detector {
+class TII_Detector
+{
 public:
-			TII_Detector	(uint8_t dabMode, int16_t);
-			~TII_Detector();
-	void		reset		();
-	void		setMode		(bool);
-	void		addBuffer	(std::vector<std::complex<float>>);
-	uint16_t	processNULL	();
+  struct STiiInfo
+  {
+    enum /*class*/ EResult
+    {
+      NONE,
+      NO_PK_FND,  // No Peak Found
+      PK_FND_ML,  // Maximum Likelihood
+      PK_FND_MPS  // Maximum Peak Search
+    };
+
+    void set(EResult iResult, uint8_t iMainId, uint8_t iSubId) {  Result = iResult; MainId = iMainId; SubId = iSubId; }
+    EResult Result = EResult::NONE;
+    uint8_t MainId = 0xFF;
+    uint8_t SubId = 0xFF;
+  };
+
+public:
+  TII_Detector(uint8_t dabMode, int16_t);
+  ~TII_Detector();
+
+  void reset();
+  void setMode(bool);
+  void addBuffer(std::vector<TIQSmpFlt>);
+  STiiInfo processNULL();
 
 private:
-	void			collapse	(std::complex<float> *,
-	                                         float *);
-	bool			detectMode_new;
-	int16_t			depth;
-	uint8_t			invTable [256];
-	dabParams		params;
-	fftHandler		my_fftHandler;
-	int16_t			T_u;
-	int16_t			carriers;
-	std::complex<float>	*fft_buffer;
-	std::vector<complex<float> >	theBuffer;
-	std::vector<float>	window;
+	void collapse(TIQSmpFlt *, float *);
+
+  bool                         mDetectMode_new;
+  int16_t                      mDepth;
+  uint8_t                      mpInvTable[256];
+  dabParams                    mParams;
+  fftHandler                   mMyFFTHandler;
+  int16_t                      mT_u;
+  int16_t                      mCarriers;
+  TIQSmpFlt          *mpFFTBuffer;
+  std::vector<TIQSmpFlt> mTheBuffer;
+  std::vector<float>           mWindow;
 };
 
 #endif
-

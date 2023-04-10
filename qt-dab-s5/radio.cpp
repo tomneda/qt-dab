@@ -620,7 +620,7 @@ uint8_t	dabBand;
 //
 	QPalette lcdPalette;
 #ifndef __MAC__
-#if QT_VERSION >= 0x060000
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 2)
 	lcdPalette. setColor (QPalette::Window, Qt::white);
 #else
 	lcdPalette. setColor (QPalette::Background, Qt::white);
@@ -2023,6 +2023,7 @@ void	RadioInterface::show_snr (int s) {
 
 //	just switch a color, called from the dabprocessor
 void	RadioInterface::setSynced	(bool b) {
+    (void) b;
 }
 //
 //	called from the PAD handler
@@ -2908,7 +2909,7 @@ void	RadioInterface::scheduleSelect (const QString &s) {
 }
 //
 void	RadioInterface::localSelect (const QString &s) {
-#if QT_VERSION >= 0x060000
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 2)
 	QStringList list = s.split (":", Qt::SkipEmptyParts);
 #else
 	QStringList list = s.split (":", QString::SkipEmptyParts);
@@ -3057,6 +3058,7 @@ QString serviceName	= s -> serviceName;
 //
 //	mark the selected service in the service list
 	int rowCount	= model. rowCount ();
+    (void)rowCount;
 	colorServiceName (serviceName, Qt::red, 16, true);
 //
 //	and display the servicename on the serviceLabel
@@ -4637,7 +4639,7 @@ QPixmap p;
 QByteArray theSlide;
 	
 	theSlide. resize (sizeof (pauzeSlide));
-	for (int i = 0; i < sizeof (pauzeSlide); i ++)
+	for (uint32_t i = 0; i < sizeof (pauzeSlide); i ++)
 	   theSlide [i] = pauzeSlide [i];
 	p. loadFromData (theSlide, "png");
 	int w   = 400;
@@ -4714,7 +4716,8 @@ void	RadioInterface::start_etiHandler () {
 }
 
 void	RadioInterface::handle_eti_activeSelector (int k) {
-bool setting	= configWidget. eti_activeSelector	-> isChecked ();
+    (void)k;
+    bool setting	= configWidget. eti_activeSelector	-> isChecked ();
 	if (inputDevice == nullptr)
 	   return;
 

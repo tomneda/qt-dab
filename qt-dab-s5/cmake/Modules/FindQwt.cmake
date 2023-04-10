@@ -22,6 +22,7 @@ find_path(QWT_INCLUDE_DIRS
   /opt/local/include/qwt
   /sw/include/qwt
   /usr/local/lib/qwt.framework/Headers
+  /usr/local/qwt-6.2.0/include
 )
 
 find_library (QWT_LIBRARIES
@@ -35,6 +36,7 @@ find_library (QWT_LIBRARIES
   /opt/local/lib
   /sw/lib
   /usr/local/lib/qwt.framework
+  /usr/local/qwt-6.2.0/lib
 )
 
 set(QWT_FOUND FALSE)

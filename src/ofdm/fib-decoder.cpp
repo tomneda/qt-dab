@@ -569,7 +569,7 @@ int     counter		= getBits   (d, used * 8 + 6, 10);
 
 	(void)Length;
 	(void)CN_bit; (void)OE_bit; (void)PD_bit;
-	fprintf (stderr, "services : %d\n", serviceCount);
+//	fprintf (stderr, "services : %d\n", serviceCount);
 	if (CN_bit == 0)	// only current configuration for now
 	   nrServices (serviceCount);
 	(void)counter;
@@ -982,6 +982,8 @@ char		label [17];
 	QString dataName = toQStringUsingCharset (
 	                                  (const char *) label,
 	                                  (CharacterSet) charSet);
+	for (int i = dataName. length (); i < 16; i ++)
+	   dataName. append (' ');
 	serviceIndex	= findService (dataName);
 	if (serviceIndex == -1) {
 	   createService (dataName, SId, 0);
@@ -1118,8 +1120,8 @@ int	serviceIndex	= findService (SId);
 	if (serviceIndex == -1)
 	   return;
 
-	if (ensemble -> services [serviceIndex]. programType == 0)
-	   return;
+//	if (ensemble -> services [serviceIndex]. programType == 0)
+//	   return;
 	if (!base -> subChannels [subChId]. inUse)
 	   return;
 
@@ -1135,6 +1137,7 @@ int	serviceIndex	= findService (SId);
 	      return;
 	}
 
+	
 	QString dataName = ensemble -> services [serviceIndex]. serviceLabel;
 	if (ensemble -> services [serviceIndex]. is_shown)
 	   showFlag = false;

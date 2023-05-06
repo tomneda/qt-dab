@@ -299,7 +299,21 @@ uint8_t	dabBand;
 
 //	The settings are done, now creation of the GUI parts
 	setupUi (this);
+	int x	= dabSettings -> value ("mainWidget-x", 100). toInt ();
+	int y	= dabSettings -> value ("mainWidget-y", 100). toInt ();
+	int wi	= dabSettings -> value ("main-widget-w", 300). toInt ();
+	int he	= dabSettings -> value ("main-widget-h", 200). toInt ();
+	this	-> resize (QSize (wi, he));
+	this	-> move (QPoint (x, y));
+
 	configWidget. setupUi (&configDisplay);
+	x	= dabSettings -> value ("configWidget-x", 200). toInt ();
+	y	= dabSettings -> value ("configWidget-y", 200). toInt ();
+	wi	= dabSettings -> value ("configWidget-w", 200). toInt ();
+	he	= dabSettings -> value ("configWidget-h", 150). toInt ();
+	configDisplay. resize (QSize (wi, he));
+	configDisplay. move (QPoint (x, y));
+
 	theTechWindow	= new techData (this, dabSettings, &theTechData);
 //
 //	Now we can set the checkbox as saved in the settings
@@ -317,7 +331,7 @@ uint8_t	dabBand;
 
 	configWidget. EPGLabel	-> hide ();
 	configWidget. EPGLabel	-> setStyleSheet ("QLabel {background-color : yellow}");
-	int x = dabSettings -> value ("muteTime", 2). toInt ();
+	x = dabSettings -> value ("muteTime", 2). toInt ();
 	configWidget. muteTimeSetting -> setValue (x);
 
 	x = dabSettings -> value ("switchDelay", 8). toInt ();
@@ -1348,6 +1362,33 @@ void	RadioInterface::TerminateProcess () {
 	   stopScanning (false);
 	running. store	(false);
 	hideButtons	();
+
+	QPoint pos	= this -> mapToGlobal (QPoint (0, 0));
+	int x		= dabSettings -> value ("mainWidget-x", 100). toInt ();
+	int y		= dabSettings -> value ("mainWidget-y", 100). toInt ();
+	if (pos. x () > x + 5)
+	   x = pos. x ();
+	if (pos. y () > y + 35)
+	   y = pos. y ();
+	dabSettings	-> setValue ("mainWidget-x", x);
+	dabSettings	-> setValue ("mainWidget-y", y);
+	QSize size	= this -> size ();
+	dabSettings	-> setValue ("mainwidget-w", size. width ());
+	dabSettings	-> setValue ("mainwidget-h", size. height ());
+	pos		= configDisplay. mapToGlobal (QPoint (0, 0));
+	x		= dabSettings -> value ("configWidget-x", 100). toInt ();
+	y		= dabSettings -> value ("configWidget-y", 100). toInt ();
+	if (pos. x () > x + 5)
+	   x = pos. x ();
+	if (pos. y () > y + 35)
+	   y = pos. y ();
+	
+	dabSettings	-> setValue ("configWidget-x", x);
+	dabSettings	-> setValue ("configWidget-y", y);
+	size		= configDisplay. size ();
+	dabSettings	-> setValue ("configWidget-w", size. width ());
+	dabSettings	-> setValue ("configWidget-h", size. height ());
+	
 //
 #ifdef	DATA_STREAMER
 	fprintf (stderr, "going to close the dataStreamer\n");
@@ -1815,10 +1856,12 @@ deviceHandler	*inputDevice	= nullptr;
 	   fprintf (stderr, "unknown device, failing\n");
 	   return nullptr;
 	}
+	
 //
 //	It took some code, but it seems we have a device
 	my_spectrumViewer. setBitDepth (inputDevice -> bitDepth());
-//
+
+	dabSettings	-> setValue ("device", s);
 //	do we want to see the widget for device control?
 	if (dabSettings -> value ("deviceVisible", 0). toInt ()) {
 	   inputDevice  -> show ();
@@ -3669,7 +3712,7 @@ QString SNR 		= "SNR " + QString::number (channel. snr);
 	                      QString::number (serviceList. size ()) + ";" +
 	                      distanceLabel -> text ();
 
-	   my_scanTable -> addLine ("\n");
+//	   my_scanTable -> addLine ("\n");
 	   my_scanTable -> addLine (headLine);
 	   my_scanTable	-> show ();
 	}

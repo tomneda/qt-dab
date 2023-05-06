@@ -54,11 +54,17 @@ bool	brush;
 	brush		= dabSettings -> value ("brush", 0). toInt () == 1;
 	displaySize	= dabSettings -> value ("displaySize",
 	                                                   512).toInt();
-	dabSettings	-> endGroup ();
+
 	if ((displaySize & (displaySize - 1)) != 0)
 	   displaySize = 1024;
-
-	setupUi (&myFrame);
+	int x   = dabSettings -> value ("position-x", 100). toInt ();
+        int y   = dabSettings -> value ("position-y", 100). toInt ();
+	int w	= dabSettings -> value ("width", 150). toInt ();
+	int h	= dabSettings -> value ("height", 120). toInt ();
+        dabSettings -> endGroup ();
+        setupUi (&myFrame);
+	myFrame. resize (QSize (w, h));
+        myFrame. move (QPoint (x, y));
 
 	myFrame. hide();
 	displayBuffer. resize (displaySize);
@@ -124,7 +130,21 @@ bool	brush;
 	setBitDepth	(12);
 }
 
-    tiiViewer::~tiiViewer() {
+	tiiViewer::~tiiViewer() {
+	dabSettings	-> beginGroup ("tiiViewer");
+	QPoint  pos     = myFrame. mapToGlobal (QPoint (0, 0));
+	int x		= dabSettings -> value ("position-x", 0). toInt ();
+	int y		= dabSettings -> value ("position-y", 0). toInt ();
+	if (pos. x () > x + 5)
+	   x = pos. x ();
+	if (pos. y () > y + 35)
+	   x = pos. y ();
+        dabSettings	-> setValue ("position-x", x);
+        dabSettings	-> setValue ("position-y", y);
+	QSize size	= myFrame. size ();
+	dabSettings	-> setValue ("width", size. width ());
+	dabSettings	-> setValue ("height", size. height ());
+	dabSettings	-> endGroup ();
 	fftwf_destroy_plan (plan);
 	fftwf_free	(spectrum);
 	myFrame. hide();

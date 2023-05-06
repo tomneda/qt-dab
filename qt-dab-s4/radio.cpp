@@ -311,8 +311,22 @@ uint8_t	dabBand;
 
 //	The settings are done, now creation of the GUI parts
 	setupUi (this);
+	int x   = dabSettings -> value ("mainWidget-x", 100). toInt (); 
+        int y   = dabSettings -> value ("mainWidget-y", 100). toInt ();
+	int wi  = dabSettings -> value ("main-widget-w", 300). toInt ();
+	int he  = dabSettings -> value ("main-widget-h", 200). toInt ();
+        this    -> resize (QSize (wi, he));
+        this    -> move (QPoint (x, y));
+
+
 //	dataDisplay	= new QFrame (nullptr);
 	techData. setupUi (&dataDisplay);
+	dabSettings	-> beginGroup ("techDataSettings");
+	x	= dabSettings	-> value ("position-x", 300). toInt ();
+	y	= dabSettings	-> value ("position-y", 300). toInt ();
+	dabSettings	-> endGroup ();
+	dataDisplay. move (QPoint (x, y));
+
 	techData. timeTable_button -> hide ();
 
 	the_audioDisplay	= new audioDisplay (this,
@@ -321,6 +335,9 @@ uint8_t	dabBand;
 	epgLabel	-> hide ();
 	epgLabel	-> setStyleSheet ("QLabel {background-color : yellow}");
 	configWidget. setupUi (&configDisplay);
+	x       = dabSettings -> value ("configWidget-x", 200). toInt ();
+        y       = dabSettings -> value ("configWidget-y", 200). toInt ();
+        configDisplay. move (QPoint (x, y));
 //
 //	Now we can set the checkbox as saved in the settings
 	if (dabSettings -> value ("onTop", 0). toInt () == 1) 
@@ -332,7 +349,7 @@ uint8_t	dabBand;
 	if (dabSettings -> value ("epgFlag", 0). toInt () == 1)
 	   configWidget. epgSelector -> setChecked (true);
 
-	int x = dabSettings -> value ("muteTime", 2). toInt ();
+	x = dabSettings -> value ("muteTime", 2). toInt ();
 	configWidget. muteTimeSetting -> setValue (x);
 
 	x = dabSettings -> value ("switchDelay", 8). toInt ();
@@ -1423,8 +1440,45 @@ void	RadioInterface::TerminateProcess () {
 	if (scanning. load ())
 	   stopScanning (false);
 	running. store	(false);
+
+	QPoint pos      = this -> mapToGlobal (QPoint (0, 0));
+	int	x	= dabSettings -> value ("mainWidget-x", 100). toInt ();
+	int	y	= dabSettings -> value ("mainWidget-y", 100). toInt ();
+	if (pos. x () > x + 5)
+	   x = pos. x ();
+	if (pos. y () > y + 31)
+	   y = pos. y ();
+        dabSettings     -> setValue ("mainWidget-x", x);
+        dabSettings     -> setValue ("mainWidget-y", y);
+	QSize size      = this -> size ();
+        dabSettings     -> setValue ("mainwidget-w", size. width ());
+        dabSettings     -> setValue ("mainwidget-h", size. height ());
+
+        pos		= configDisplay. mapToGlobal (QPoint (0, 0));
+	x		= dabSettings -> value ("configWidget-x", 0). toInt ();
+	y		= dabSettings -> value ("configWidget-y", 0). toInt ();
+	if (pos. x () > x + 5)
+	   x = pos. x ();
+	if (pos. y () > y + 31)
+	   y = pos. y ();
+        dabSettings     -> setValue ("configWidget-x", x);
+        dabSettings     -> setValue ("configWidget-y", y);
+
+	pos		= dataDisplay. mapToGlobal (QPoint (0, 0));
+	dabSettings	-> beginGroup ("techDataSettings");
+	x		= dabSettings -> value ("position-x", 0). toInt ();
+	y		= dabSettings -> value ("position-y", 0). toInt ();
+	if (pos. x () > x + 5)
+	   x = pos. x ();
+	if (pos. y () > y + 31)
+	   y = pos. y ();
+        dabSettings     -> setValue ("position-x", x);
+        dabSettings     -> setValue ("position-y", y);
+	dabSettings	-> endGroup ();
+	
 	dumpControlState (dabSettings);
 	hideButtons	();
+
 #ifdef	DATA_STREAMER
 	fprintf (stderr, "going to close the dataStreamer\n");
 	delete		dataStreamer;
@@ -3848,7 +3902,7 @@ QString SNR 		= "SNR " + QString::number (currentSNR);
 	                      QString::number (serviceList. size ()) + ";" +
 	                      distanceLabel -> text ();
 
-	   my_scanTable -> addLine ("\n");
+//	   my_scanTable -> addLine ("\n");
 	   my_scanTable -> addLine (headLine);
 	   my_scanTable	-> show ();
 	}

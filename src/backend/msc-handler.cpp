@@ -220,7 +220,7 @@ void	mscHandler::reset_Channel () {
 void	mscHandler::stop_service	(descriptorType *d, int flag) {
 	fprintf (stderr, "obsolete function stopService\n");
 	locker. lock ();
-	for (int i = 0; i < theBackends. size (); i ++) {
+	for (size_t i = 0; i < theBackends. size (); i ++) {
 	   Backend *b = theBackends. at (i);
 	   if ((b -> subChId == d -> subchId) && (b -> borf == flag)) {
 	      fprintf (stderr, "stopping (sub)service at subchannel %d\n",
@@ -235,7 +235,7 @@ void	mscHandler::stop_service	(descriptorType *d, int flag) {
 
 void	mscHandler::stop_service	(int subchId, int flag) {
 	locker. lock ();
-	for (int i = 0; i < theBackends. size (); i ++) {
+	for (size_t i = 0; i < theBackends. size (); i ++) {
 	   Backend *b = theBackends. at (i);
 	   if ((b -> subChId == subchId) && (b -> borf == flag)) {
 	      fprintf (stderr, "stopping subchannel %d\n", subchId);
@@ -271,7 +271,7 @@ bool	mscHandler::set_Channel (descriptorType *d,
 	                                     dump,
 	                                     flag));
 	fprintf (stderr, "we have now %d backends running\n",
-	                        theBackends. size ());
+            (int)theBackends. size ());
 	return true;
 }
 

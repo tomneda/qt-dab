@@ -1115,6 +1115,7 @@ void	fibDecoder::bind_audioService (dabConfig *base,
 int16_t	i;
 int16_t	firstFree	= -1;
 bool	showFlag	= true;
+(void)showFlag;
 int	serviceIndex	= findService (SId);
 
 	if (serviceIndex == -1)

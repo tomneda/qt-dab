@@ -415,7 +415,7 @@ uint8_t	dabBand;
 	         this, SLOT (handle_transmitterTags  (int)));
 
 	transmitterTags_local	= configWidget. transmitterTags -> isChecked ();
-	theTechWindow 		-> hide ();
+	theTechWindow 		-> hide ();	// until shown otherwise
 	stillMuting		-> hide ();
 	serviceList. clear ();
 	model . clear ();
@@ -437,10 +437,10 @@ uint8_t	dabBand;
 	configWidget. streamoutSelector	-> hide();
 #ifdef	TCP_STREAMER
 	soundOut		= new tcpStreamer	(20040);
-	theTechWindow		-> hideMisssed		();
+	theTechWindow		-> hide		();
 #elif	QT_AUDIO
 	soundOut		= new Qt_Audio();
-	theTechWindow		-> hideMisssed		();
+	theTechWindow		-> hide		();
 #else
 //	just sound out
 	soundOut		= new audioSink		(latency);
@@ -733,6 +733,8 @@ uint8_t	dabBand;
 	   my_correlationViewer. show ();
 	if (dabSettings -> value ("snrVisible", 0). toInt () == 1)
 	   my_snrViewer. show ();
+	if (dabSettings -> value ("techDataVisible", 0). toInt () == 1)
+	   theTechWindow -> show ();
 
 //	if a device was selected, we just start, otherwise
 //	we wait until one is selected
@@ -1363,28 +1365,13 @@ void	RadioInterface::TerminateProcess () {
 	running. store	(false);
 	hideButtons	();
 
-	QPoint pos	= this -> mapToGlobal (QPoint (0, 0));
-	int x		= dabSettings -> value ("mainWidget-x", 100). toInt ();
-	int y		= dabSettings -> value ("mainWidget-y", 100). toInt ();
-	if (pos. x () > x + 5)
-	   x = pos. x ();
-	if (pos. y () > y + 35)
-	   y = pos. y ();
-	dabSettings	-> setValue ("mainWidget-x", x);
-	dabSettings	-> setValue ("mainWidget-y", y);
+	dabSettings	-> setValue ("mainWidget-x", this -> pos (). x ());
+	dabSettings	-> setValue ("mainWidget-y", this -> pos (). y ());
 	QSize size	= this -> size ();
 	dabSettings	-> setValue ("mainwidget-w", size. width ());
 	dabSettings	-> setValue ("mainwidget-h", size. height ());
-	pos		= configDisplay. mapToGlobal (QPoint (0, 0));
-	x		= dabSettings -> value ("configWidget-x", 100). toInt ();
-	y		= dabSettings -> value ("configWidget-y", 100). toInt ();
-	if (pos. x () > x + 5)
-	   x = pos. x ();
-	if (pos. y () > y + 35)
-	   y = pos. y ();
-	
-	dabSettings	-> setValue ("configWidget-x", x);
-	dabSettings	-> setValue ("configWidget-y", y);
+	dabSettings	-> setValue ("configWidget-x", configDisplay. pos (). x ());
+	dabSettings	-> setValue ("configWidget-y", configDisplay. pos (). y ());
 	size		= configDisplay. size ();
 	dabSettings	-> setValue ("configWidget-w", size. width ());
 	dabSettings	-> setValue ("configWidget-h", size. height ());
@@ -2354,6 +2341,8 @@ void	RadioInterface::handle_detailButton	() {
 	   theTechWindow -> show ();
 	else
 	   theTechWindow -> hide ();
+	dabSettings -> setValue ("techDataVisible",
+	                     theTechWindow -> isHidden () ? 0 : 1);
 }
 //
 //	Whenever the input device is a file, some functions,

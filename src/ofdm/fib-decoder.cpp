@@ -1563,7 +1563,7 @@ std::vector<serviceId> services;
 }
 
 std::vector<serviceId>
-	fibDecoder::insert (std::vector<serviceId> l,
+	fibDecoder::insert (std::vector<serviceId> &l,
 	                        serviceId n, int order) {
 std::vector<serviceId> k;
 	if (l . size () == 0) {

@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,61 +19,58 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef	__OFDM_DECODER__
-#define	__OFDM_DECODER__
+#ifndef __OFDM_DECODER__
+#define __OFDM_DECODER__
 
-#include	"dab-constants.h"
-#include	<QObject>
-#include	<vector>
-#include	<cstdint>
-#include	"ringbuffer.h"
-#include	"phasetable.h"
-#include	"freq-interleaver.h"
-#include	"dab-params.h"
-#include	"fft-handler.h"
+#include "dab-constants.h"
+#include "dab-params.h"
+#include "fft-handler.h"
+#include "freq-interleaver.h"
+#include "ringbuffer.h"
+#include <QObject>
+#include <cstdint>
+#include <vector>
 
-class	RadioInterface;
+class RadioInterface;
 
-class	ofdmDecoder: public QObject {
-Q_OBJECT
+class ofdmDecoder : public QObject {
+  Q_OBJECT
 public:
-		ofdmDecoder		(RadioInterface *,
-	                                 uint8_t,
-	                                 int16_t,
-	                                 RingBuffer<std::complex<float>> * iqBuffer = nullptr);
-		~ofdmDecoder		();
-	void	processBlock_0		(std::vector<std::complex<float> >);
-	void	decode			(std::vector<std::complex<float>> &,
-	                                 int32_t n, std::vector<int16_t> &);
-	void	stop			();
-	void	reset			();
+  ofdmDecoder(RadioInterface *, uint8_t, int16_t,
+              RingBuffer<std::complex<float>> *iqBuffer = nullptr);
+  ~ofdmDecoder() = default;
+  
+  void processBlock_0(std::vector<std::complex<float>>);
+  void decode(const std::vector<std::complex<float> > &, int32_t n, std::vector<int16_t> &);
+  void stop();
+  void reset();
+
 private:
-	RadioInterface	*myRadioInterface;
-	dabParams	params;
-	interLeaver     myMapper;
-	fftHandler	fft;
-	RingBuffer<std::complex<float>> *iqBuffer;
-	float		computeQuality	(std::complex<float> *);
-        float		compute_timeOffset      (std::complex<float> *,
-                                                 std::complex<float> *);
-        float		compute_clockOffset     (std::complex<float> *,
-                                                 std::complex<float> *);
-        float		compute_frequencyOffset (std::complex<float> *,
-                                                 std::complex<float> *);
-	int32_t		T_s;
-	int32_t		T_u;
-	int32_t		T_g;
-	int32_t		nrBlocks;
-	int32_t		carriers;
-	int16_t		getMiddle();
-	std::vector<complex<float>>	phaseReference;
-	std::vector<int16_t>		ibits;
-	phaseTable	*phasetable;
+  RadioInterface *myRadioInterface;
+  dabParams params;
+  interLeaver myMapper;
+  fftHandler fft;
+  RingBuffer<std::complex<float>> *iqBuffer;
+  
+  int32_t T_s;
+  int32_t T_u;
+  int32_t T_g;
+  int32_t nrBlocks;
+  int32_t carriers;
+  int32_t cnt = 0;
+  std::vector<complex<float>> phaseReference;
+  std::vector<complex<float>> fft_buffer;
+  std::vector<std::complex<float>> dataVector;
+ 
+  float compute_mod_quality(const std::vector<std::complex<float>> & v);
+  float compute_time_offset(const std::vector<std::complex<float>> &, const std::vector<std::complex<float>> &);
+  float compute_clock_offset(const std::complex<float> *, const std::complex<float> *);
+  float compute_frequency_offset(const std::vector<std::complex<float>> &, const std::vector<std::complex<float>> &);
+  int16_t getMiddle();
 
 signals:
-	void		showIQ		(int);
-	void		showQuality	(float, float, float);
+  void showIQ(int);
+  void showQuality(float, float, float);
 };
 
 #endif
-

@@ -76,12 +76,6 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QwtPlot" name="iqDisplay">
-         <property name="maximumSize">
-          <size>
-           <width>291</width>
-           <height>181</height>
-          </size>
-         </property>
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;IQ constallation of the decoded signal. Ideally one sees 4 dots, one in each quadrant&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>

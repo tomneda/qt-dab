@@ -63,7 +63,7 @@ QwtLinearColorMap *colorMap  = new QwtLinearColorMap (Qt::black, Qt::white);
 }
 
 void	IQDisplay::setPoint (int x, int y, int val) {
-	plotData [(x + Radius - 1) * 2 * Radius + y + Radius - 1] = val;
+	plotData [(y + Radius - 1) * 2 * Radius + x + Radius - 1] = val;
 }
 
 void	IQDisplay::DisplayIQ (std::complex<float> *z,

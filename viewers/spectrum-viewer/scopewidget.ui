@@ -237,10 +237,13 @@ An &quot;ideal&quot; (i.e. synthetic) signal reaches a value of over 20. Poor si
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="7" column="0" colspan="2">
           <widget class="QCheckBox" name="cbLogIqScope">
            <property name="text">
-            <string>Log</string>
+            <string>IQ scope in log. scale</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

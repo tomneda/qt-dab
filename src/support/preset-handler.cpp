@@ -63,9 +63,12 @@ QDomElement root = the_presets. createElement ("preset_db");
 	the_presets. appendChild (root);
 
 	for (int i = 1; i < cb -> count (); i ++) {
-	   QStringList list = cb -> itemText (i).
-	                        split (":", QString::SkipEmptyParts);
-           if (list. length () != 2)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 2)
+    QStringList list = cb -> itemText (i).split (":", Qt::SkipEmptyParts);
+#else
+    QStringList list = cb -> itemText (i).split (":", QString::SkipEmptyParts);
+#endif
+     if (list. length () != 2)
 	      continue;
            QString channel = list. at (0);
            QString serviceName = list. at (1);

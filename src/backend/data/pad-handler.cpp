@@ -279,6 +279,7 @@ std::vector<uint8_t> data;		// for the local addition
 //	fields, starting with CI = 2, continuing with CI = 3
 void	padHandler::dynamicLabel (uint8_t *data, int16_t length, uint8_t CI) {
 static int16_t segmentno	   = 0;
+(void)segmentno;
 static int16_t remainDataLength    = 0;
 static bool    isLastSegment       = false;
 static bool    moreXPad            = false;

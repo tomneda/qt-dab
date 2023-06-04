@@ -52,8 +52,9 @@
 #include  "waterfall-scope.h"
 #include  "null-scope.h"
 
-#define  SP_DISPLAYSIZE  512
-#define  SP_SPECTRUMSIZE  2048
+constexpr int32_t SP_DISPLAYSIZE = 512;
+constexpr int32_t SP_SPECTRUMSIZE = 2048;
+constexpr int32_t SP_SPECTRUMOVRSMPFAC = (SP_SPECTRUMSIZE / SP_DISPLAYSIZE);
 
 #include  "fft-handler.h"
 
@@ -87,24 +88,29 @@ private:
   QSettings * dabSettings;
   RingBuffer<std::complex<float>> * spectrumBuffer;
   RingBuffer<std::complex<float>> * iqBuffer;
-  QwtPlotPicker * lm_picker;
-  QColor displayColor;
-  QColor gridColor;
-  QColor curveColor;
+  QwtPlotPicker * lm_picker{};
+  QColor mDisplayColor;
+  QColor mGridColor;
+  QColor mCurveColor;
 
   fftHandler fft;
-  std::complex<float> spectrum[SP_SPECTRUMSIZE];
-  double displayBuffer[SP_DISPLAYSIZE];
-  float Window[SP_SPECTRUMSIZE];;
-  QwtPlotMarker * Marker;
-  QwtPlot * plotgrid;
-  QwtPlotGrid * grid;
-  QwtPlotCurve * spectrumCurve;
-  QBrush * ourBrush;
-  int32_t indexforMarker;
+
+  std::array<std::complex<float>, SP_SPECTRUMSIZE> spectrum{ 0 };
+  std::array<double, SP_SPECTRUMSIZE> displayBuffer{ 0 };
+  std::array<float,  SP_SPECTRUMSIZE> Window{ 0 };
+  std::array<double, SP_SPECTRUMSIZE> X_axis{ 0 };
+  std::array<double, SP_SPECTRUMSIZE> Y_values{ 0 };
+  std::array<double, SP_SPECTRUMSIZE> Y2_values{ 0 };
+
+  QwtPlotMarker * Marker{};
+  QwtPlot * plotgrid{};
+  QwtPlotGrid * grid{};
+  QwtPlotCurve * spectrumCurve{};
+  QBrush * ourBrush{};
+  int32_t indexforMarker{};
   void ViewSpectrum(double *, double *, double, int);
-  float get_db(float);
-  int32_t normalizer;
+  float get_db(float) const;
+  int32_t normalizer{};
 
   IQDisplay * myIQDisplay;
   spectrumScope * mySpectrumScope;

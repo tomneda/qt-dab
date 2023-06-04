@@ -90,7 +90,7 @@ int     i, j;
 //	delete	WaterfallData;
 }
 
-void    waterfallScope::display (double *X_axis,
+void    waterfallScope::display (const double *X_axis,
 	                         double *Y1_value,
 	                         double  amp,
 	                         int32_t marker) {

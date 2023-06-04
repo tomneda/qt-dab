@@ -81,7 +81,7 @@ bool	brush;
 	delete		grid;
 }
 
-void	spectrumScope::showSpectrum	(double *X_axis,
+void	spectrumScope::showSpectrum	(const double *X_axis,
 	                                 double *Y_value,
 	                                 int amplification,
 	                                 int	frequency) {

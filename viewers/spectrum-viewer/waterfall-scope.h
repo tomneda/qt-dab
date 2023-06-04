@@ -46,7 +46,7 @@ Q_OBJECT
 public:
 		waterfallScope	(QwtPlot *, int, int);
 		~waterfallScope	();
-	void	display		(double *, double *,
+	void	display		(const double *, double *,
 	                         double, int32_t);
 private:
 	QwtPlot		*plotgrid;

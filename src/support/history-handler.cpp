@@ -74,9 +74,12 @@ QDomElement root = the_history. createElement ("history_db");
 	the_history. appendChild (root);
 
 	for (int i = 1; i < historyList. size (); i ++) {
-	   QStringList list = historyList. at (i).
-	                        split (":", QString::SkipEmptyParts);
-           if (list. length () != 2)
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 2)
+    QStringList list = historyList. at (i). split (":", Qt::SkipEmptyParts);
+#else
+    QStringList list = historyList. at (i). split (":", QString::SkipEmptyParts);
+#endif
+     if (list. length () != 2)
 	      continue;
            QString channel = list. at (0);
            QString serviceName = list. at (1);

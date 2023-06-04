@@ -29,7 +29,8 @@
 
 
 spectrumViewer::spectrumViewer(RadioInterface * mr, QSettings * dabSettings, RingBuffer<std::complex<float>> * sbuffer, RingBuffer<std::complex<float>> * ibuffer)
-  : myFrame(nullptr),
+  : Ui_scopeWidget(),
+    myFrame(nullptr),
     fft(SP_SPECTRUMSIZE, false)
 {
   int16_t i;
@@ -57,9 +58,9 @@ spectrumViewer::spectrumViewer(RadioInterface * mr, QSettings * dabSettings, Rin
 
   for (i = 0; i < SP_SPECTRUMSIZE; i++)
   {
-    Window[i] = 0.42
-              - 0.50 * cos((2.0 * M_PI * i) / (SP_SPECTRUMSIZE - 1))
-              + 0.08 * cos((4.0 * M_PI * i) / (SP_SPECTRUMSIZE - 1));
+    Window[i] = static_cast<float>(0.42
+                                 - 0.50 * cos((2.0 * M_PI * i) / (SP_SPECTRUMSIZE - 1))
+                                 + 0.08 * cos((4.0 * M_PI * i) / (SP_SPECTRUMSIZE - 1)));
   }
 
   mySpectrumScope = new spectrumScope(dabScope, SP_DISPLAYSIZE, dabSettings);
@@ -91,9 +92,7 @@ spectrumViewer::~spectrumViewer()
 void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
 {
   (void)amount;
-  double X_axis[SP_DISPLAYSIZE];
-  double Y_values[SP_DISPLAYSIZE];
-  double Y2_values[SP_DISPLAYSIZE];
+
   double temp = (double)INPUT_RATE / 2 / SP_DISPLAYSIZE;
   int16_t averageCount = 5;
 
@@ -102,8 +101,9 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
     return;
   }
 
-  spectrumBuffer->getDataFromBuffer(spectrum, SP_SPECTRUMSIZE);
+  spectrumBuffer->getDataFromBuffer(spectrum.data(), SP_SPECTRUMSIZE);
   spectrumBuffer->FlushRingBuffer();
+
   if (myFrame.isHidden())
   {
     spectrumBuffer->FlushRingBuffer();
@@ -113,8 +113,9 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
   //	first X axis labels
   for (int i = 0; i < SP_DISPLAYSIZE; i++)
   {
-    X_axis[i] = ((double)vfoFrequency - (double)(INPUT_RATE / 2) + (double)((i) * (double)2 * temp)) / ((double)1000);
+    X_axis[i] = ((double)vfoFrequency - (double)(int)(INPUT_RATE / 2) + (double)((i) * (double)2 * temp)) / 1000.0;
   }
+
   //
   //	and window it
   //	get the buffer data
@@ -130,7 +131,7 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
     }
   }
 
-  fft.fft(spectrum);
+  fft.fft(spectrum.data());
   //
   //	and map the SP_SPECTRUMSIZE values onto SP_DISPLAYSIZE elements
   for (int i = 0; i < SP_DISPLAYSIZE / 2; i++)
@@ -141,13 +142,13 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
       f += abs(spectrum[SP_SPECTRUMSIZE / SP_DISPLAYSIZE * i + j]);
     }
 
-    Y_values[SP_DISPLAYSIZE / 2 + i] = f / (SP_SPECTRUMSIZE / SP_DISPLAYSIZE);
+    Y_values[SP_DISPLAYSIZE / 2 + i] = f / (double)SP_SPECTRUMOVRSMPFAC; // (int) ->avoid clang-tidy issue
     f = 0;
     for (int j = 0; j < SP_SPECTRUMSIZE / SP_DISPLAYSIZE; j++)
     {
       f += abs(spectrum[SP_SPECTRUMSIZE / 2 + SP_SPECTRUMSIZE / SP_DISPLAYSIZE * i + j]);
     }
-    Y_values[i] = f / (SP_SPECTRUMSIZE / SP_DISPLAYSIZE);
+    Y_values[i] = f / SP_SPECTRUMOVRSMPFAC;
   }
   //
   //	average the image a little.
@@ -158,16 +159,16 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
       continue;
     }
 
-    displayBuffer[i] = (double)(averageCount - 1) / averageCount * displayBuffer[i] + 1.0f / averageCount * Y_values[i];
+    displayBuffer[i] = (double)(averageCount - 1) / averageCount * displayBuffer[i] + 1.0 / averageCount * Y_values[i];
   }
 
-  memcpy(Y_values, displayBuffer, SP_DISPLAYSIZE * sizeof(double));
-  memcpy(Y2_values, displayBuffer, SP_DISPLAYSIZE * sizeof(double));
-  mySpectrumScope->showSpectrum(X_axis, Y_values, scopeAmplification->value(), vfoFrequency / 1000);
-  myWaterfallScope->display(X_axis, Y2_values, dabWaterfallAmplitude->value(), vfoFrequency / 1000);
+  memcpy(Y_values.data(), displayBuffer.data(), SP_DISPLAYSIZE * sizeof(double));
+  memcpy(Y2_values.data(), displayBuffer.data(), SP_DISPLAYSIZE * sizeof(double));
+  mySpectrumScope->showSpectrum(X_axis.data(), Y_values.data(), scopeAmplification->value(), vfoFrequency / 1000);
+  myWaterfallScope->display(X_axis.data(), Y2_values.data(), dabWaterfallAmplitude->value(), vfoFrequency / 1000);
 }
 
-float spectrumViewer::get_db(float x)
+float spectrumViewer::get_db(float x) const
 {
   return 20 * log10((x + 1) / (float)(normalizer));
 }
@@ -238,9 +239,9 @@ void spectrumViewer::showIQ(int amount)
       }
     }
   }
-  avg /= t;
+  avg /= (float)t;
 
-  myIQDisplay->DisplayIQ(Values, 512, scopeWidth / avg);
+  myIQDisplay->DisplayIQ(Values, 512, (float)scopeWidth / avg);
 }
 
 void spectrumViewer::showQuality(float q, float timeOffset, float freqOffset)
@@ -288,6 +289,7 @@ void spectrumViewer::show_nullPeriod(float * v, int amount)
 
 void spectrumViewer::rightMouseClick(const QPointF & point)
 {
+  (void) point;
   colorSelector * selector;
   int index;
   selector = new colorSelector("display color");
@@ -321,15 +323,15 @@ void spectrumViewer::rightMouseClick(const QPointF & point)
   dabSettings->setValue("curveColor", curveColor);
   dabSettings->endGroup();
 
-  this->displayColor = QColor(displayColor);
-  this->gridColor = QColor(gridColor);
-  this->curveColor = QColor(curveColor);
-  spectrumCurve->setPen(QPen(this->curveColor, 2.0));
+  mDisplayColor = QColor(displayColor);
+  mGridColor = QColor(gridColor);
+  mCurveColor = QColor(curveColor);
+  spectrumCurve->setPen(QPen(mCurveColor, 2.0));
 #if defined QWT_VERSION && ((QWT_VERSION >> 8) < 0x0601)
   grid		-> setMajPen (QPen(this -> gridColor, 0,
                                                      Qt::DotLine));
 #else
-  grid->setMajorPen(QPen(this->gridColor, 0, Qt::DotLine));
+  grid->setMajorPen(QPen(mGridColor, 0, Qt::DotLine));
 #endif
   grid->enableXMin(true);
   grid->enableYMin(true);
@@ -337,13 +339,12 @@ void spectrumViewer::rightMouseClick(const QPointF & point)
   grid		-> setMinPen (QPen(this -> gridColor, 0,
                                                      Qt::DotLine));
 #else
-  grid->setMinorPen(QPen(this->gridColor, 0, Qt::DotLine));
+  grid->setMinorPen(QPen(mGridColor, 0, Qt::DotLine));
 #endif
-  plotgrid->setCanvasBackground(this->displayColor);
+  plotgrid->setCanvasBackground(mDisplayColor);
 }
 
 void spectrumViewer::showFrequency(float f)
 {
   frequencyDisplay->display(f);
 }
-

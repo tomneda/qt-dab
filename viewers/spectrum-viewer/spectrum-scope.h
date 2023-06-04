@@ -30,7 +30,7 @@ public:
 	                         int,
 	                         QSettings *);
 		~spectrumScope	();
-	void	showSpectrum	(double *, double *, int, int);
+	void	showSpectrum	(const double *, double *, int, int);
 	void	setBitDepth	(int);
 
 private:

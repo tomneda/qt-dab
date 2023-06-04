@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2008, 2009, 2010
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,50 +19,52 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef	__IQDISPLAY__
-#define	__IQDISPLAY__
+#ifndef  __IQDISPLAY__
+#define  __IQDISPLAY__
 
-#include	"dab-constants.h"
-#include	<vector>
-#include	<qwt.h>
-#include	<qwt_slider.h>
-#include	<qwt_plot.h>
-#include	<qwt_plot_curve.h>
-#include	<qwt_plot_marker.h>
-#include	<qwt_plot_grid.h>
-#include	<qwt_dial.h>
-#include	<qwt_dial_needle.h>
-#include	<qwt_plot_spectrogram.h>
-#include	<qwt_color_map.h>
-#include	<qwt_plot_spectrogram.h>
-#include	<qwt_scale_widget.h>
-#include	<qwt_scale_draw.h>
-#include	<qwt_plot_zoomer.h>
-#include	<qwt_plot_panner.h>
-#include	<qwt_plot_layout.h>
-#include	"dab-constants.h"
+#include  "dab-constants.h"
+#include  <vector>
+#include  <qwt.h>
+#include  <qwt_slider.h>
+#include  <qwt_plot.h>
+#include  <qwt_plot_curve.h>
+#include  <qwt_plot_marker.h>
+#include  <qwt_plot_grid.h>
+#include  <qwt_dial.h>
+#include  <qwt_dial_needle.h>
+#include  <qwt_plot_spectrogram.h>
+#include  <qwt_color_map.h>
+#include  <qwt_plot_spectrogram.h>
+#include  <qwt_scale_widget.h>
+#include  <qwt_scale_draw.h>
+#include  <qwt_plot_zoomer.h>
+#include  <qwt_plot_panner.h>
+#include  <qwt_plot_layout.h>
+#include  "dab-constants.h"
+
 /*
  *	for the waterfall display
  */
 
-class IQDisplay: public QObject, public QwtPlotSpectrogram {
+class IQDisplay : public QObject, public QwtPlotSpectrogram
+{
 Q_OBJECT
 public:
-	IQDisplay		(QwtPlot *, int16_t);
-	~IQDisplay();
-void	DisplayIQ		(std::complex<float> *, int, float);
+  IQDisplay(QwtPlot *, int16_t);
+  ~IQDisplay();
+  void DisplayIQ(const complex<float> * z, int amount, float scale);
 private:
-	int32_t			x_amount;
-	std::vector<double>	plotData;
-	std::vector<double>	plot2;
-//	std::vector<complex<int> > Points;
-//	std::complex<int> 	*Points;
-	QwtPlot			*plotgrid;
-	int			_OutputRate;
-	int			Radius;
-	int			CycleCount;
-	void			setPoint	(int, int, int);
+  int32_t x_amount;
+  std::vector<double> plotData;
+  std::vector<double> plot2;
+  QwtPlot * plotgrid;
+  int _OutputRate;
+  int Radius;
+  int CycleCount;
+
+  void setPoint(int, int, int);
 private slots:
 };
+
 #endif
 

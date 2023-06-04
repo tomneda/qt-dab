@@ -36,7 +36,10 @@
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in/out&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="value">
-            <number>25</number>
+            <number>33</number>
+           </property>
+           <property name="sliderPosition">
+            <number>33</number>
            </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -224,6 +227,20 @@ An &quot;ideal&quot; (i.e. synthetic) signal reaches a value of over 20. Poor si
            </property>
            <property name="segmentStyle">
             <enum>QLCDNumber::Flat</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QCheckBox" name="cbLogIqScope">
+           <property name="text">
+            <string>Log</string>
            </property>
           </widget>
          </item>

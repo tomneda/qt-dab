@@ -52,7 +52,7 @@ Q_OBJECT
 public:
   IQDisplay(QwtPlot *, int16_t);
   ~IQDisplay();
-  void DisplayIQ(const complex<float> * z, int amount, float scale);
+  void DisplayIQ(const std::complex<float> * z, int amount, float scale, float ref);
 private:
   int32_t x_amount;
   std::vector<double> plotData;
@@ -61,8 +61,10 @@ private:
   int _OutputRate;
   int Radius;
   int CycleCount;
+  float lastCircleSize{ 10 };
 
   void setPoint(int, int, int);
+  void draw_circle(float ref, int val);
 private slots:
 };
 

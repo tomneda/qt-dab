@@ -241,7 +241,7 @@ void spectrumViewer::showIQ(int amount)
   }
   avg /= (float)t;
 
-  myIQDisplay->DisplayIQ(Values, 512, (float)scopeWidth / avg);
+  myIQDisplay->DisplayIQ(Values, 512, (float)scopeWidth / avg, (float)scopeWidth);
 }
 
 void spectrumViewer::showQuality(float q, float timeOffset, float freqOffset)

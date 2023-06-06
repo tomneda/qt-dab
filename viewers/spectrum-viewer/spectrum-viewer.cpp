@@ -206,12 +206,12 @@ bool spectrumViewer::isHidden()
 
 void spectrumViewer::showIQ(int amount)
 {
-  std::complex<float> Values[amount];
+  std::complex<float> Values[amount]; // amount typ 1536
 
   const int scopeWidth = scopeSlider->value();
   const bool logIqScope = cbLogIqScope->isChecked();
 
-  const int32_t t = iqBuffer->getDataFromBuffer(Values, amount);
+  const int32_t numRead = iqBuffer->getDataFromBuffer(Values, amount);
 
   if (myFrame.isHidden())
   {
@@ -220,7 +220,7 @@ void spectrumViewer::showIQ(int amount)
 
   float avg = 0;
 
-  for (auto i = 0; i < t; i++)
+  for (auto i = 0; i < numRead; i++)
   {
     const float r = fabs(Values[i]);
 
@@ -231,7 +231,7 @@ void spectrumViewer::showIQ(int amount)
         const float phi = std::arg(Values[i]);
         const float rl = log10f(1.0f + r); // no scaling necessary here due to averaging
         Values[i] = rl * std::exp(std::complex<float>(0, phi)); // retain phase only log the vector length
-        avg += rl / 2.0f; // dividing due to similar looking lin <-> log
+        avg += rl; // dividing due to similar looking lin <-> log
       }
       else
       {
@@ -239,9 +239,9 @@ void spectrumViewer::showIQ(int amount)
       }
     }
   }
-  avg /= (float)t;
+  avg /= (float)numRead;
 
-  myIQDisplay->DisplayIQ(Values, 512, (float)scopeWidth / avg, (float)scopeWidth);
+  myIQDisplay->display_iq(Values, (float)scopeWidth, avg);
 }
 
 void spectrumViewer::showQuality(float q, float timeOffset, float freqOffset)

@@ -22,51 +22,42 @@
 #include  "iqdisplay.h"
 #include  "spectrogramdata.h"
 
-/*
- *	iq circle plotter
- */
-SpectrogramData * IQData = nullptr;
-static std::array<std::complex<int>, 512> Points;
+SpectrogramData * sIQData = nullptr;
 
-IQDisplay::IQDisplay(QwtPlot * plot, int16_t x)
-  : QwtPlotSpectrogram()
+IQDisplay::IQDisplay(QwtPlot * plot, int32_t iNoValues)
+  : QwtPlotSpectrogram(),
+    mNoValues(iNoValues)
 {
-  QwtLinearColorMap * colorMap = new QwtLinearColorMap(Qt::darkBlue, Qt::yellow);
+  auto * const colorMap = new QwtLinearColorMap(Qt::darkBlue, Qt::yellow);
 
   setRenderThreadCount(1);
-  Radius = 100;
-  plotgrid = plot;
-  x_amount = 512;
-  CycleCount = 0;
-  this->setColorMap(colorMap);
-  plotData.resize(2 * Radius * 2 * Radius);
-  plot2.resize(2 * Radius * 2 * Radius);
-  memset(plotData.data(), 0, 2 * 2 * Radius * Radius * sizeof(double));
-  IQData = new SpectrogramData(plot2.data(), 0, 2 * Radius, 2 * Radius, 2 * Radius, 50.0);
-  for (int i = 0; i < x_amount; i++)
-  {
-    Points[i] = std::complex<int>(0, 0);
-  }
-  this->setData(IQData);
+  mPlotgrid = plot;
+  setColorMap(colorMap);
+  mPoints.resize(iNoValues, { 0, 0 });
+  mPlotDataBackgroundBuffer.resize(2 * RADIUS * 2 * RADIUS);
+  mPlotDataDrawBuffer.resize(2 * RADIUS * 2 * RADIUS);
+  memset(mPlotDataBackgroundBuffer.data(), 0, 2 * 2 * RADIUS * RADIUS * sizeof(double));
+  sIQData = new SpectrogramData(mPlotDataDrawBuffer.data(), 0, 2 * RADIUS, 2 * RADIUS, 2 * RADIUS, 50.0);
+  setData(sIQData);
   plot->enableAxis(QwtPlot::xBottom, false);
   plot->enableAxis(QwtPlot::yLeft, false);
-  this->setDisplayMode(QwtPlotSpectrogram::ImageMode, true);
-  plotgrid->replot();
+  setDisplayMode(QwtPlotSpectrogram::ImageMode, true);
+  mPlotgrid->replot();
 }
 
 IQDisplay::~IQDisplay()
 {
-  this->detach();
-  //	delete		IQData;
+  detach();
+  // delete sIQData;
 }
 
-void IQDisplay::setPoint(int x, int y, int val)
+inline void IQDisplay::set_point(int x, int y, int val)
 {
-  //plotData[(y + Radius - 1) * 2 * Radius + x + Radius - 1] = val;
-  plotData.at((y + Radius - 1) * 2 * Radius + x + Radius - 1) = val;
+  //mPlotDataBackgroundBuffer[(y + RADIUS - 1) * 2 * RADIUS + x + RADIUS - 1] = val;
+  mPlotDataBackgroundBuffer.at((y + RADIUS - 1) * 2 * RADIUS + x + RADIUS - 1) = val;
 }
 
-template <class T> inline void symmetric_limit(T &ioVal, const T iLimit)
+template<typename T> inline void symmetric_limit(T & ioVal, const T iLimit)
 {
   if (ioVal > iLimit)
   {
@@ -78,64 +69,80 @@ template <class T> inline void symmetric_limit(T &ioVal, const T iLimit)
   }
 }
 
-void IQDisplay::DisplayIQ(const std::complex<float> * z, int amount, float scale, float ref)
+void IQDisplay::display_iq(const std::complex<float> * z, float scale, float ref)
 {
-  //	clean the screen
-  for (int i = 0; i < amount; i++)
+  const float scaleNormed = scale / ref;
+
+  clean_screen_from_old_data_points();
+  draw_cross();
+  repaint_circle(scale / 100.0f);
+
+  for (int i = 0; i < mNoValues; i++)
   {
-    setPoint(real(Points[i]), imag(Points[i]), 0);
+    int x = (int)(scaleNormed * real(z[i]));
+    int y = (int)(scaleNormed * imag(z[i]));
+
+    symmetric_limit(x, RADIUS - 1);
+    symmetric_limit(y, RADIUS - 1);
+
+    mPoints[i] = std::complex<int>(x, y);
+    set_point(x, y, 100);
   }
 
-  // draw cross
-  for (int32_t i = -(Radius-1); i < Radius; i++)
-  {
-    setPoint(0, i, 10);
-    setPoint(i, 0, 10);
-  }
+  memcpy(mPlotDataDrawBuffer.data(), mPlotDataBackgroundBuffer.data(), 2 * 2 * RADIUS * RADIUS * sizeof(double));
 
-  // clear and draw unit circle
-  draw_circle(lastCircleSize, 0);
-  draw_circle(ref, 10);
-  lastCircleSize = ref;
-
-  for (int i = 0; i < amount; i++)
-  {
-    int x = (int)(scale * real(z[i]));
-    int y = (int)(scale * imag(z[i]));
-
-    symmetric_limit(x, Radius - 1);
-    symmetric_limit(y, Radius - 1);
-
-    Points[i] = std::complex<int>(x, y);
-    setPoint(x, y, 100);
-  }
-
-  memcpy(plot2.data(), plotData.data(), 2 * 2 * Radius * Radius * sizeof(double));
-  this->detach();
-  this->setData(IQData);
-  this->setDisplayMode(QwtPlotSpectrogram::ImageMode, true);
-  this->attach(plotgrid);
-  plotgrid->replot();
+  detach();
+  setData(sIQData);
+  setDisplayMode(QwtPlotSpectrogram::ImageMode, true);
+  attach(mPlotgrid);
+  mPlotgrid->replot();
 }
 
-void IQDisplay::draw_circle(float ref, int val)
+void IQDisplay::clean_screen_from_old_data_points()
 {
-  int32_t MAX_CIRCLE_POINTS = 45;
-  float SCALE = ref / 100.0f;
+  for (int i = 0; i < mNoValues; i++)
+  {
+    set_point(real(mPoints[i]), imag(mPoints[i]), 0);
+  }
+}
+
+void IQDisplay::draw_cross()
+{
+  for (int32_t i = -(RADIUS - 1); i < RADIUS; i++)
+  {
+    set_point(0, i, 10); // vertical line
+    set_point(i, 0, 10); // horizontal line
+  }
+}
+
+void IQDisplay::draw_circle(float scale, int val)
+{
+  constexpr int32_t MAX_CIRCLE_POINTS = 45; // per quarter
 
   for (int32_t i = 0; i < MAX_CIRCLE_POINTS; ++i)
   {
-    float phase = 0.5f * M_PI * i / MAX_CIRCLE_POINTS;
+    const float phase = 0.5f * (float)M_PI * (float)i / MAX_CIRCLE_POINTS;
 
-    int32_t h = (int32_t)(Radius * SCALE * cosf(phase));
-    int32_t v = (int32_t)(Radius * SCALE * sinf(phase));
+    auto h = (int32_t)(RADIUS * scale * cosf(phase));
+    auto v = (int32_t)(RADIUS * scale * sinf(phase));
 
-    symmetric_limit(h, Radius - 1);
-    symmetric_limit(v, Radius - 1);
+    symmetric_limit(h, RADIUS - 1);
+    symmetric_limit(v, RADIUS - 1);
 
-    setPoint(-h, -v, val);
-    setPoint(-h, +v, val);
-    setPoint(+h, -v, val);
-    setPoint(+h, +v, val);
+    // as h and v covers only the top right segment, fill also other segments
+    set_point(-h, -v, val);
+    set_point(-h, +v, val);
+    set_point(+h, -v, val);
+    set_point(+h, +v, val);
   }
+}
+
+void IQDisplay::repaint_circle(float size)
+{
+  if (size != mLastCircleSize)
+  {
+    draw_circle(mLastCircleSize, 0); // clear old circle
+    mLastCircleSize = size;
+  }
+  draw_circle(size, 10);
 }

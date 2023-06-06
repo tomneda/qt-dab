@@ -50,22 +50,25 @@ class IQDisplay : public QObject, public QwtPlotSpectrogram
 {
 Q_OBJECT
 public:
-  IQDisplay(QwtPlot *, int16_t);
+  IQDisplay(QwtPlot * plot, int32_t iNoValues);
   ~IQDisplay();
-  void DisplayIQ(const std::complex<float> * z, int amount, float scale, float ref);
+  void display_iq(const std::complex<float> * z, float scale, float ref);
 private:
-  int32_t x_amount;
-  std::vector<double> plotData;
-  std::vector<double> plot2;
-  QwtPlot * plotgrid;
-  int _OutputRate;
-  int Radius;
-  int CycleCount;
-  float lastCircleSize{ 10 };
+  static constexpr int32_t RADIUS{ 100 };
 
-  void setPoint(int, int, int);
+  const int32_t mNoValues;
+  float mLastCircleSize{ 0 };
+  QwtPlot * mPlotgrid{ nullptr };
+
+  std::vector<std::complex<int>> mPoints;
+  std::vector<double> mPlotDataBackgroundBuffer;
+  std::vector<double> mPlotDataDrawBuffer;
+
+  void set_point(int, int, int);
+  void clean_screen_from_old_data_points();
+  void draw_cross();
   void draw_circle(float ref, int val);
-private slots:
+  void repaint_circle(float size);
 };
 
 #endif

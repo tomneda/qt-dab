@@ -24,19 +24,16 @@
 
 SpectrogramData * sIQData = nullptr;
 
-IQDisplay::IQDisplay(QwtPlot * plot, int32_t iNoValues)
-  : QwtPlotSpectrogram(),
-    mNoValues(iNoValues)
+IQDisplay::IQDisplay(QwtPlot * plot)
+  : QwtPlotSpectrogram()
 {
   auto * const colorMap = new QwtLinearColorMap(Qt::darkBlue, Qt::yellow);
 
   setRenderThreadCount(1);
   mPlotgrid = plot;
   setColorMap(colorMap);
-  mPoints.resize(iNoValues, { 0, 0 });
-  mPlotDataBackgroundBuffer.resize(2 * RADIUS * 2 * RADIUS);
-  mPlotDataDrawBuffer.resize(2 * RADIUS * 2 * RADIUS);
-  memset(mPlotDataBackgroundBuffer.data(), 0, 2 * 2 * RADIUS * RADIUS * sizeof(double));
+  mPlotDataBackgroundBuffer.resize(2 * RADIUS * 2 * RADIUS, 0.0);
+  mPlotDataDrawBuffer.resize(2 * RADIUS * 2 * RADIUS, 0.0);
   sIQData = new SpectrogramData(mPlotDataDrawBuffer.data(), 0, 2 * RADIUS, 2 * RADIUS, 2 * RADIUS, 50.0);
   setData(sIQData);
   plot->enableAxis(QwtPlot::xBottom, false);
@@ -69,23 +66,28 @@ template<typename T> inline void symmetric_limit(T & ioVal, const T iLimit)
   }
 }
 
-void IQDisplay::display_iq(const std::complex<float> * z, float scale, float ref)
+void IQDisplay::display_iq(const std::vector<std::complex<float>> & z, float scale, float ref)
 {
+  if (z.size() != mPoints.size())
+  {
+    mPoints.resize(z.size(), { 0, 0 });
+  }
+
   const float scaleNormed = scale / ref;
 
   clean_screen_from_old_data_points();
   draw_cross();
   repaint_circle(scale / 100.0f);
 
-  for (int i = 0; i < mNoValues; i++)
+  for (uint32_t i = 0; i < z.size(); i++)
   {
-    int x = (int)(scaleNormed * real(z[i]));
-    int y = (int)(scaleNormed * imag(z[i]));
+    auto x = (int32_t)(scaleNormed * real(z[i]));
+    auto y = (int32_t)(scaleNormed * imag(z[i]));
 
     symmetric_limit(x, RADIUS - 1);
     symmetric_limit(y, RADIUS - 1);
 
-    mPoints[i] = std::complex<int>(x, y);
+    mPoints[i] = std::complex<int32_t>(x, y);
     set_point(x, y, 100);
   }
 
@@ -100,9 +102,9 @@ void IQDisplay::display_iq(const std::complex<float> * z, float scale, float ref
 
 void IQDisplay::clean_screen_from_old_data_points()
 {
-  for (int i = 0; i < mNoValues; i++)
+  for (const auto & p : mPoints)
   {
-    set_point(real(mPoints[i]), imag(mPoints[i]), 0);
+    set_point(real(p), imag(p), 0);
   }
 }
 

@@ -25,8 +25,8 @@
 //	Shows the spectrum of the incoming data stream 
 //	If made invisible, it is a "do nothing"
 //
-#ifndef    __SPECTRUM_VIEWER__
-#define    __SPECTRUM_VIEWER__
+#ifndef    SPECTRUM_VIEWER_INCLUDE
+#define    SPECTRUM_VIEWER_INCLUDE
 
 #include        "dab-constants.h"
 #include  <QFrame>
@@ -69,7 +69,7 @@ class spectrumViewer : public QObject, Ui_scopeWidget
 Q_OBJECT
 public:
   spectrumViewer(RadioInterface *, QSettings *, RingBuffer<std::complex<float>> *, RingBuffer<std::complex<float>> *);
-  ~spectrumViewer();
+  ~spectrumViewer() override;
   void showSpectrum(int32_t, int32_t);
   void showFrequency(float);
   void showIQ(int32_t);
@@ -102,14 +102,14 @@ private:
   std::array<double, SP_SPECTRUMSIZE> Y_values{ 0 };
   std::array<double, SP_SPECTRUMSIZE> Y2_values{ 0 };
 
-  QwtPlotMarker * Marker{};
+  //QwtPlotMarker * Marker{};
   QwtPlot * plotgrid{};
   QwtPlotGrid * grid{};
   QwtPlotCurve * spectrumCurve{};
-  QBrush * ourBrush{};
-  int32_t indexforMarker{};
-  void ViewSpectrum(double *, double *, double, int);
-  float get_db(float) const;
+  //QBrush * ourBrush{};
+  //int32_t indexforMarker{};
+  //void ViewSpectrum(double *, double *, double, int);
+  [[nodiscard]] float get_db(float) const;
   int32_t normalizer{};
 
   IQDisplay * myIQDisplay;

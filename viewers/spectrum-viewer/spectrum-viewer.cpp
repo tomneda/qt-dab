@@ -65,7 +65,7 @@ spectrumViewer::spectrumViewer(RadioInterface * mr, QSettings * dabSettings, Rin
 
   mySpectrumScope = new spectrumScope(dabScope, SP_DISPLAYSIZE, dabSettings);
   myWaterfallScope = new waterfallScope(dabWaterfall, SP_DISPLAYSIZE, 50);
-  myIQDisplay = new IQDisplay(iqDisplay, 512);
+  myIQDisplay = new IQDisplay(iqDisplay);
   myNullScope = new nullScope(nullDisplay, 256, dabSettings);
   setBitDepth(12);
 }
@@ -206,12 +206,12 @@ bool spectrumViewer::isHidden()
 
 void spectrumViewer::showIQ(int amount)
 {
-  std::complex<float> Values[amount]; // amount typ 1536
+  std::vector<std::complex<float>> Values(amount); // amount typ 1536
 
   const int scopeWidth = scopeSlider->value();
   const bool logIqScope = cbLogIqScope->isChecked();
 
-  const int32_t numRead = iqBuffer->getDataFromBuffer(Values, amount);
+  const int32_t numRead = iqBuffer->getDataFromBuffer(Values.data(), (int32_t)Values.size());
 
   if (myFrame.isHidden())
   {

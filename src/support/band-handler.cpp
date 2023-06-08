@@ -301,13 +301,13 @@ int	i;
 
 	for (i = 0; selectedBand [i]. key != nullptr; i ++) {
 	   if (selectedBand [i]. key == Channel) {
-	      tunedFrequency	= KHz (selectedBand [i]. fKHz);
+	      tunedFrequency	= kHz (selectedBand [i]. fKHz);
 	      break;
 	   }
 	}
 
 	if (tunedFrequency == 0)	// should not happen
-	   tunedFrequency = KHz (selectedBand [0]. fKHz);
+	   tunedFrequency = kHz (selectedBand [0]. fKHz);
 
 	return tunedFrequency;
 }

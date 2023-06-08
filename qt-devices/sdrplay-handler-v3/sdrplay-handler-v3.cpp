@@ -20,10 +20,10 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include	<QThread>
+//#include	<QThread>
 #include	<QSettings>
 #include	<QTime>
-#include	<QDate>
+//#include	<QDate>
 #include	<QLabel>
 #include	<QFileDialog>
 #include	"sdrplay-handler-v3.h"
@@ -188,7 +188,7 @@ std::string errorMessage (int errorCode) {
 /////////////////////////////////////////////////////////////////////////
 
 int32_t	sdrplayHandler_v3::defaultFrequency	() {
-	return Mhz (220);
+	return MHz (220);
 }
 
 int32_t	sdrplayHandler_v3::getVFOFrequency() {
@@ -615,7 +615,7 @@ uint32_t                ndev;
 	         theRsp	= new RspDx_handler (this,
 	                                     chosenDevice,
 	                                     inputRate,
-	                                     KHz (14070),
+	                                     kHz (14070),
 	                                     agcMode,
 	                                     lnaState,
 	                                     GRdBValue,
@@ -626,7 +626,7 @@ uint32_t                ndev;
 	         theRsp	= new Rsp1A_handler (this,
 	                                     chosenDevice,
 	                                     inputRate,
-	                                     KHz (14070),
+	                                     kHz (14070),
 	                                     agcMode,
 	                                     lnaState,
 	                                     GRdBValue,
@@ -637,7 +637,7 @@ uint32_t                ndev;
 	         theRsp	= new RspII_handler (this,
 	                                     chosenDevice,
 	                                     inputRate,
-	                                     KHz (14070),
+	                                     kHz (14070),
 	                                     agcMode,
 	                                     lnaState,
 	                                     GRdBValue,
@@ -648,7 +648,7 @@ uint32_t                ndev;
 	         theRsp	= new RspDuo_handler (this,
 	                                     chosenDevice,
 	                                     inputRate,
-	                                     KHz (14070),
+	                                     kHz (14070),
 	                                     agcMode,
 	                                     lnaState,
 	                                     GRdBValue,
@@ -659,7 +659,7 @@ uint32_t                ndev;
 	         theRsp	= new Rsp_device (this,
 	                                  chosenDevice,
 	                                  2112000,
-	                                  KHz (14070),
+	                                  kHz (14070),
 	                                  agcMode,
 	                                  lnaState,
 	                                  GRdBValue,

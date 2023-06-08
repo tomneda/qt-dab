@@ -25,7 +25,7 @@
 	set_deviceName_signal	(deviceModel);
 	set_antennaSelect_signal (1);
 	set_nrBits_signal	(nrBits);
-	if (freq < Mhz (420))
+	if (freq < MHz (420))
 	   lna_upperBound = 9;
 	else
 	   lna_upperBound = 6;

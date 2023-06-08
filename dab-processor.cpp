@@ -302,7 +302,7 @@ void dabProcessor::run()
       if (correction != 100)
       {
         coarseOffset += 0.4 * correction * carrierDiff;
-        if (abs(coarseOffset) > Khz (35))
+        if (abs(coarseOffset) > kHz (35))
         {
           coarseOffset = 0;
         }

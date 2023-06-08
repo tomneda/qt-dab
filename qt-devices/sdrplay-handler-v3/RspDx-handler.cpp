@@ -52,7 +52,7 @@ int	RSPdx_Table [6][29] = {
 
 
 int16_t RspDx_handler::bankFor_rspdx (int freq) {
-	if (freq < Mhz (60))
+	if (freq < MHz (60))
 	   return 0;
 	if (freq < MHz (250))
 	   return 1;

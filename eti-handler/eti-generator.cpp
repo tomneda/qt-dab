@@ -90,7 +90,7 @@ uint8_t	theVector [6144];
 	this	-> my_ficHandler	= my_ficHandler;
 
 	index_Out		= 0;
-	BitsperBlock		= 2 * params. get_carriers ();
+	BitsperBlock		= 2 * params.get_K();
 	numberofblocksperCIF	= 18;	// mode I
 	amount			= 0;
 	CIFCount_hi		= -1;
@@ -118,7 +118,7 @@ void	etiGenerator::reset	() {
            descrambler [i]      = nullptr;
         }
 	index_Out		= 0;
-	BitsperBlock		= 2 * params. get_carriers ();
+	BitsperBlock		= 2 * params.get_K();
 	numberofblocksperCIF	= 18;	// mode I
 	amount			= 0;
 	CIFCount_hi		= -1;

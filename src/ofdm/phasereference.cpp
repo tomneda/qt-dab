@@ -54,7 +54,7 @@ phaseReference::phaseReference(RadioInterface * mr, processParams * p)
   this->depth = p->echo_depth;
   this->T_u = params.get_T_u();
   this->T_g = params.get_T_g();
-  this->carriers = params.get_carriers();
+  this->carriers = params.get_K();
 
   refTable.resize(T_u);
   phaseDifferences.resize(diff_length);
@@ -67,7 +67,7 @@ phaseReference::phaseReference(RadioInterface * mr, processParams * p)
     refTable[i] = cmplx(0, 0);
   }
 
-  for (i = 1; i <= params.get_carriers() / 2; i++)
+  for (i = 1; i <= params.get_K() / 2; i++)
   {
     Phi_k = get_Phi(i);
     refTable[i] = cmplx(cos(Phi_k), sin(Phi_k));

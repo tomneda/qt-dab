@@ -57,7 +57,7 @@ dabProcessor::dabProcessor(RadioInterface * mr, deviceHandler * inputDevice, pro
   this->T_g = T_s - T_u;
   this->T_F = params.get_T_F();
   this->nrBlocks = params.get_L();
-  this->carriers = params.get_carriers();
+  this->carriers = params.get_K();
   this->carrierDiff = params.get_carrierDiff();
   this->tii_delay = p->tii_delay;
   this->tii_counter = 0;
@@ -151,7 +151,7 @@ void dabProcessor::run()
   bool null_shower;
 
   QVector<cmplx> tester(T_u / 2);
-  ibits.resize(2 * params.get_carriers());
+  ibits.resize(2 * params.get_K());
   fineOffset = 0;
   coarseOffset = 0;
   correctionNeeded = true;

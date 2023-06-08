@@ -54,7 +54,7 @@ int	local	= 0;
 int16_t	shiftRegister [9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 
 	index		= 0;
-	BitsperBlock	= 2 * params. get_carriers();
+	BitsperBlock	= 2 * params.get_K();
 	ficno		= 0;
 	ficBlocks	= 0;
 	ficMissed	= 0;

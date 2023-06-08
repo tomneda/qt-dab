@@ -59,7 +59,7 @@ int16_t	i;
 	interLeaver::interLeaver (uint8_t mode): p (mode) {
 
 	int32_t T_u		= p. get_T_u();
-	int32_t	carriers	= p. get_carriers();
+	int32_t	carriers	= p.get_K();
 	permTable. resize (T_u);
 
 	switch (mode) {

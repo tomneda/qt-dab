@@ -120,7 +120,7 @@ int16_t	i;
 
 	this	-> depth	= depth;
 	this	-> T_u		= params. get_T_u();
-	carriers		= params. get_carriers();
+	carriers		= params.get_K();
 	theBuffer. resize	(T_u);
 	window. resize 		(T_u);
 	for (i = 0; i < T_u; i ++)

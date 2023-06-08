@@ -54,7 +54,7 @@ ofdmDecoder::ofdmDecoder(RadioInterface *mr, uint8_t dabMode, int16_t bitDepth,
   this->T_s      = params.get_T_s();
   this->T_u      = params.get_T_u();
   this->nrBlocks = params.get_L();
-  this->carriers = params.get_carriers();
+  this->carriers = params.get_K();
   
   this->T_g = T_s - T_u;
 

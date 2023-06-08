@@ -49,7 +49,7 @@ static int cifTable [] = {18, 72, 0, 36};
 	myRadioInterface	= mr;
 	this	-> frameBuffer	= frameBuffer;
 	cifVector. resize (55296);
-	BitsperBlock		= 2 * params. get_carriers();
+	BitsperBlock		= 2 * params.get_K();
 	ibits. resize (BitsperBlock);
 	nrBlocks		= params. get_L();
 
@@ -172,7 +172,7 @@ cmplx fft_buffer [params. get_T_u ()];;
 //	"our" msc blocks start with blkno 4
 	fft. fft (fft_buffer);
 	if (blkno >= 4) {
-	   for (int i = 0; i < params. get_carriers(); i ++) {
+	   for (int i = 0; i < params.get_K(); i ++) {
 	      int16_t      index   = myMapper. mapIn (i);
 	      if (index < 0)
 	         index += params. get_T_u();
@@ -182,7 +182,7 @@ cmplx fft_buffer [params. get_T_u ()];;
 //      Recall:  the viterbi decoder wants 127 max pos, - 127 max neg
 //      we make the bits into softbits in the range -127 .. 127
 	      ibits [i]            =  - real (r1) / ab1 * 256.0;
-	      ibits [params. get_carriers() + i]
+	      ibits [params.get_K() + i]
 	                           =  - imag (r1) / ab1 * 256.0;
 	   }
 

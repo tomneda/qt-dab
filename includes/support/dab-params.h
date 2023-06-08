@@ -48,7 +48,7 @@ public:
 
   [[nodiscard]] int16_t get_dabMode()     const { return mDabMode; }
   [[nodiscard]] int16_t get_L()           const { return get_dab_par().L; }
-  [[nodiscard]] int16_t get_carriers()    const { return get_dab_par().K; }
+  [[nodiscard]] int16_t get_K()           const { return get_dab_par().K; }
   [[nodiscard]] int16_t get_T_null()      const { return get_dab_par().T_n; }
   [[nodiscard]] int16_t get_T_s()         const { return get_dab_par().T_s; }
   [[nodiscard]] int16_t get_T_u()         const { return get_dab_par().T_u; }
@@ -58,7 +58,7 @@ public:
   [[nodiscard]] int16_t get_CIFs()        const { return get_dab_par().CIFs; }
 
 private:
-  uint8_t mDabMode{ 0 };
+  const uint8_t mDabMode{ 0 };
   using TArrDabPar = std::array<SDabPar, 5>;
   static const TArrDabPar msDabPar;
 };

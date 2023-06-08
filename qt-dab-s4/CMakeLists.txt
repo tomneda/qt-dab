@@ -20,6 +20,7 @@ if(MINGW)
 endif()
 
 add_definitions (-D__FFTW3__)
+#add_definitions (-D__KISS_FFT__)
 
 IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../.git" AND IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../.git")
    execute_process (

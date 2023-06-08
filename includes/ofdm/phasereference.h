@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,60 +20,67 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #
-#ifndef	__PHASEREFERENCE__
-#define	__PHASEREFERENCE__
-#include	<QObject>
-#include	<cstdio>
-#include	<cstdint>
-#include	<vector>
-#include	"fft-handler.h"
-#include	"phasetable.h"
-#include	"dab-constants.h"
-#include	"dab-params.h"
-#include	"process-params.h"
-#include	"ringbuffer.h"
-class	RadioInterface;
-#ifdef	__WITH_JAN__
+
+#ifndef  __PHASEREFERENCE__
+#define  __PHASEREFERENCE__
+
+#include  <QObject>
+#include  <cstdio>
+#include  <cstdint>
+#include  <vector>
+#include  "fft-handler.h"
+#include  "phasetable.h"
+#include  "dab-constants.h"
+#include  "dab-params.h"
+#include  "process-params.h"
+#include  "ringbuffer.h"
+
+class RadioInterface;
+
+#ifdef  __WITH_JAN__
 class	channel;
 #endif
-#include	"fft-handler.h"
 
-class phaseReference : public QObject, public phaseTable {
+#include  "fft-handler.h"
+
+class phaseReference : public QObject, public phaseTable
+{
 Q_OBJECT
 public:
-			phaseReference 		(RadioInterface *,
-	                                         processParams *);
-			~phaseReference		();
-	int32_t		findIndex		(std::vector<cmplx>, int);
-	int16_t		estimate_CarrierOffset	(std::vector<cmplx>);
-	float		phase			(std::vector<cmplx>&, int);
-#ifdef	__WITH_JAN__
-	void		estimate		(std::vector<cmplx>);
+  phaseReference(RadioInterface *, processParams *);
+  ~phaseReference();
+
+  int32_t findIndex(std::vector<cmplx>, int);
+  int16_t estimate_carrier_offset(std::vector<cmplx> v) const;
+  float phase(const std::vector<cmplx> & iV, const int32_t iTs) const;
+#ifdef  __WITH_JAN__
+  void		estimate		(std::vector<cmplx>);
 #endif
-//	This one is used in the ofdm decoder
-	std::vector<cmplx> refTable;
+  //	This one is used in the ofdm decoder
+  std::vector<cmplx> refTable;
 private:
-	dabParams	params;
-#ifdef	__WITH_JAN__
-	channel		*theEstimator;
+  dabParams params;
+#ifdef  __WITH_JAN__
+  channel		*theEstimator;
 #endif
-	RingBuffer<float> *response;
-	std::vector<float> phaseDifferences;
-	int16_t		diff_length;
-	int16_t		depth;
-	int32_t		T_u;
-	int32_t		T_g;
-	int16_t		carriers;
+  RingBuffer<float> * response;
+  std::vector<float> phaseDifferences;
+  int16_t diff_length;
+  int16_t depth;
+  int32_t T_u;
+  int32_t T_g;
+  int16_t carriers;
 
-	int32_t		fft_counter;
-	int32_t		framesperSecond;	
-	int32_t		displayCounter;
+  int32_t fft_counter;
+  int32_t framesperSecond;
+  int32_t displayCounter;
 
-	fftHandler	fft_forward;
-	fftHandler	fft_backwards;
+  fftHandler fft_forward;
+  fftHandler fft_backwards;
 
 signals:
-	void		showCorrelation	(int, int, QVector<int>);
+  void showCorrelation(int, int, QVector<int>);
 };
+
 #endif
 

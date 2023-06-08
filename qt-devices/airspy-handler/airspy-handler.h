@@ -182,7 +182,7 @@ const	char*		board_id_name();
 	int32_t		selectedRate;
 	int16_t		convBufferSize;
 	int16_t		convIndex;
-	std::vector <complex<float> >	convBuffer;
+	std::vector <cmplx>	convBuffer;
 	int16_t		mapTable_int   [4 * 512];
 	float		mapTable_float [4 * 512];
 	QSettings	*airspySettings;

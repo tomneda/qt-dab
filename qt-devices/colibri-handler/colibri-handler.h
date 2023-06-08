@@ -59,7 +59,7 @@ public:
 	RingBuffer<cmplx>	_I_Buffer;
 	int16_t		convBufferSize;
 	int16_t		convIndex;
-	std::vector <complex<float> >   convBuffer;
+	std::vector <cmplx>   convBuffer;
 	int16_t		mapTable_int   [2048];
 	float		mapTable_float [2048];
 private:

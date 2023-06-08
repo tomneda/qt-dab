@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2015 .. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,32 +20,40 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #
-#ifndef	__FFT_HANDLER__
-#define	__FFT_HANDLER__
+
+#ifndef  __FFT_HANDLER__
+#define  __FFT_HANDLER__
 
 #include "dab-constants.h"
-#include	<vector>
-#include	"kiss_fft.h"
-#ifdef	__FFTW3__
-#include	<fftw3.h>
+#include  <vector>
+#include  "kiss_fft.h"
+
+#ifdef  __FFTW3__
+
+  #include  <fftw3.h>
+
 #endif
 
-class	fftHandler {
+class fftHandler
+{
 public:
-			fftHandler	(int size, bool);
-			~fftHandler	();
-	void		fft 		(std::vector<cmplx> &);
-	void		fft 		(cmplx *);
+  fftHandler(int size, bool);
+  ~fftHandler();
+
+  void fft(std::vector<cmplx> & ioV) const;
+  void fft(cmplx * const ioV) const;
+
 private:
-	int		size;
-	bool		dir;
-#ifdef	__KISS_FFT__
-	kiss_fft_cfg	plan;
-	kiss_fft_cpx	*fftVector_in;
-	kiss_fft_cpx	*fftVector_out;
-#elif	__FFTW3__
-	fftwf_plan	plan;
-	cmplx *fftVector;
+  int size;
+  bool dir;
+#ifdef  __KISS_FFT__
+  kiss_fft_cfg plan;
+  kiss_fft_cpx *fftVector_in;
+  kiss_fft_cpx *fftVector_out;
+#elif  __FFTW3__
+  fftwf_plan plan;
+  cmplx * fftVector;
 #endif
 };
+
 #endif

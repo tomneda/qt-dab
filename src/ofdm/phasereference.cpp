@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,12 +19,13 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include	"phasereference.h" 
-#include	<QVector>
-#include	<cstring>
-#include	"radio.h"
-#include	<vector>
-#ifdef	__WITH_JAN__
+#include  "phasereference.h"
+#include  <QVector>
+#include  <cstring>
+#include  "radio.h"
+#include  <vector>
+
+#ifdef  __WITH_JAN__
 #include	"channel.h"
 #endif
 /**
@@ -36,61 +36,65 @@
   *	The class inherits from the phaseTable.
   */
 
-#define	PILOTS	100
-#define	TAPS	100
+#define  PILOTS  100
+#define  TAPS  100
 
-	phaseReference::phaseReference (RadioInterface *mr,
-	                                processParams	*p):
-	                                     phaseTable (p -> dabMode),
-	                                     params (p -> dabMode),
-	                                     fft_forward (params. get_T_u (), false),
-	                                     fft_backwards (params. get_T_u (), true) {
-int32_t	i;
-float	Phi_k;
+phaseReference::phaseReference(RadioInterface * mr, processParams * p)
+  : phaseTable(p->dabMode),
+    params(p->dabMode),
+    fft_forward(params.get_T_u(), false),
+    fft_backwards(params.get_T_u(), true)
+{
+  int32_t i;
+  float Phi_k;
 
-	this	-> response	= p -> responseBuffer;
-	this	-> diff_length	= p -> diff_length;
-	this	-> diff_length	= 128;
-	this	-> depth	= p -> echo_depth;
-	this	-> T_u		= params. get_T_u();
-	this	-> T_g		= params. get_T_g();
-	this	-> carriers	= params. get_carriers();
-	
-	refTable.		resize (T_u);
-	phaseDifferences.       resize (diff_length);
+  this->response = p->responseBuffer;
+  this->diff_length = p->diff_length;
+  this->diff_length = 128;
+  this->depth = p->echo_depth;
+  this->T_u = params.get_T_u();
+  this->T_g = params.get_T_g();
+  this->carriers = params.get_carriers();
 
-	framesperSecond		= 2048000 / params. get_T_F();
-	displayCounter		= 0;
-	
-	for (i = 0; i < T_u; i ++)
-	   refTable [i] = cmplx (0, 0);
+  refTable.resize(T_u);
+  phaseDifferences.resize(diff_length);
 
-	for (i = 1; i <= params. get_carriers() / 2; i ++) {
-	   Phi_k =  get_Phi (i);
-	   refTable [i] = cmplx (cos (Phi_k), sin (Phi_k));
-	   Phi_k = get_Phi (-i);
-	   refTable [T_u - i] = cmplx (cos (Phi_k), sin (Phi_k));
-	}
+  framesperSecond = 2048000 / params.get_T_F();
+  displayCounter = 0;
 
-//
-//      prepare a table for the coarse frequency synchronization
-//      can be a static one, actually, we are only interested in
-//      the ones with a null
-	for (i = 1; i <= diff_length; i ++) 
-	   phaseDifferences [i - 1] = abs (arg (refTable [(T_u + i) % T_u] *
-	                         conj (refTable [(T_u + i + 1) % T_u])));
-	
-	connect (this, SIGNAL (showCorrelation (int, int, QVector<int>)),
-	         mr,   SLOT   (showCorrelation (int, int, QVector<int>)));
+  for (i = 0; i < T_u; i++)
+  {
+    refTable[i] = cmplx(0, 0);
+  }
 
-#ifdef	__WITH_JAN__
-	theEstimator	= new channel (refTable, PILOTS, TAPS);
+  for (i = 1; i <= params.get_carriers() / 2; i++)
+  {
+    Phi_k = get_Phi(i);
+    refTable[i] = cmplx(cos(Phi_k), sin(Phi_k));
+    Phi_k = get_Phi(-i);
+    refTable[T_u - i] = cmplx(cos(Phi_k), sin(Phi_k));
+  }
+
+  //
+  //      prepare a table for the coarse frequency synchronization
+  //      can be a static one, actually, we are only interested in
+  //      the ones with a null
+  for (i = 1; i <= diff_length; i++)
+  {
+    phaseDifferences[i - 1] = abs(arg(refTable[(T_u + i) % T_u] * conj(refTable[(T_u + i + 1) % T_u])));
+  }
+
+  connect(this, SIGNAL (showCorrelation(int, int, QVector<int>)), mr, SLOT   (showCorrelation(int, int, QVector<int>)));
+
+#ifdef  __WITH_JAN__
+  theEstimator	= new channel (refTable, PILOTS, TAPS);
 #endif
 }
 
-	phaseReference::~phaseReference () {
-#ifdef	__WITH_JAN__
-	delete theEstimator;
+phaseReference::~phaseReference()
+{
+#ifdef  __WITH_JAN__
+  delete theEstimator;
 #endif
 }
 
@@ -104,130 +108,151 @@ float	Phi_k;
   *	looking for.
   */
 
-int32_t	phaseReference::findIndex (std::vector <cmplx> v,
-	                           int threshold ) {
-int32_t	i;
-int32_t	maxIndex	= -1;
-float	sum		= 0;
-float	Max		= -1000;
-float	lbuf [T_u / 2];
+int32_t phaseReference::findIndex(std::vector<cmplx> v, int threshold)
+{
+  int32_t i;
+  int32_t maxIndex = -1;
+  float sum = 0;
+  float Max = -1000;
+  float lbuf[T_u / 2];
 
-	fft_forward. fft (v);
-//
-//	into the frequency domain, now correlate
-	for (i = 0; i < T_u; i ++) 
-	   v [i] = v [i] * conj (refTable [i]);
+  fft_forward.fft(v);
+  //
+  //	into the frequency domain, now correlate
+  for (i = 0; i < T_u; i++)
+  {
+    v[i] = v[i] * conj(refTable[i]);
+  }
 
-//	and, again, back into the time domain
-	fft_backwards. fft (v);
-/**
-  *	We compute the average and the max signal values
-  */
-	for (i = 0; i < T_u / 2; i ++) {
-	   lbuf [i] = jan_abs (v[i]);
-	   sum	+= lbuf [i];
-	}
+  //	and, again, back into the time domain
+  fft_backwards.fft(v);
+  /**
+    *	We compute the average and the max signal values
+    */
+  for (i = 0; i < T_u / 2; i++)
+  {
+    lbuf[i] = jan_abs(v[i]);
+    sum += lbuf[i];
+  }
 
-	sum /= T_u / 2;
-	QVector<int> indices;
+  sum /= T_u / 2;
+  QVector<int> indices;
 
-	for (i = T_g - 250; i < T_g + 250; i ++) {
-	   if (lbuf [i] / sum > threshold)  {
-	      bool foundOne = true;
-	      for (int j = 1; (j < 10) && (i + j < T_g + 250); j ++) {
-	         if (lbuf [i + j] > lbuf [i]) {
-	            foundOne = false;
-	            break;
-	         }
-	      }
-	      if (foundOne) {
-	         indices. push_back (i);
-	         if (lbuf [i]> Max){
-	            Max = lbuf [i];
-	            maxIndex = i;
-	         }
-	         i += 10;
-	      }
-	   }
-	}
+  for (i = T_g - 250; i < T_g + 250; i++)
+  {
+    if (lbuf[i] / sum > threshold)
+    {
+      bool foundOne = true;
+      for (int j = 1; (j < 10) && (i + j < T_g + 250); j++)
+      {
+        if (lbuf[i + j] > lbuf[i])
+        {
+          foundOne = false;
+          break;
+        }
+      }
+      if (foundOne)
+      {
+        indices.push_back(i);
+        if (lbuf[i] > Max)
+        {
+          Max = lbuf[i];
+          maxIndex = i;
+        }
+        i += 10;
+      }
+    }
+  }
 
-	if (Max / sum < threshold) {
-	   return (- abs (Max / sum) - 1);
-	}
+  if (Max / sum < threshold)
+  {
+    return (-abs(Max / sum) - 1);
+  }
 
-	if (response != nullptr) {
-	   if (++displayCounter > framesperSecond / 2) {
-	      response	-> putDataIntoBuffer (lbuf, T_u / 2);
-	      showCorrelation (T_u / 2, T_g, indices);
-	      displayCounter	= 0;
-	   }
-	}
-	
-	return maxIndex;
+  if (response != nullptr)
+  {
+    if (++displayCounter > framesperSecond / 2)
+    {
+      response->putDataIntoBuffer(lbuf, T_u / 2);
+      showCorrelation(T_u / 2, T_g, indices);
+      displayCounter = 0;
+    }
+  }
+
+  return maxIndex;
 }
 //
 //
 //	an approach that works fine is to correlate the phasedifferences
 //	between subsequent carriers
-#define	SEARCH_RANGE	(2 * 35)
-int16_t	phaseReference::
-	     estimate_CarrierOffset (std::vector<cmplx> v) {
-int16_t index_1 = 100, index_2 = 100;
-float	computedDiffs [SEARCH_RANGE + diff_length + 1];
+#define  SEARCH_RANGE  (2 * 35)
 
-	fft_forward. fft (v);
+int16_t phaseReference::estimate_carrier_offset(std::vector<cmplx> v) const
+{
+  int16_t index_1 = 100, index_2 = 100;
+  float computedDiffs[SEARCH_RANGE + diff_length + 1];
 
-	for (int i = T_u - SEARCH_RANGE / 2;
-	     i < T_u + SEARCH_RANGE / 2 + diff_length; i ++) {
-	   computedDiffs [i - (T_u - SEARCH_RANGE / 2)] =
-	      abs (arg (v [i % T_u] *
-	                      conj (v [(i + 1) % T_u])));
-	}
+  fft_forward.fft(v);
 
-	float	Mmin	= 1000;
-	float	Mmax	= 0;
-	for (int i = T_u - SEARCH_RANGE / 2;
-	     i < T_u + SEARCH_RANGE / 2; i ++) {
-	   float sum	= 0;
-	   float sum2	= 0;
+  for (int i = T_u - SEARCH_RANGE / 2; i < T_u + SEARCH_RANGE / 2 + diff_length; i++)
+  {
+    computedDiffs[i - (T_u - SEARCH_RANGE / 2)] = abs(arg(v[i % T_u] * conj(v[(i + 1) % T_u])));
+  }
 
-	   for (int j = 1; j < diff_length; j ++) {
-	      if (phaseDifferences [j - 1] < 0.1) {
-	         sum += computedDiffs [i - (T_u - SEARCH_RANGE / 2) + j];
-	      }
-	      if (phaseDifferences [j - 1] > M_PI - 0.1) {
-	         sum2 += computedDiffs [i - (T_u - SEARCH_RANGE / 2) + j];
-	      }
-	   }
-	   if (sum < Mmin) {
-	      Mmin = sum;
-	      index_1 = i;
-	   }
-	   if (sum2 > Mmax) {
-	      Mmax = sum2;
-	      index_2 = i;
-	   }
-	}
+  float Mmin = 1000;
+  float Mmax = 0;
+  for (int i = T_u - SEARCH_RANGE / 2; i < T_u + SEARCH_RANGE / 2; i++)
+  {
+    float sum = 0;
+    float sum2 = 0;
 
-	if (index_1 != index_2)
-	   return 100;
-	return index_1 - T_u; 
+    for (int j = 1; j < diff_length; j++)
+    {
+      if (phaseDifferences[j - 1] < 0.1)
+      {
+        sum += computedDiffs[i - (T_u - SEARCH_RANGE / 2) + j];
+      }
+      if (phaseDifferences[j - 1] > M_PI - 0.1)
+      {
+        sum2 += computedDiffs[i - (T_u - SEARCH_RANGE / 2) + j];
+      }
+    }
+    if (sum < Mmin)
+    {
+      Mmin = sum;
+      index_1 = i;
+    }
+    if (sum2 > Mmax)
+    {
+      Mmax = sum2;
+      index_2 = i;
+    }
+  }
+
+  if (index_1 != index_2)
+  {
+    return 100;
+  }
+  return index_1 - T_u;
 }
 
-float	phaseReference::phase (std::vector<complex<float>> &v, int Ts) {
-cmplx sum = cmplx (0, 0);
+float phaseReference::phase(const std::vector<cmplx> & iV, const int32_t iTs) const
+{
+  cmplx sum = cmplx(0, 0);
 
-	for (int i = 0; i < Ts; i ++)
-	   sum += v [i];
+  for (int i = 0; i < iTs; i++)
+  {
+    sum += iV[i];
+  }
 
-	return arg (sum);
+  return arg(sum);
 }
 
-#ifdef	__WITH_JAN__
+#ifdef  __WITH_JAN__
 void	phaseReference::estimate	(std::vector<cmplx> v) {
 cmplx h_td [TAPS];
 
-	fft_forward. fft (v);
-	theEstimator -> estimate (v, h_td);
+  fft_forward. fft (v);
+  theEstimator -> estimate (v, h_td);
 }
 #endif

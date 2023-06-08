@@ -298,7 +298,8 @@ void dabProcessor::run()
     correctionNeeded = !my_ficHandler.syncReached();
     if (correctionNeeded)
     {
-      int correction = phaseSynchronizer.estimate_CarrierOffset(ofdmBuffer);
+      int correction = phaseSynchronizer.estimate_carrier_offset(ofdmBuffer);
+
       if (correction != 100)
       {
         coarseOffset += 0.4 * correction * carrierDiff;

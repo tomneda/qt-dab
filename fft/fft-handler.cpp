@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2015 .. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,89 +19,119 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#
-//
-//	a simple wrapper for using kiss-fft, fftw3 or fft-complex
-//
-#include	"fft-handler.h"
-#include	"fft-complex.h"
+#include "fft-handler.h"
+#include "fft-complex.h"
 
-	fftHandler::fftHandler	(int size, bool dir) {
-	this	-> size		= size;
-	this	-> dir		= dir;
-#ifdef	__KISS_FFT__
-	fftVector_in            = new kiss_fft_cpx [size];
-        fftVector_out           = new kiss_fft_cpx [size];
-        plan			= kiss_fft_alloc (size, dir, nullptr, nullptr);
-#elif	__FFTW3__
-	fftVector		= (cmplx *)
-	                          fftwf_malloc (sizeof (cmplx)* size);
-	plan			= fftwf_plan_dft_1d (size,
-	                           reinterpret_cast <fftwf_complex *>(fftVector),
-                                   reinterpret_cast <fftwf_complex *>(fftVector),
-                                   FFTW_FORWARD, FFTW_ESTIMATE);
+fftHandler::fftHandler(int size, bool dir)
+{
+  this->size = size;
+  this->dir = dir;
+#ifdef  __KISS_FFT__
+  fftVector_in = new kiss_fft_cpx[size];
+  fftVector_out = new kiss_fft_cpx[size];
+  plan = kiss_fft_alloc(size, dir, nullptr, nullptr);
+#elif  __FFTW3__
+  fftVector = (cmplx *)fftwf_malloc(sizeof(cmplx) * size);
+  plan = fftwf_plan_dft_1d(size,
+                           reinterpret_cast <fftwf_complex *>(fftVector),
+                           reinterpret_cast <fftwf_complex *>(fftVector),
+                           FFTW_FORWARD,
+                           FFTW_ESTIMATE);
 #endif
 }
 
-	fftHandler::~fftHandler	() {
-#ifdef	__KISS_FFT__
-	delete fftVector_in;
-	delete fftVector_out;
-#elif	__FFTW3__
-	fftwf_destroy_plan (plan);
-	fftwf_free (fftVector);
+fftHandler::~fftHandler()
+{
+#ifdef  __KISS_FFT__
+  delete fftVector_in;
+  delete fftVector_out;
+#elif  __FFTW3__
+  fftwf_destroy_plan(plan);
+  fftwf_free(fftVector);
 #endif
 }
 
-void	fftHandler::fft		(std::vector<cmplx> &v) {
-#ifdef	__KISS_FFT__
-	for (int i = 0; i < size; i ++) {
-	   fftVector_in [i]. r = real (v [i]);
-	   fftVector_in [i]. i = imag (v [i]);
-	}
-	kiss_fft (plan, fftVector_in, fftVector_out);
-	for (int i = 0; i < size; i ++) {
-	   v [i] = cmplx (fftVector_out [i]. r,
-	                                fftVector_out [i]. i);
-	}
+void fftHandler::fft(std::vector<cmplx> & ioV) const
+{
+#ifdef  __KISS_FFT__
+  for (int i = 0; i < size; i++)
+  {
+    fftVector_in[i].r = real(ioV[i]);
+    fftVector_in[i].i = imag(ioV[i]);
+  }
+
+  kiss_fft(plan, fftVector_in, fftVector_out);
+
+  for (int i = 0; i < size; i++)
+  {
+    ioV[i] = cmplx(fftVector_out[i].r, fftVector_out[i].i);
+  }
 #elif __FFTW3__
-	if (dir)
-	   for (int i = 0; i < size; i ++)
-	      fftVector [i] = conj (v [i]);
-	else
-	   for (int i = 0; i < size; i ++)
-	      fftVector [i] = v [i];
-	fftwf_execute (plan);
-	if (dir)
-	   for (int i = 0;  i < size; i ++)
-	      v [i] = conj (fftVector [i]);
-	else
-	   for (int i = 0; i < size; i ++)
-	      v [i] = fftVector [i];
+  if (dir)
+  {
+    for (int i = 0; i < size; i++)
+    {
+      fftVector[i] = conj(ioV[i]);
+    }
+  }
+  else
+  {
+    for (int i = 0; i < size; i++)
+    {
+      fftVector[i] = ioV[i];
+    }
+  }
+
+  fftwf_execute(plan);
+
+  if (dir)
+  {
+    for (int i = 0; i < size; i++)
+    {
+      ioV[i] = conj(fftVector[i]);
+    }
+  }
+  else
+  {
+    for (int i = 0; i < size; i++)
+    {
+      ioV[i] = fftVector[i];
+    }
+  }
 #else
-	Fft_transform (v. data (), size, dir);
+  Fft_transform(ioV.data (), size, dir);
 #endif
 }
 
-void	fftHandler::fft		(cmplx  *v) {
-#ifdef	__KISS_FFT__
-	for (int i = 0; i < size; i ++) {
-	   fftVector_in [i]. r = real (v [i]);
-	   fftVector_in [i]. i = imag (v [i]);
-	}
-	kiss_fft (plan, fftVector_in, fftVector_out);
-	for (int i = 0; i < size; i ++) {
-	   v [i] = cmplx (fftVector_out [i]. r,
-	                                fftVector_out [i]. i);
-	}
-#elif	__FFTW3__
-	for (int i = 0; i < size; i ++)
-	   fftVector [i] = v [i];
-	fftwf_execute (plan);
-	for (int i = 0;  i < size; i ++)
-	   v [i] = fftVector [i];
+void fftHandler::fft(cmplx * const ioV) const
+{
+#ifdef  __KISS_FFT__
+  for (int i = 0; i < size; i++)
+  {
+    fftVector_in[i].r = real(ioV[i]);
+    fftVector_in[i].i = imag(ioV[i]);
+  }
+
+  kiss_fft(plan, fftVector_in, fftVector_out);
+
+  for (int i = 0; i < size; i++)
+  {
+    ioV[i] = cmplx(fftVector_out[i].r, fftVector_out[i].i);
+  }
+#elif  __FFTW3__
+  for (int i = 0; i < size; i++)
+  {
+    fftVector[i] = ioV[i];
+  }
+
+  fftwf_execute(plan);
+
+  for (int i = 0; i < size; i++)
+  {
+    ioV[i] = fftVector[i];
+  }
 #else
-	Fft_transform (v, size, dir);
+  Fft_transform(ioV, size, dir);
 #endif
 }
 

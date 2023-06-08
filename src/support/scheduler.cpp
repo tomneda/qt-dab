@@ -61,7 +61,7 @@ QString  weekdays [7];
 	         this, SLOT (handle_timeOut ()));
 	connect (this, SIGNAL (timeOut (const QString &)),
 	         mr, SLOT (scheduler_timeOut (const QString &)));
-	this	-> wakeupTime = 365 * MINUTES_PER_DAY;
+	this	-> mWakeupTime = 365 * MINUTES_PER_DAY;
 	for (int i = 1; i <= 7; i ++)
 	   weekdays [i - 1] = QDate::shortDayName (i);
 	read (fileName);
@@ -152,8 +152,8 @@ QTime	currentTime	= QTime::currentTime ();
 	tableWidget	-> item (row, 1) -> setText (wakeupDay);
 	tableWidget	-> item (row, 2) -> setText (recordTime);
 	
-	if (wakeupTime < this -> wakeupTime) {
-	   this -> wakeupTime = wakeupTime;
+	if (wakeupTime < this -> mWakeupTime) {
+	   this -> mWakeupTime = wakeupTime;
 	   this	-> wakeupIndex = tableWidget -> rowCount () - 1;
 	};
 
@@ -161,7 +161,7 @@ QTime	currentTime	= QTime::currentTime ();
 //	fprintf (stderr, "waiting time %d hours %d minutes\n",
 //	                       tempDelay / MINUTES_PER_HOUR / 60,
 //	                       tempDelay / MINUTES_PER_HOUR % 60);
-	int theDelay	= this -> wakeupTime  - currentSeconds - SWITCHTIME;
+	int theDelay	= this -> mWakeupTime  - currentSeconds - SWITCHTIME;
 	if (theDelay <= 1000) 
 	   theDelay = 1000;	// milliseconds
 	else
@@ -178,7 +178,7 @@ void	Scheduler::removeRow (int row, int column) {
 	wakeupTimer. stop ();
 	tableWidget	-> removeRow (row);
 	if (tableWidget -> rowCount () == 0) {
-	   wakeupTime	= 365 * MINUTES_PER_DAY;
+     mWakeupTime	= 365 * MINUTES_PER_DAY;
 	   wakeupTimer. stop ();
 	   hide ();
 	   return;
@@ -196,8 +196,8 @@ void	Scheduler::removeRow (int row, int column) {
 	   int delayDays	= dayDiff (startDay, wakeupDay);
 	   int testSeconds	= (delayDays * MINUTES_PER_DAY +
 	                           hours * MINUTES_PER_HOUR + minutes) * 60;
-	   if (testSeconds < this -> wakeupTime) {
-	      this -> wakeupTime = testSeconds;
+	   if (testSeconds < this -> mWakeupTime) {
+	      this -> mWakeupTime = testSeconds;
 	      wakeupIndex = i;
 	   }
 	}
@@ -211,7 +211,7 @@ void	Scheduler::removeRow (int row, int column) {
 	                                    currentTime. second ();
 
 	int64_t theDelay
-	             = this ->  wakeupTime - currentSeconds - SWITCHTIME; // seconds
+	             = this ->  mWakeupTime - currentSeconds - SWITCHTIME; // seconds
 	if (theDelay <= 0) 
 	   theDelay = 1000;	// milliseconds
 	else
@@ -236,8 +236,8 @@ int	currentSeconds	= (theNow * MINUTES_PER_DAY +
                            currentTime. minute ()) * 60 +
                                             currentTime. second ();
 
-	if (currentSeconds >= wakeupTime - SWITCHTIME) {
-	   wakeupTime	= 365 * MINUTES_PER_DAY;	// minutes
+	if (currentSeconds >= mWakeupTime - SWITCHTIME) {
+     mWakeupTime	= 365 * MINUTES_PER_DAY;	// minutes
 	   removeRow (wakeupIndex, 0);
 
 	
@@ -254,8 +254,8 @@ int	currentSeconds	= (theNow * MINUTES_PER_DAY +
 	      int testSeconds	= (delayDays * MINUTES_PER_DAY +
 	                           hours * MINUTES_PER_HOUR + minutes) * 60;
 
-	      if (testSeconds < this -> wakeupTime) {
-	         this -> wakeupTime = testSeconds;
+	      if (testSeconds < this -> mWakeupTime) {
+	         this -> mWakeupTime = testSeconds;
 	         wakeupIndex = i;
 	      }
 	   }
@@ -267,7 +267,7 @@ int	currentSeconds	= (theNow * MINUTES_PER_DAY +
 	}
 
 	int theDelay	=
-	           this -> wakeupTime - currentSeconds - SWITCHTIME; // seconds
+	           this -> mWakeupTime - currentSeconds - SWITCHTIME; // seconds
 	if (theDelay <= 500) 
 	   theDelay = 1000;	// milliseconds
 	else

@@ -54,7 +54,7 @@ private:
 	QTimer		wakeupTimer;
 	QScrollArea	myWidget;
 	QTableWidget	*tableWidget;
-	int		wakeupTime;
+	int		mWakeupTime;
 	int		wakeupIndex;
 	QDate		referenceDate;
 	QString		fileName;

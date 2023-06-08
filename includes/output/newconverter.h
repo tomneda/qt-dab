@@ -50,8 +50,8 @@ public:
 
 		~newConverter();
 
-	bool	convert (std::complex<float> v,
-	                       std::complex<float> *out, int32_t *amount);
+	bool	convert (cmplx v,
+	                       cmplx *out, int32_t *amount);
 
 int32_t	getOutputsize();
 };

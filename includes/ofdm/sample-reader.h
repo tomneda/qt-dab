@@ -47,13 +47,13 @@ Q_OBJECT
 public:
 			sampleReader	(RadioInterface *mr,
 	                         	deviceHandler *theRig,
-	                         	RingBuffer<std::complex<float>> *spectrumBuffer = nullptr);
+	                         	RingBuffer<cmplx> *spectrumBuffer = nullptr);
 
 			~sampleReader();
 		void	setRunning	(bool b);
 		float	get_sLevel	();
-		std::complex<float> getSample	(int32_t);
-	        void	getSamples	(std::vector<std::complex<float>> &v,
+		cmplx getSample	(int32_t);
+	        void	getSamples	(std::vector<cmplx> &v,
 	                                 int index,
 	                                 int32_t n, int32_t phase);
 	        void	startDumping	(SNDFILE *);
@@ -61,8 +61,8 @@ public:
 private:
 		RadioInterface	*myRadioInterface;
 		deviceHandler	*theRig;
-		RingBuffer<std::complex<float>> *spectrumBuffer;
-		std::vector<std::complex<float>> localBuffer;
+		RingBuffer<cmplx> *spectrumBuffer;
+		std::vector<cmplx> localBuffer;
 		int32_t		localCounter;
 		int32_t		bufferSize;
 		int32_t		currentPhase;

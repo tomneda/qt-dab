@@ -27,14 +27,14 @@
 #endif
 
 static inline
-std::complex<float> cmul (std::complex<float> in, float y) {
-	return std::complex<float> (real (in) * y,
+cmplx cmul (cmplx in, float y) {
+	return cmplx (real (in) * y,
 	                            imag (in) * y);
 }
 
 static inline 
-std::complex<float> cdiv (std::complex<float> in, float y) {
-	return std::complex<float> (real (in) / y,
+cmplx cdiv (cmplx in, float y) {
+	return cmplx (real (in) / y,
 	                            imag (in) / y);
 }
 
@@ -51,7 +51,7 @@ float	sum	= 0;
 	this	-> bufferSize	= bufferSize;
 
 	for (int i = 0; i < bufferSize; i ++)
-	   buffer [i] = std::complex<float> (0, 0);
+	   buffer [i] = cmplx (0, 0);
 
 	for (int i = 0; i < order; i ++) {
 	   if (i == order / 2)
@@ -67,18 +67,18 @@ float	sum	= 0;
 	}
 
 	for (int i = 0; i < order; i ++)
-	   kernel [i] = std::complex<float> (tmp [i] / sum, 0);
+	   kernel [i] = cmplx (tmp [i] / sum, 0);
 }
 
 	upFilter::~upFilter	() {
 }
 //
 static bool first_time = false;
-void	upFilter::Filter (std::complex<float> in, std::complex<float> *res) {
+void	upFilter::Filter (cmplx in, cmplx *res) {
 
 	buffer [ip] = in;
 	for (int i = 0; i < multiplier; i ++) {
-	   res [i] = std::complex<float> (0, 0);
+	   res [i] = cmplx (0, 0);
 	   for (int j = 0; j < bufferSize; j ++) {
 	      int index = ip - j;
 	      if (index < 0)

@@ -442,7 +442,7 @@ int	ret;
 	connected	= true;
 	state -> setText ("ready to go");
 //	set up for the display
-	fftBuffer	= new std::complex<float> [8192];
+	fftBuffer	= new cmplx [8192];
         plotgrid        = transmittedSignal;
         plotgrid        -> setCanvasBackground (QColor("black"));
 	gridColor	= QColor ("white");
@@ -665,7 +665,7 @@ void	plutoHandler::run_receiver	() {
 char	*p_end, *p_dat;
 int	p_inc;
 int	nbytes_rx;
-std::complex<float> localBuf [DAB_RATE / DIVIDER];
+cmplx localBuf [DAB_RATE / DIVIDER];
 std::complex<int16_t> dumpBuf [CONV_SIZE + 1];
 
 	state -> setText ("running");
@@ -680,7 +680,7 @@ std::complex<int16_t> dumpBuf [CONV_SIZE + 1];
 	      const int16_t i_p = ((int16_t *)p_dat) [0];
 	      const int16_t q_p = ((int16_t *)p_dat) [1];
 	      dumpBuf [convIndex] = std::complex<int16_t> (i_p, q_p);
-	      std::complex<float>sample = std::complex<float> (i_p / 2048.0,
+	      cmplxsample = cmplx (i_p / 2048.0,
 	                                                       q_p / 2048.0);
 	      convBuffer [convIndex ++] = sample;
 	      if (convIndex > CONV_SIZE) {
@@ -702,7 +702,7 @@ std::complex<int16_t> dumpBuf [CONV_SIZE + 1];
 	}
 }
 
-int32_t	plutoHandler::getSamples (std::complex<float> *V, int32_t size) { 
+int32_t	plutoHandler::getSamples (cmplx *V, int32_t size) {
 	if (!running. load ())
 	   return 0;
 	return _I_Buffer. getDataFromBuffer (V, size);
@@ -933,7 +933,7 @@ int	sourceSize	= bufferLength / (2 * sizeof (int16_t));
 	      }
 	      if (!transmitting)
 	         break;
-	      std::complex<float> bb; 
+	      cmplx bb;
 	      _O_Buffer. getDataFromBuffer (&bb, 1);
 	      int16_t *i_p = &((int16_t *)p_dat) [0];
 	      int16_t *q_p = &((int16_t *)p_dat) [1];
@@ -944,8 +944,8 @@ int	sourceSize	= bufferLength / (2 * sizeof (int16_t));
 	}
 }
 
-void    plutoHandler::sendSample        (std::complex<float> v, float s) {
-std::complex<float> buf [FM_RATE / 192000];
+void    plutoHandler::sendSample        (cmplx v, float s) {
+cmplx buf [FM_RATE / 192000];
 	if (!transmitting. load ())
 	   return;
 	showSignal (s);
@@ -1171,7 +1171,7 @@ static double Y_values [2048];
 static double endV [2048] = {0};
 
 	for (int i = 0; i < 8192; i ++)
-	   fftBuffer [i] = std::complex<float> (b [i] * window [i], 0);
+	   fftBuffer [i] = cmplx (b [i] * window [i], 0);
 
 	Fft_transform (fftBuffer, 8192, false);
 	

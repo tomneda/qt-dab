@@ -11,7 +11,7 @@ complex<float> createExp (float s) {
 }
 
 
-	channel::channel	(std::vector<std::complex<float>> &refTable,
+	channel::channel	(std::vector<cmplx> &refTable,
 	                         int nrPilots, int nrTaps) {
 	fftSize                 = 2048;
         numberofCarriers	= 1536;
@@ -29,7 +29,7 @@ complex<float> createExp (float s) {
 
 	for (int row = 0; row < numberofPilots; row ++)
            for (int col = 0; col < numberofPilots; col ++)
-              S_p (row, col) = std::complex<float> (0, 0);
+              S_p (row, col) = cmplx (0, 0);
         for (int index = 0; index < numberofPilots; index ++)
 	   S_p (index, index) = refTable [pilotTable [index]];
 
@@ -45,8 +45,8 @@ complex<float> createExp (float s) {
 
 	channel::~channel	() {}
 
-void	channel::estimate	(std::complex<float> *testRow,
-	                         std::complex<float> *resultRow) {
+void	channel::estimate	(cmplx *testRow,
+	                         cmplx *resultRow) {
 Vector  h_td (numberofTaps);
 Vector  H_fd (numberofPilots);
 Vector  X_p  (numberofPilots);

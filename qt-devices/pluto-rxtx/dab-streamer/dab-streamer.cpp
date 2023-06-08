@@ -61,10 +61,10 @@ struct timeval  tv;
 	this	-> outRate		= outRate;
 	this	-> generator		= generator;
 
-	oscillatorTable = new std::complex<float> [outRate];
+	oscillatorTable = new cmplx [outRate];
         for (int i = 0; i < outRate; i ++)
            oscillatorTable [i] =
-                      std::complex<float> (cos (2 * M_PI * (float)i / outRate),
+                      cmplx (cos (2 * M_PI * (float)i / outRate),
                                            sin (2 * M_PI * (float)i / outRate));
 
 	running. store (false);
@@ -117,7 +117,7 @@ float lBuffer [2 * amount];
 	while (pcmBuffer. GetRingBufferWriteAvailable () < 2 * amount)
 	   usleep (1000);
 	for (int i = 0; i < amount; i ++) {
-	   std::complex<float> x = std::complex<float> (v [2 * i],
+	   cmplx x = cmplx (v [2 * i],
 	                                                v [2 * i + 1]);
 	   x	= lowPassFilter. Pass (x);
 	   lBuffer [2 * i] = real (x);
@@ -177,8 +177,8 @@ uint64_t        nextStop;
 
 	   while (running. load () && 
 	        (pcmBuffer. GetRingBufferReadAvailable () < inRate / 10)) {
-//	      std::complex<float> filler [48];
-//	      memset (filler, 0, 48 * sizeof (std::complex<float>));
+//	      cmplx filler [48];
+//	      memset (filler, 0, 48 * sizeof (cmplx));
 	      usleep (10000);
 	   }
 
@@ -186,9 +186,9 @@ uint64_t        nextStop;
 	      break;
 	   readCount	= pcmBuffer. getDataFromBuffer (lBuf, inRate / 10);
 	   for (int i = 0; i < readCount / 2; i ++) {
-	      std::complex<float> v = std::complex<float> (4 * lBuf [2 * i],
+	      cmplx v = cmplx (4 * lBuf [2 * i],
 	                                                   4 * lBuf [2 * i + 1]);
-	      std::complex<float> lbuf [outRate / inRate];	
+	      cmplx lbuf [outRate / inRate];
 	      theFilter. Filter (v, lbuf);	
 	      modulateData ((float *)lbuf, outRate / inRate, 2);
 	   }

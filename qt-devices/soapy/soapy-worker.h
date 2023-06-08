@@ -29,7 +29,7 @@ public:
 		soapyWorker	(void);
 virtual		~soapyWorker	(void);
 virtual	int	Samples		(void);
-virtual	int	getSamples	(std::complex<float> *, int);
+virtual	int	getSamples	(cmplx *, int);
 };
 
 #endif

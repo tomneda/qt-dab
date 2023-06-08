@@ -17,14 +17,14 @@ public:
 	                          int32_t low, int32_t high,
 	                          int32_t sampleRate);
 		~BandPassFIR	();
-std::complex<float>	Pass	(std::complex<float>);
+cmplx	Pass	(cmplx);
 float		Pass		(float);
 private:
 
 	int	filterSize;
 	int	sampleRate;
 	int	ip;
-	std::complex<float> *kernel;
-	std::complex<float> *buffer;
+	cmplx *kernel;
+	cmplx *buffer;
 };
 #endif

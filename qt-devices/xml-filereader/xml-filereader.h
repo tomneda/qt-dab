@@ -42,7 +42,7 @@ Q_OBJECT
 public:
 				xml_fileReader	(QString);
                 		~xml_fileReader	();
-	int32_t			getSamples	(std::complex<float> *,
+	int32_t			getSamples	(cmplx *,
 	                                                         int32_t);
 	int32_t			Samples		();
 	bool			restartReader	(int32_t);
@@ -56,7 +56,7 @@ private:
 	QFrame			myFrame;
 	std::atomic<bool>	running;
 	QString			fileName;
-	RingBuffer<std::complex<float>>	_I_Buffer;
+	RingBuffer<cmplx>	_I_Buffer;
 	FILE			*theFile;
 	uint32_t		filePointer;
 	xmlDescriptor		*theDescriptor;

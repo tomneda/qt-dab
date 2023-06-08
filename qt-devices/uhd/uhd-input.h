@@ -62,7 +62,7 @@ virtual	int32_t	getVFOFrequency	(void);
 	int32_t	defaultFrequency	(void) {return 100000000;}
 virtual	bool	restartReader	(void);
 virtual	void	stopReader	(void);
-virtual	int32_t	getSamples	(std::complex<float> *, int32_t size);
+virtual	int32_t	getSamples	(cmplx *, int32_t size);
 virtual	int32_t	Samples		(void);
 	uint8_t	myIdentity	(void);
 virtual	void	resetBuffer	(void);
@@ -74,7 +74,7 @@ private:
 	QFrame		*myFrame;
 	uhd::usrp::multi_usrp::sptr m_usrp;
 	uhd::rx_streamer::sptr m_rx_stream;
-	RingBuffer<std::complex<float> > *theBuffer;
+	RingBuffer<cmplx > *theBuffer;
 	uhd_streamer* m_workerHandle;
 	int32_t		inputRate;
 	int32_t		ringbufferSize;

@@ -24,12 +24,12 @@
 #ifndef	__XML_READER_H
 #define	__XML_READER_H
 
+#include "dab-constants.h"
 #include	<QThread>
 #include	<QMessageBox>
 #include	<stdio.h>
 #include	"ringbuffer.h"
 #include	<stdint.h>
-#include	<complex>
 #include	<vector>
 #include	<atomic>
 
@@ -43,7 +43,7 @@ public:
 	                            FILE		*f,
 	                            xmlDescriptor	*fd,
 	                            uint32_t		filePointer,
-	                            RingBuffer<std::complex<float>> *b);
+	                            RingBuffer<cmplx> *b);
 			~xml_Reader	();
 	void		stopReader	();
 	bool		handle_continuousButton	();
@@ -52,7 +52,7 @@ private:
 	FILE		*file;
 	xmlDescriptor	*fd;
 	uint32_t	filePointer;
-	RingBuffer<std::complex<float>> *sampleBuffer;
+	RingBuffer<cmplx> *sampleBuffer;
 	xml_fileReader	*parent;
 	int		nrElements;
 	int		samplesToRead;
@@ -61,20 +61,20 @@ private:
 	int		compute_nrSamples 	(FILE *f, int blockNumber);
 	int		readSamples		(FILE *f, 
 	                                       void(xml_Reader::*)(FILE *,
-	                                          std::complex<float> *, int));
+	                                          cmplx *, int));
 	void		readElements_IQ		(FILE *f,
-	                                         std::complex<float> *, int amount);
+	                                         cmplx *, int amount);
 	void		readElements_QI		(FILE *f, 
-	                                         std::complex<float> *, int amount);
+	                                         cmplx *, int amount);
 	void		readElements_I		(FILE *f, 
-	                                         std::complex<float> *, int amount);
+	                                         cmplx *, int amount);
 	void		readElements_Q		(FILE *f, 
-	                                         std::complex<float> *, int amount);
+	                                         cmplx *, int amount);
 //
 //	for the conversion - if any
 	int16_t         convBufferSize;
         int16_t         convIndex;
-        std::vector <std::complex<float> >   convBuffer;
+        std::vector <cmplx >   convBuffer;
         int16_t         mapTable_int   [2048];
         float           mapTable_float [2048];
 

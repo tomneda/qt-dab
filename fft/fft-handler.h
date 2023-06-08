@@ -24,7 +24,7 @@
 #ifndef	__FFT_HANDLER__
 #define	__FFT_HANDLER__
 
-#include	<complex>
+#include "dab-constants.h"
 #include	<vector>
 #include	"kiss_fft.h"
 #ifdef	__FFTW3__
@@ -35,8 +35,8 @@ class	fftHandler {
 public:
 			fftHandler	(int size, bool);
 			~fftHandler	();
-	void		fft 		(std::vector<std::complex<float>> &);
-	void		fft 		(std::complex<float> *);
+	void		fft 		(std::vector<cmplx> &);
+	void		fft 		(cmplx *);
 private:
 	int		size;
 	bool		dir;
@@ -46,7 +46,7 @@ private:
 	kiss_fft_cpx	*fftVector_out;
 #elif	__FFTW3__
 	fftwf_plan	plan;
-	std::complex<float> *fftVector;
+	cmplx *fftVector;
 #endif
 };
 #endif

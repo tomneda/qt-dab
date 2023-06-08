@@ -63,13 +63,13 @@ float	Phi_k;
 	displayCounter		= 0;
 	
 	for (i = 0; i < T_u; i ++)
-	   refTable [i] = std::complex<float> (0, 0);
+	   refTable [i] = cmplx (0, 0);
 
 	for (i = 1; i <= params. get_carriers() / 2; i ++) {
 	   Phi_k =  get_Phi (i);
-	   refTable [i] = std::complex<float> (cos (Phi_k), sin (Phi_k));
+	   refTable [i] = cmplx (cos (Phi_k), sin (Phi_k));
 	   Phi_k = get_Phi (-i);
-	   refTable [T_u - i] = std::complex<float> (cos (Phi_k), sin (Phi_k));
+	   refTable [T_u - i] = cmplx (cos (Phi_k), sin (Phi_k));
 	}
 
 //
@@ -104,7 +104,7 @@ float	Phi_k;
   *	looking for.
   */
 
-int32_t	phaseReference::findIndex (std::vector <std::complex<float>> v,
+int32_t	phaseReference::findIndex (std::vector <cmplx> v,
 	                           int threshold ) {
 int32_t	i;
 int32_t	maxIndex	= -1;
@@ -171,7 +171,7 @@ float	lbuf [T_u / 2];
 //	between subsequent carriers
 #define	SEARCH_RANGE	(2 * 35)
 int16_t	phaseReference::
-	     estimate_CarrierOffset (std::vector<std::complex<float>> v) {
+	     estimate_CarrierOffset (std::vector<cmplx> v) {
 int16_t index_1 = 100, index_2 = 100;
 float	computedDiffs [SEARCH_RANGE + diff_length + 1];
 
@@ -215,7 +215,7 @@ float	computedDiffs [SEARCH_RANGE + diff_length + 1];
 }
 
 float	phaseReference::phase (std::vector<complex<float>> &v, int Ts) {
-std::complex<float> sum = std::complex<float> (0, 0);
+cmplx sum = cmplx (0, 0);
 
 	for (int i = 0; i < Ts; i ++)
 	   sum += v [i];
@@ -224,8 +224,8 @@ std::complex<float> sum = std::complex<float> (0, 0);
 }
 
 #ifdef	__WITH_JAN__
-void	phaseReference::estimate	(std::vector<std::complex<float>> v) {
-std::complex<float> h_td [TAPS];
+void	phaseReference::estimate	(std::vector<cmplx> v) {
+cmplx h_td [TAPS];
 
 	fft_forward. fft (v);
 	theEstimator -> estimate (v, h_td);

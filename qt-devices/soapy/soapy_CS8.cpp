@@ -51,12 +51,12 @@ int	soapy_CS8::Samples	(void) {
 	return theBuffer. GetRingBufferReadAvailable () / 2;
 }
 
-int	soapy_CS8::getSamples	(std::complex<float> *v, int amount) {
+int	soapy_CS8::getSamples	(cmplx *v, int amount) {
 int8_t temp [amount * 2];
 int	realAmount;
 	realAmount	= theBuffer. getDataFromBuffer (temp, amount * 2);
 	for (int i = 0; i < realAmount / 2; i ++) 
-	   v [i] = std::complex<float> (temp [2 * i] / 127.0,
+	   v [i] = cmplx (temp [2 * i] / 127.0,
 	                                temp [2 * i + 1] / 127.0);
 	return realAmount / 2;
 }

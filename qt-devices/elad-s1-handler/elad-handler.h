@@ -39,7 +39,7 @@
 class	QSettings;
 class	eladWorker;
 class	eladLoader;
-//typedef	std::complex<float>(*makeSampleP)(uint8_t *);
+//typedef	cmplx(*makeSampleP)(uint8_t *);
 
 class	eladHandler: public deviceHandler, public Ui_eladWidget {
 Q_OBJECT
@@ -52,7 +52,7 @@ public:
 
 	bool	restartReader		(int32_t);
 	void	stopReader		();
-	int32_t	getSamples		(std::complex<float> *, int32_t);
+	int32_t	getSamples		(cmplx *, int32_t);
 	int32_t	Samples			();
 	void	resetBuffer		();
 	int32_t	getRate			();
@@ -68,7 +68,7 @@ private:
 	QSettings	*eladSettings;
 	QFrame		myFrame;
 	RingBuffer<uint8_t>	_I_Buffer;
-	RingBuffer<std::complex<float>>	_O_Buffer;
+	RingBuffer<cmplx>	_O_Buffer;
 	bool		deviceOK;
 	eladLoader	*theLoader;
 	eladWorker	*theWorker;
@@ -80,7 +80,7 @@ private:
 	int		Nyquist;
 	std::atomic<bool> iqSwitch;
 	int		iqSize;
-	std::complex<float> convBuffer	[ELAD_RATE / 1000 + 1];
+	cmplx convBuffer	[ELAD_RATE / 1000 + 1];
 	int		mapTable_int	[INPUT_RATE / 1000];
         float		mapTable_float	[INPUT_RATE / 1000];
 	int		convIndex;

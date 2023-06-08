@@ -124,7 +124,7 @@ void	uhd_streamer::run (void) {
 	   std::cout << boost::format("Actual RX Rate: %f Msps...") % (inputRate/1e6) << std::endl << std::endl;
 
 //	allocate the rx buffer
-	   theBuffer	= new RingBuffer<std::complex<float> >(ringbufferSize * 1024);
+	   theBuffer	= new RingBuffer<cmplx >(ringbufferSize * 1024);
 	}
 	catch (...) {
 	   fprintf (stderr, "No luck with uhd\n");
@@ -202,7 +202,7 @@ uint8_t	uhdInput::myIdentity	(void) {
 	return DAB_STICK;
 }
 
-int32_t	uhdInput::getSamples	(std::complex<float> *v, int32_t size) {
+int32_t	uhdInput::getSamples	(cmplx *v, int32_t size) {
 	size = std::min ((uint32_t)size,
 	                 (uint32_t)(theBuffer -> GetRingBufferReadAvailable ()));
 	theBuffer -> getDataFromBuffer (v, size);

@@ -109,8 +109,8 @@ private:
   int16_t echo_depth;
   deviceHandler * inputDevice;
   dabParams params;
-  RingBuffer<std::complex<float>> * tiiBuffer;
-  RingBuffer<std::complex<float>> * nullBuffer;
+  RingBuffer<cmplx> * tiiBuffer;
+  RingBuffer<cmplx> * nullBuffer;
   RingBuffer<float> * snrBuffer;
   int16_t tii_delay;
   int16_t tii_counter;
@@ -139,7 +139,7 @@ private:
   int32_t coarseOffset;
   QByteArray transmitters;
   bool correctionNeeded;
-  std::vector<std::complex<float>> ofdmBuffer;
+  std::vector<cmplx> ofdmBuffer;
   bool wasSecond(int16_t, dabParams *);
   virtual void run();
 

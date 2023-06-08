@@ -33,14 +33,14 @@ class	rawReader:public QThread {
 Q_OBJECT
 public:
 			rawReader	(rawFiles *,
-	                                 FILE *, RingBuffer<std::complex<float>> *); 
+	                                 FILE *, RingBuffer<cmplx> *);
 			~rawReader();
 	void		startReader();
 	void		stopReader();
 private:
 virtual void		run();
 	FILE		*filePointer;
-	RingBuffer<std::complex<float>>	*_I_Buffer;
+	RingBuffer<cmplx>	*_I_Buffer;
 	uint64_t	period;
 	std::atomic<bool>	running;
 	uint8_t		*bi;

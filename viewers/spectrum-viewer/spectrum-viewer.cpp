@@ -28,7 +28,7 @@
 #include  "color-selector.h"
 
 
-spectrumViewer::spectrumViewer(RadioInterface * mr, QSettings * dabSettings, RingBuffer<std::complex<float>> * sbuffer, RingBuffer<std::complex<float>> * ibuffer)
+spectrumViewer::spectrumViewer(RadioInterface * mr, QSettings * dabSettings, RingBuffer<cmplx> * sbuffer, RingBuffer<cmplx> * ibuffer)
   : Ui_scopeWidget(),
     myFrame(nullptr),
     fft(SP_SPECTRUMSIZE, false)
@@ -123,7 +123,7 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
   {
     if (std::isnan(abs(spectrum[i])) || std::isinf(abs(spectrum[i])))
     {
-      spectrum[i] = std::complex<float>(0, 0);
+      spectrum[i] = cmplx(0, 0);
     }
     else
     {
@@ -206,7 +206,7 @@ bool spectrumViewer::isHidden()
 
 void spectrumViewer::showIQ(int amount)
 {
-  std::vector<std::complex<float>> Values(amount); // amount typ 1536
+  std::vector<cmplx> Values(amount); // amount typ 1536
 
   const int scopeWidth = scopeSlider->value();
   const bool logIqScope = cbLogIqScope->isChecked();
@@ -230,7 +230,7 @@ void spectrumViewer::showIQ(int amount)
       {
         const float phi = std::arg(Values[i]);
         const float rl = log10f(1.0f + r); // no scaling necessary here due to averaging
-        Values[i] = rl * std::exp(std::complex<float>(0, phi)); // retain phase only log the vector length
+        Values[i] = rl * std::exp(cmplx(0, phi)); // retain phase only log the vector length
         avg += rl; // dividing due to similar looking lin <-> log
       }
       else

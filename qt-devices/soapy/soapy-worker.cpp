@@ -24,7 +24,7 @@
 	soapyWorker::soapyWorker	(void) {}
 	soapyWorker::~soapyWorker	(void) {}
 int	soapyWorker::Samples		(void) {return 0;}
-int	soapyWorker::getSamples		(std::complex<float> *, int) {
+int	soapyWorker::getSamples		(cmplx *, int) {
 	   return 0;
 }
 

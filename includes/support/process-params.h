@@ -16,10 +16,10 @@ public:
 	int16_t	echo_depth;
 	int16_t	bitDepth;
 	RingBuffer<float>	* responseBuffer;
-	RingBuffer<std::complex<float>> * spectrumBuffer;
-	RingBuffer<std::complex<float>> * iqBuffer;
-	RingBuffer<std::complex<float>> * tiiBuffer;
-	RingBuffer<std::complex<float>> * nullBuffer;
+	RingBuffer<cmplx> * spectrumBuffer;
+	RingBuffer<cmplx> * iqBuffer;
+	RingBuffer<cmplx> * tiiBuffer;
+	RingBuffer<cmplx> * nullBuffer;
 	RingBuffer<float>		* snrBuffer;
 	RingBuffer<uint8_t> *frameBuffer;
 };

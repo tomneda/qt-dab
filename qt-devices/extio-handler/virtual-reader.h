@@ -37,10 +37,10 @@
 //	made fitting the framework
 class	virtualReader {
 protected:
-RingBuffer<std::complex<float>>	*theBuffer;
+RingBuffer<cmplx>	*theBuffer;
 int32_t	blockSize;
 public:
-		virtualReader	(RingBuffer<std::complex<float>> *p,
+		virtualReader	(RingBuffer<cmplx> *p,
 	                                                  int32_t rate);
 virtual		~virtualReader	(void);
 virtual void	restartReader	(int32_t s);
@@ -49,15 +49,15 @@ virtual void	processData	(float IQoffs, void *data, int cnt);
 virtual	int16_t	bitDepth	(void);
 protected:
 	int32_t	base;
-	void	convertandStore		(std::complex<float> *, int32_t);
+	void	convertandStore		(cmplx *, int32_t);
 private:
 	void	setMapper	(int32_t, int32_t);
 	float	*mapTable;
 	int16_t	conv;
 	int16_t	inSize;
 	int16_t	outSize;
-	std::complex<float>	*inTable;
-	std::complex<float>	*outTable;
+	cmplx	*inTable;
+	cmplx	*outTable;
 	
 };
 

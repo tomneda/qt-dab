@@ -47,7 +47,7 @@ public:
 	void		stopReader		();
 	void		setVFOFrequency		(int32_t);
 	int32_t		getVFOFrequency		(void);
-	int32_t		getSamples		(std::complex<float> *, int32_t);
+	int32_t		getSamples		(cmplx *, int32_t);
 	int32_t		Samples			();
 	void		resetBuffer		(void);
 	int16_t		bitDepth		(void);
@@ -56,7 +56,7 @@ public:
 	bool		isHidden		();
 	QString		deviceName		();
 
-	RingBuffer<std::complex<float>>	_I_Buffer;
+	RingBuffer<cmplx>	_I_Buffer;
 	int16_t		convBufferSize;
 	int16_t		convIndex;
 	std::vector <complex<float> >   convBuffer;

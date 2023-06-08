@@ -44,7 +44,7 @@ void	deviceHandler::setVFOFrequency	(int freq) {
 	(void)freq;
 }
 
-int32_t	deviceHandler::getSamples	(std::complex<float> *v,
+int32_t	deviceHandler::getSamples	(cmplx *v,
 	                                               int32_t amount) {
 	(void)v; 
 	(void)amount; 

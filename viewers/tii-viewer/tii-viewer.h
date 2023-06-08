@@ -60,7 +60,7 @@ Q_OBJECT
 public:
 			tiiViewer		(RadioInterface *,
 	                                         QSettings *,
-	                                         RingBuffer<std::complex<float>> *);
+	                                         RingBuffer<cmplx> *);
 			~tiiViewer		();
 	void		showSpectrum		(int32_t);
 	void		showTransmitters	(QByteArray);
@@ -76,7 +76,7 @@ private:
 	QFrame		myFrame;
 	QwtPlotCurve	spectrumCurve;
 	QwtPlotGrid	grid;
-	RingBuffer<std::complex<float>>	*tiiBuffer;
+	RingBuffer<cmplx>	*tiiBuffer;
 	QwtPlotPicker	*lm_picker;
 	QColor		displayColor;
 	QColor		gridColor;
@@ -84,7 +84,7 @@ private:
 
 	fftHandler	fft;
 	double		displayBuffer [TII_DISPLAYSIZE];
-	std::complex<float> spectrumBuffer [TII_SPECTRUMSIZE];
+	cmplx spectrumBuffer [TII_SPECTRUMSIZE];
 	float		Window [TII_SPECTRUMSIZE];
 	QwtPlotMarker	*Marker;
 	QwtPlot		*plotgrid;

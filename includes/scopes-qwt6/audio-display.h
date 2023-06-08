@@ -66,7 +66,7 @@ private:
 	int16_t		displaySize;
 	int16_t		spectrumSize;
 	double		displayBuffer [512];
-	std::complex<float>	*spectrumBuffer;
+	cmplx	*spectrumBuffer;
 	float		Window [4 * 512];
 	fftHandler	fft;
 	QwtPlotPicker   *lm_picker;

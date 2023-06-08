@@ -183,7 +183,7 @@ public:
 	bool		restartReader		(int32_t);
 	void		stopReader		(void);
 	int32_t		Samples			(void);
-	int32_t		getSamples		(std::complex<float> *,
+	int32_t		getSamples		(cmplx *,
 	                                                        int32_t);
 	int16_t		bitDepth		(void);
 	long		GetHWLO			(void);	// should be available
@@ -198,7 +198,7 @@ private:
 	int32_t		base_32;
 	int32_t		inputRate;
 	bool		loadFunctions	(void);
-	RingBuffer<std::complex<float>>	*_I_Buffer;
+	RingBuffer<cmplx>	*_I_Buffer;
 //	functions to be extracted from the dll
 	pfnDllMain	DllMain;	// maybe available
 	pfnInitHW	InitHW;		// should be available

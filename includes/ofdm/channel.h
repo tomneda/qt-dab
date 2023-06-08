@@ -34,16 +34,16 @@ using namespace	Eigen;
 //	symbol
 class	channel {
 public:
-		channel		(std::vector<std::complex<float>> &, int, int);
+		channel		(std::vector<cmplx> &, int, int);
 		~channel	();
-	void	estimate	(std::complex<float> *, std::complex<float> *);
+	void	estimate	(cmplx *, cmplx *);
 private:
 	int16_t		numberofCarriers;
 	int16_t		numberofPilots;
 	int16_t		numberofTaps;
 	int16_t		fftSize;
-	typedef Matrix<std::complex<float>, Dynamic, Dynamic> MatrixXd;
-	typedef Matrix<std::complex<float>, Dynamic, 1> Vector;
+	typedef Matrix<cmplx, Dynamic, Dynamic> MatrixXd;
+	typedef Matrix<cmplx, Dynamic, 1> Vector;
 	MatrixXd	F_p;
 	MatrixXd	S_p;
 	MatrixXd	S_pxF_p;

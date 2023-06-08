@@ -29,8 +29,8 @@
 
 
 class	upFilter {
-	std::vector<std::complex<float>> kernel;
-	std::vector<std::complex<float>> buffer;
+	std::vector<cmplx> kernel;
+	std::vector<cmplx> buffer;
 	int		ip;
 	int		order;
 	int		bufferSize;
@@ -38,7 +38,7 @@ class	upFilter {
 public:
 	upFilter	(int, int, int);
 	~upFilter	();
-void	Filter	(std::complex<float>, std::complex<float> *);
+void	Filter	(cmplx, cmplx *);
 };
 #endif
 

@@ -68,7 +68,7 @@ class spectrumViewer : public QObject, Ui_scopeWidget
 {
 Q_OBJECT
 public:
-  spectrumViewer(RadioInterface *, QSettings *, RingBuffer<std::complex<float>> *, RingBuffer<std::complex<float>> *);
+  spectrumViewer(RadioInterface *, QSettings *, RingBuffer<cmplx> *, RingBuffer<cmplx> *);
   ~spectrumViewer() override;
   void showSpectrum(int32_t, int32_t);
   void showFrequency(float);
@@ -86,8 +86,8 @@ private:
   QFrame myFrame;
   RadioInterface * myRadioInterface;
   QSettings * dabSettings;
-  RingBuffer<std::complex<float>> * spectrumBuffer;
-  RingBuffer<std::complex<float>> * iqBuffer;
+  RingBuffer<cmplx> * spectrumBuffer;
+  RingBuffer<cmplx> * iqBuffer;
   QwtPlotPicker * lm_picker{};
   QColor mDisplayColor;
   QColor mGridColor;
@@ -95,7 +95,7 @@ private:
 
   fftHandler fft;
 
-  std::array<std::complex<float>, SP_SPECTRUMSIZE> spectrum{ 0 };
+  std::array<cmplx, SP_SPECTRUMSIZE> spectrum{ 0 };
   std::array<double, SP_SPECTRUMSIZE> displayBuffer{ 0 };
   std::array<float,  SP_SPECTRUMSIZE> Window{ 0 };
   std::array<double, SP_SPECTRUMSIZE> X_axis{ 0 };

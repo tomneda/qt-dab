@@ -55,8 +55,8 @@ public:
 	                                         uint8_t,
 	                                         RingBuffer<uint8_t> *);
 			~mscHandler();
-	void		processBlock_0		(std::complex<float> *);
-	void		process_Msc		(std::complex<float> *, int);
+	void		processBlock_0		(cmplx *);
+	void		process_Msc		(cmplx *, int);
 	bool		set_Channel		(descriptorType *,
 	                                         RingBuffer<int16_t> *,
 	                                         RingBuffer<uint8_t> *,
@@ -74,7 +74,7 @@ private:
 	RingBuffer<uint8_t>	*dataBuffer;
 	RingBuffer<uint8_t>	*frameBuffer;
 	dabParams	params;
-	std::vector<std::complex<float>>     phaseReference;
+	std::vector<cmplx>     phaseReference;
 
         interLeaver     myMapper;
 	QMutex		locker;
@@ -94,7 +94,7 @@ private:
 	int		nrBlocks;
 #ifdef	__MSC_THREAD__
         void            processBlock_0	();
-        std::vector<std::vector<std::complex<float> > > command;
+        std::vector<std::vector<cmplx > > command;
         int16_t         amount;
 	void            run();
         QSemaphore      bufferSpace;

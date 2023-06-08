@@ -41,18 +41,17 @@
 #endif
 
 #ifdef  __MINGW32__
-//#include	"iostream.h"
-#include	"windows.h"
+  //#include	"iostream.h"
+  #include	"windows.h"
 #else
-#ifndef  __FREEBSD__
-//#include	"alloca.h"
+  #ifndef  __FREEBSD__
+    //#include	"alloca.h"
+  #endif
+  #include  "dlfcn.h"
+  typedef void * HINSTANCE;
 #endif
 
-#include  "dlfcn.h"
-
-typedef void * HINSTANCE;
-#endif
-
+using cmplx = std::complex<float>;
 
 #ifndef  M_PI
 # define M_PI           3.14159265358979323846  /* pi */
@@ -116,14 +115,14 @@ static inline bool isInfinite(float x)
   return x == std::numeric_limits<float>::infinity();
 }
 
-static inline std::complex<float> cmul(std::complex<float> x, float y)
+static inline cmplx cmul(cmplx x, float y)
 {
-  return std::complex<float>(real(x) * y, imag(x) * y);
+  return cmplx(real(x) * y, imag(x) * y);
 }
 
-static inline std::complex<float> cdiv(std::complex<float> x, float y)
+static inline cmplx cdiv(cmplx x, float y)
 {
-  return std::complex<float>(real(x) / y, imag(x) / y);
+  return cmplx(real(x) / y, imag(x) / y);
 }
 
 static inline float get_db(float x)
@@ -135,7 +134,7 @@ static inline float get_db(float x)
 #define  MINIMUM(x, y)  ((x) < (y) ? x : y)
 #define  MAXIMUM(x, y)  ((x) > (y) ? x : y)
 
-static inline float jan_abs(std::complex<float> z)
+static inline float jan_abs(cmplx z)
 {
   float re = real(z);
   float im = imag(z);

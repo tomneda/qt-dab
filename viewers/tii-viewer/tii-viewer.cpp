@@ -30,7 +30,7 @@
 
 	tiiViewer::tiiViewer	(RadioInterface	*mr,
 	                         QSettings	*dabSettings,
-	                         RingBuffer<std::complex<float>> *sbuffer):
+	                         RingBuffer<cmplx> *sbuffer):
 	                              myFrame (nullptr),
 	                              spectrumCurve (""),
 	                              fft (TII_SPECTRUMSIZE, false) {

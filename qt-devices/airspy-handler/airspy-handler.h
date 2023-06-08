@@ -97,7 +97,7 @@ public:
 	int32_t		defaultFrequency	();
 	bool		restartReader		(int32_t);
 	void		stopReader		();
-	int32_t		getSamples		(std::complex<float> *v,
+	int32_t		getSamples		(cmplx *v,
 	                                                 int32_t size);
 	int32_t		Samples			();
 	void		resetBuffer		();
@@ -110,7 +110,7 @@ public:
 	int16_t		currentTab;
 private:
 	QFrame		myFrame;
-	RingBuffer<std::complex<float>> _I_Buffer;
+	RingBuffer<cmplx> _I_Buffer;
 	QString		recorderVersion;
 	FILE            *xmlDumper;
         xml_fileWriter  *xmlWriter;

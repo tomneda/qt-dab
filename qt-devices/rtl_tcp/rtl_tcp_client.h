@@ -51,7 +51,7 @@ public:
 	int32_t		getVFOFrequency	();
 	bool		restartReader	(int32_t);
 	void		stopReader	();
-	int32_t		getSamples	(std::complex<float> *V, int32_t size);
+	int32_t		getSamples	(cmplx *V, int32_t size);
 	int32_t		Samples		();
 	void		show		();
 	void		hide		();
@@ -76,7 +76,7 @@ private:
 	QSettings	*remoteSettings;
 	int32_t		theRate;
 	int32_t		vfoFrequency;
-	RingBuffer<std::complex<float>>	*_I_Buffer;
+	RingBuffer<cmplx>	*_I_Buffer;
 	bool		connected;
 	int16_t		theGain;
 	int16_t		thePpm;

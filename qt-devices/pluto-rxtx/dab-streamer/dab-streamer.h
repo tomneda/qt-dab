@@ -150,7 +150,7 @@ private:
 	int		inRate;
 	int		outRate;
 	plutoHandler	*generator;
-	std::complex<float>	*oscillatorTable;
+	cmplx	*oscillatorTable;
 	float		*sinTable;
 	void		modulateData	(float *, int, int);
 	std::atomic<bool>	running;

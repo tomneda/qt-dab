@@ -139,10 +139,10 @@ void	colibriHandler::handle_iqSwitcher	()  {
 }
 
 static
-bool	the_callBackRx (std::complex<float> *buffer, uint32_t len,
+bool	the_callBackRx (cmplx *buffer, uint32_t len,
 	                               bool overload, void *ctx) {
 colibriHandler *p = static_cast<colibriHandler *>(ctx);
-std::complex<float> temp [2048];
+cmplx temp [2048];
 
 	(void)overload;
 	for (int i = 0; i < len; i ++) {
@@ -188,12 +188,12 @@ void	colibriHandler::stopReader() {
 	running. store (false);
 }
 
-int32_t	colibriHandler::getSamples (std::complex<float> *V, int32_t size) { 
+int32_t	colibriHandler::getSamples (cmplx *V, int32_t size) {
 	if (iqSwitcher) {
-	   std::complex<float> xx [size];
+	   cmplx xx [size];
 	   _I_Buffer. getDataFromBuffer (xx, size);
 	   for (int i = 0; i < size; i ++)
-	      V[i] = std::complex<float> (imag (xx [i]), real (xx [i]));
+	      V[i] = cmplx (imag (xx [i]), real (xx [i]));
 	   return size;
 	}
 	else

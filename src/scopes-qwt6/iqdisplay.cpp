@@ -66,7 +66,7 @@ template<typename T> inline void symmetric_limit(T & ioVal, const T iLimit)
   }
 }
 
-void IQDisplay::display_iq(const std::vector<std::complex<float>> & z, float scale, float ref)
+void IQDisplay::display_iq(const std::vector<cmplx> & z, float scale, float ref)
 {
   if (z.size() != mPoints.size())
   {

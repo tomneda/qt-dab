@@ -40,7 +40,7 @@
  *	carriers and map them on (soft) bits
  */
 ofdmDecoder::ofdmDecoder(RadioInterface *mr, uint8_t dabMode, int16_t bitDepth,
-                         RingBuffer<std::complex<float> > *iqBuffer)
+                         RingBuffer<cmplx > *iqBuffer)
   : params(dabMode)
   , myMapper(dabMode)
   , fft(params.get_T_u(), false)
@@ -73,7 +73,7 @@ void ofdmDecoder::reset()
 
 /**
  */
-void ofdmDecoder::processBlock_0(std::vector<std::complex<float> > buffer)
+void ofdmDecoder::processBlock_0(std::vector<cmplx > buffer)
 {
   fft.fft(buffer);
   /**
@@ -81,7 +81,7 @@ void ofdmDecoder::processBlock_0(std::vector<std::complex<float> > buffer)
    *	as coming from the FFT as phase reference.
    */
   
-  memcpy(phaseReference.data(), buffer.data(), T_u * sizeof(std::complex<float>));
+  memcpy(phaseReference.data(), buffer.data(), T_u * sizeof(cmplx));
 }
 
 /**
@@ -91,9 +91,9 @@ void ofdmDecoder::processBlock_0(std::vector<std::complex<float> > buffer)
  *	only to spare a test. The mapping code is the same
  */
 
-void ofdmDecoder::decode(const std::vector<std::complex<float> > &buffer, int32_t blkno, std::vector<int16_t> &oBits)
+void ofdmDecoder::decode(const std::vector<cmplx > &buffer, int32_t blkno, std::vector<int16_t> &oBits)
 {
-  memcpy(fft_buffer.data(), &((buffer.data())[T_g]), T_u * sizeof(std::complex<float>));
+  memcpy(fft_buffer.data(), &((buffer.data())[T_g]), T_u * sizeof(cmplx));
 
   // fftlabel:
   /**
@@ -128,7 +128,7 @@ void ofdmDecoder::decode(const std::vector<std::complex<float> > &buffer, int32_
      *	on the same position in the next block
      */
     
-    std::complex<float> r1 = fft_buffer[index] * conj(phaseReference[index]);
+    cmplx r1 = fft_buffer[index] * conj(phaseReference[index]);
     dataVector[i] = r1;
     float ab1 = abs(r1);
     
@@ -156,10 +156,10 @@ void ofdmDecoder::decode(const std::vector<std::complex<float> > &buffer, int32_
     }
   }
 
-  memcpy(phaseReference.data(), fft_buffer.data(), T_u * sizeof(std::complex<float>));
+  memcpy(phaseReference.data(), fft_buffer.data(), T_u * sizeof(cmplx));
 }
 
-float ofdmDecoder::compute_mod_quality(const std::vector<std::complex<float>> & v)
+float ofdmDecoder::compute_mod_quality(const std::vector<cmplx> & v)
 {
   //	since we do not equalize, we have a kind of "fake"
   //	reference point.
@@ -168,12 +168,12 @@ float ofdmDecoder::compute_mod_quality(const std::vector<std::complex<float>> & 
   //	std deviation of the phases rather than the computation
   //	from the Modulation Error Ratio as specified in Tr 101 290
   
-  constexpr std::complex<float> rotator = std::complex<float>(1.0f, -1.0f); // this is the reference phase shift to get the phase zero degree
+  constexpr cmplx rotator = cmplx(1.0f, -1.0f); // this is the reference phase shift to get the phase zero degree
   float squareVal = 0;
 
   for (int i = 0; i < carriers; i++)
   {
-    float x1 = arg(std::complex<float>(abs(real(v[i])), abs(imag(v[i]))) * rotator); // map to top right section and shift phase to zero (nominal)
+    float x1 = arg(cmplx(abs(real(v[i])), abs(imag(v[i]))) * rotator); // map to top right section and shift phase to zero (nominal)
     squareVal += x1 * x1;
   }
 
@@ -189,25 +189,25 @@ float ofdmDecoder::compute_mod_quality(const std::vector<std::complex<float>> & 
 //	so, with that in mind we experiment with formula 5.39
 //	and 5.40 from "OFDM Baseband Receiver Design for Wireless
 //	Communications (Chiueh and Tsai)"
-float ofdmDecoder::compute_time_offset(const std::vector<std::complex<float>> & r, const std::vector<std::complex<float>> & v)
+float ofdmDecoder::compute_time_offset(const std::vector<cmplx> & r, const std::vector<cmplx> & v)
 {
-  std::complex<float> leftTerm;
-  std::complex<float> rightTerm;
-  std::complex<float> sum = std::complex<float>(0, 0);
+  cmplx leftTerm;
+  cmplx rightTerm;
+  cmplx sum = cmplx(0, 0);
 
   for (int i = -carriers / 2; i < carriers / 2; i += 6)
   {
     int index_1 = i < 0 ? i + T_u : i;
     int index_2 = (i + 1) < 0 ? (i + 1) + T_u : (i + 1);
     
-    std::complex<float> s = r[index_1] * conj(v[index_2]);
+    cmplx s = r[index_1] * conj(v[index_2]);
     
-    s = std::complex<float>(abs(real(s)), abs(imag(s)));
-    leftTerm = s * conj(std::complex<float>(abs(s) / sqrt(2), abs(s) / sqrt(2)));
+    s = cmplx(abs(real(s)), abs(imag(s)));
+    leftTerm = s * conj(cmplx(abs(s) / sqrt(2), abs(s) / sqrt(2)));
     
     s = r[index_2] * conj(v[index_2]);
-    s = std::complex<float>(abs(real(s)), abs(imag(s)));
-    rightTerm = s * conj(std::complex<float>(abs(s) / sqrt(2), abs(s) / sqrt(2)));
+    s = cmplx(abs(real(s)), abs(imag(s)));
+    rightTerm = s * conj(cmplx(abs(s) / sqrt(2), abs(s) / sqrt(2)));
     
     sum += conj(leftTerm) * rightTerm;
   }
@@ -215,22 +215,22 @@ float ofdmDecoder::compute_time_offset(const std::vector<std::complex<float>> & 
   return arg(sum);
 }
 
-float ofdmDecoder::compute_frequency_offset(const std::vector<std::complex<float>> & r, const std::vector<std::complex<float>> & c)
+float ofdmDecoder::compute_frequency_offset(const std::vector<cmplx> & r, const std::vector<cmplx> & c)
 {
-  std::complex<float> theta = std::complex<float>(0, 0);
+  cmplx theta = cmplx(0, 0);
 
   for (int i = -carriers / 2; i < carriers / 2; i += 6)
   {
     int index = i < 0 ? i + T_u : i;
-    std::complex<float> val = r[index] * conj(c[index]);
-    val    = std::complex<float>(abs(real(val)), abs(imag(val)));
-    theta += val * std::complex<float>(1, -1);
+    cmplx val = r[index] * conj(c[index]);
+    val    = cmplx(abs(real(val)), abs(imag(val)));
+    theta += val * cmplx(1, -1);
   }
 
   return arg(theta) / (2 * M_PI) * 2048000 / T_u;
 }
 
-float ofdmDecoder::compute_clock_offset(const std::complex<float> * r, const std::complex<float> * v)
+float ofdmDecoder::compute_clock_offset(const cmplx * r, const cmplx * v)
 {
   float offsa = 0;
   int offsb = 0;
@@ -239,8 +239,8 @@ float ofdmDecoder::compute_clock_offset(const std::complex<float> * r, const std
   {
     int index   = i < 0 ? (i + T_u) : i;
     int index_2 = i + carriers / 2;
-    std::complex<float> a1 = std::complex<float>(abs(real(r[index])), abs(imag(r[index])));
-    std::complex<float> a2 = std::complex<float>(abs(real(v[index])), abs(imag(v[index])));
+    cmplx a1 = cmplx(abs(real(r[index])), abs(imag(r[index])));
+    cmplx a2 = cmplx(abs(real(v[index])), abs(imag(v[index])));
     float s = abs(arg(a1 * conj(a2)));
     offsa += index * s;
     offsb += index_2 * index_2;

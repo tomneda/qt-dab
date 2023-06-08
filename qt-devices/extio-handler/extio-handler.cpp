@@ -217,7 +217,7 @@ int32_t	inputRate	= 0;
 	   }
 	}
 
-	_I_Buffer	= new RingBuffer<std::complex<float>>(1024 * 1024);
+	_I_Buffer	= new RingBuffer<cmplx>(1024 * 1024);
 	fprintf (stderr, "hardware type = %d\n", hardwareType);
 	switch (hardwareType) {
 	   case exthwNone:
@@ -400,7 +400,7 @@ int32_t	x = _I_Buffer -> GetRingBufferReadAvailable();
 	return x;
 }
 
-int32_t	extioHandler::getSamples	(std::complex<float> *buffer,
+int32_t	extioHandler::getSamples	(cmplx *buffer,
 	                                 int32_t number) {
 	return _I_Buffer -> getDataFromBuffer (buffer, number);
 }

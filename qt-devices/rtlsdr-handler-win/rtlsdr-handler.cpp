@@ -331,7 +331,7 @@ void	rtlsdrHandler::set_ppmCorrection	(int32_t ppm) {
 	rtlsdr_set_freq_correction (theDevice, ppm);
 }
 
-int32_t	rtlsdrHandler::getSamples (std::complex<float> *V, int32_t size) { 
+int32_t	rtlsdrHandler::getSamples (cmplx *V, int32_t size) {
 std::complex<uint8_t> temp [size];
 int	amount;
 static uint8_t dumpBuffer [4096];
@@ -348,12 +348,12 @@ static int iqTeller	= 0;
 	   }
 	   for (int i = 0; i < amount; i ++) 
 	      V [i] = theFilter. Pass (
-	               std::complex<float> (mapTable [real (temp [i]) & 0xFF],
+	               cmplx (mapTable [real (temp [i]) & 0xFF],
 	                                    mapTable [imag (temp [i]) & 0xFF]));
 	}
 	else
 	   for (int i = 0; i < amount; i ++) 
-	      V [i] = std::complex<float> (mapTable [real (temp [i]) & 0xFF],
+	      V [i] = cmplx (mapTable [real (temp [i]) & 0xFF],
 	                                   mapTable [imag (temp [i]) & 0xFF]);
 	if (xml_dumping. load ())
 	   xmlWriter -> add (temp, amount);

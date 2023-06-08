@@ -25,7 +25,7 @@
 #ifndef	__FFT_COMPLEX__
 #define	__FFT_COMPLEX__
 
-#include <complex>
+#include "dab-constants.h"
 //#include	"basics.h"
 
 #ifdef __cplusplus
@@ -38,7 +38,7 @@ extern "C" {
  * The vector can have any length. This is a wrapper function. The inverse transform does not perform scaling,
  * so it is not a true inverse. Returns true if successful, false otherwise (out of memory).
  */
-bool Fft_transform (std::complex<float> vec[], size_t n, bool inverse);
+bool Fft_transform (cmplx vec[], size_t n, bool inverse);
 
 
 /* 
@@ -49,7 +49,7 @@ bool Fft_transform (std::complex<float> vec[], size_t n, bool inverse);
  * Returns true if successful, false otherwise
  * (n is not a power of 2, or out of memory).
  */
-bool Fft_transformRadix2 (std::complex<float> vec[], size_t n, bool inverse);
+bool Fft_transformRadix2 (cmplx vec[], size_t n, bool inverse);
 
 
 /* 
@@ -60,7 +60,7 @@ bool Fft_transformRadix2 (std::complex<float> vec[], size_t n, bool inverse);
  * Uses Bluestein's chirp z-transform algorithm.
  * Returns true if successful, false otherwise (out of memory).
  */
-bool Fft_transformBluestein (std::complex<float> vec[], size_t n, bool inverse);
+bool Fft_transformBluestein (cmplx vec[], size_t n, bool inverse);
 
 
 /* 
@@ -68,9 +68,9 @@ bool Fft_transformBluestein (std::complex<float> vec[], size_t n, bool inverse);
  * Each vector's length must be the same.
  * Returns true if successful, false otherwise (out of memory).
  */
-bool	Fft_convolve (const std::complex<float> xvec [],
-	              const std::complex<float> yvec [],
-	              std::complex<float> outvec[], size_t n);
+bool	Fft_convolve (const cmplx xvec [],
+	              const cmplx yvec [],
+	              cmplx outvec[], size_t n);
 
 
 #ifdef __cplusplus

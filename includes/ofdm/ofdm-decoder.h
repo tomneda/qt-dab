@@ -37,11 +37,11 @@ class ofdmDecoder : public QObject {
   Q_OBJECT
 public:
   ofdmDecoder(RadioInterface *, uint8_t, int16_t,
-              RingBuffer<std::complex<float>> *iqBuffer = nullptr);
+              RingBuffer<cmplx> *iqBuffer = nullptr);
   ~ofdmDecoder() = default;
   
-  void processBlock_0(std::vector<std::complex<float>>);
-  void decode(const std::vector<std::complex<float> > &, int32_t n, std::vector<int16_t> &);
+  void processBlock_0(std::vector<cmplx>);
+  void decode(const std::vector<cmplx > &, int32_t n, std::vector<int16_t> &);
   void stop();
   void reset();
 
@@ -50,7 +50,7 @@ private:
   dabParams params;
   interLeaver myMapper;
   fftHandler fft;
-  RingBuffer<std::complex<float>> *iqBuffer;
+  RingBuffer<cmplx> *iqBuffer;
   
   int32_t T_s;
   int32_t T_u;
@@ -58,14 +58,14 @@ private:
   int32_t nrBlocks;
   int32_t carriers;
   int32_t cnt = 0;
-  std::vector<std::complex<float>> phaseReference;
-  std::vector<std::complex<float>> fft_buffer;
-  std::vector<std::complex<float>> dataVector;
+  std::vector<cmplx> phaseReference;
+  std::vector<cmplx> fft_buffer;
+  std::vector<cmplx> dataVector;
  
-  float compute_mod_quality(const std::vector<std::complex<float>> & v);
-  float compute_time_offset(const std::vector<std::complex<float>> &, const std::vector<std::complex<float>> &);
-  float compute_clock_offset(const std::complex<float> *, const std::complex<float> *);
-  float compute_frequency_offset(const std::vector<std::complex<float>> &, const std::vector<std::complex<float>> &);
+  float compute_mod_quality(const std::vector<cmplx> & v);
+  float compute_time_offset(const std::vector<cmplx> &, const std::vector<cmplx> &);
+  float compute_clock_offset(const cmplx *, const cmplx *);
+  float compute_frequency_offset(const std::vector<cmplx> &, const std::vector<cmplx> &);
   int16_t getMiddle();
 
 signals:

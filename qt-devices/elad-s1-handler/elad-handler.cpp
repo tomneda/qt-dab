@@ -184,7 +184,7 @@ void	eladHandler::stopReader	(void) {
 	theWorker = nullptr;
 }
 
-std::complex<float>	makeSample_31bits (uint8_t *, bool);
+cmplx	makeSample_31bits (uint8_t *, bool);
 
 typedef union {
 	struct __attribute__((__packed__)) {
@@ -213,7 +213,7 @@ typedef union {
 // ADC out unsigned 14 bit input to FPGA output signed 16 bit
 #define SCALE_FACTOR_16to14    (0.250)       //(8192/32768)  
 
-std::complex<float>	makeSample_31bits (uint8_t *buf, bool iqSwitch) {
+cmplx	makeSample_31bits (uint8_t *buf, bool iqSwitch) {
 int ii = 0; int qq = 0;
 int16_t	i = 0;
 uint32_t	uii = 0, uqq = 0;
@@ -238,10 +238,10 @@ uint32_t	uii = 0, uqq = 0;
         qq =(int)uqq;
 
 	if (iqSwitch)
-	   return std::complex<float> ((float)qq * SCALE_FACTOR_32to14,
+	   return cmplx ((float)qq * SCALE_FACTOR_32to14,
 	                               (float)ii * SCALE_FACTOR_32to14);
 	else
-	   return std::complex<float> ((float)ii * SCALE_FACTOR_32to14,
+	   return cmplx ((float)ii * SCALE_FACTOR_32to14,
 	                               (float)qq * SCALE_FACTOR_32to14);
 }
 
@@ -260,9 +260,9 @@ uint32_t	uii = 0, uqq = 0;
 #define	SEGMENT_SIZE	(1024 * iqSize)
 static
 int	teller		= 0;
-int32_t	eladHandler::getSamples (std::complex<float> *V, int32_t size) { 
+int32_t	eladHandler::getSamples (cmplx *V, int32_t size) {
 uint8_t lBuf [SEGMENT_SIZE];
-std::complex<float> temp [2048];
+cmplx temp [2048];
 //
 //	if we have sufficient samples in the buffer, go for it
 	if (_O_Buffer. GetRingBufferReadAvailable () >= size) 

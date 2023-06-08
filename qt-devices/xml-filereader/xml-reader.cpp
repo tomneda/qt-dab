@@ -35,8 +35,8 @@ int r	= 1;
 }
 
 static inline
-std::complex<float> compmul (std::complex<float> a, float b) {
-	return std::complex<float> (real (a) * b, imag (a) * b);
+cmplx compmul (cmplx a, float b) {
+	return cmplx (real (a) * b, imag (a) * b);
 }
 
 static inline
@@ -52,7 +52,7 @@ struct timeval tv;
 	                        FILE	*f,
 	                        xmlDescriptor *fd,
 	                        uint32_t	filePointer,
-	                        RingBuffer<std::complex<float>> *b) {
+	                        RingBuffer<cmplx> *b) {
 	this	-> parent	= mr;
 	this	-> file		= f;
 	this	-> fd		= fd;
@@ -172,8 +172,8 @@ int	samplesToRead	= 0;
 
 int	xml_Reader::readSamples (FILE *theFile, 
 	                         void(xml_Reader::*r)(FILE *theFile,
-	                                    std::complex<float> *, int)) {
-std::complex<float> temp [2048];
+	                                    cmplx *, int)) {
+cmplx temp [2048];
 
 	(*this.*r) (theFile, &convBuffer [1], convBufferSize);
 	for (int i = 0; i < 2048; i ++) {
@@ -210,7 +210,7 @@ float mapTable [] = {
 //
 //	the readers
 void	xml_Reader::readElements_IQ (FILE *theFile, 
-	                             std::complex<float> *buffer,
+	                             cmplx *buffer,
 	                             int amount) {
 
 int	nrBits	= fd -> bitsperChannel;
@@ -220,7 +220,7 @@ float	scaler	= float (shift (nrBits));
 	   uint8_t lbuf [2 * amount];
 	   fread (lbuf, 1, 2 * amount, theFile);
 	   for (int i = 0; i < amount; i ++)
-	      buffer [i] = std::complex<float> (((int8_t)lbuf [2 * i]) / 127.0,
+	      buffer [i] = cmplx (((int8_t)lbuf [2 * i]) / 127.0,
 	                                        ((int8_t)lbuf [2 * i + 1]) / 127.0);
 	   return;
 	}
@@ -229,7 +229,7 @@ float	scaler	= float (shift (nrBits));
 	   uint8_t lbuf [2 * amount];
 	   fread (lbuf, 1, 2 * amount, theFile);
 	   for (int i = 0; i < amount; i ++)
-	      buffer [i] = std::complex<float> (mapTable [lbuf [2 * i]],
+	      buffer [i] = cmplx (mapTable [lbuf [2 * i]],
 	                                        mapTable [lbuf [2 * i + 1]]);
 	   return;
 	}
@@ -241,7 +241,7 @@ float	scaler	= float (shift (nrBits));
 	      for (int i = 0; i < amount; i ++) {
 	         int16_t temp_16_1 = (lbuf [4 * i] << 8) | lbuf [4 * i + 1];
 	         int16_t temp_16_2 = (lbuf [4 * i + 2] << 8) | lbuf [4 * i + 3];
-	         buffer [i] = std::complex<float> ((float)temp_16_1 / scaler,
+	         buffer [i] = cmplx ((float)temp_16_1 / scaler,
 	                                           (float)temp_16_2 / scaler);
 	      }
 	   }
@@ -249,7 +249,7 @@ float	scaler	= float (shift (nrBits));
 	      for (int i = 0; i < amount; i ++) {
 	         int16_t temp_16_1 = (lbuf [4 * i + 1] << 8) | lbuf [4 * i];
 	         int16_t temp_16_2 = (lbuf [4 * i + 3] << 8) | lbuf [4 * i + 2];
-	         buffer [i] = std::complex<float> ((float)temp_16_1 / scaler,
+	         buffer [i] = cmplx ((float)temp_16_1 / scaler,
 	                                           (float)temp_16_2 / scaler);
 	      }
 	   }
@@ -269,7 +269,7 @@ float	scaler	= float (shift (nrBits));
 	            temp_32_1 |= 0xFF000000;
 	   	 if (temp_32_2 & 0x800000) 
 	            temp_32_2 |= 0xFF000000;
-	         buffer [i] = std::complex<float> ((float)temp_32_1 / scaler,
+	         buffer [i] = cmplx ((float)temp_32_1 / scaler,
 	                                           (float)temp_32_2 / scaler);
 	      }
 	   }
@@ -283,7 +283,7 @@ float	scaler	= float (shift (nrBits));
 	            temp_32_1 |= 0xFF000000;
 	   	 if (temp_32_2 & 0x800000) 
 	            temp_32_2 |= 0xFF000000;
-	         buffer [i] = std::complex<float> ((float)temp_32_1 / scaler,
+	         buffer [i] = cmplx ((float)temp_32_1 / scaler,
 	                                           (float)temp_32_2 / scaler);
 	      }
 	   }
@@ -301,7 +301,7 @@ float	scaler	= float (shift (nrBits));
                  int32_t temp_32_2 = (lbuf [8 * i + 4] << 24) |
 	                             (lbuf [8 * i + 5] << 16) |
 	                             (lbuf [8 * i + 6] << 8) | lbuf [8 * i + 7];
-	         buffer [i] = std::complex<float> ((float)temp_32_1 / scaler,
+	         buffer [i] = cmplx ((float)temp_32_1 / scaler,
 	                                           (float)temp_32_2 / scaler);
 	      }
 	   }
@@ -313,7 +313,7 @@ float	scaler	= float (shift (nrBits));
                  int32_t temp_32_2 = (lbuf [8 * i + 7] << 24) |
 	                             (lbuf [8 * i + 6] << 16) |
 	                             (lbuf [8 * i + 5] << 8) | lbuf [8 * i + 4];
-	         buffer [i] = std::complex<float> ((float)temp_32_1 / scaler,
+	         buffer [i] = cmplx ((float)temp_32_1 / scaler,
 	                                           (float)temp_32_2 / scaler);
 	      }
 	   }
@@ -333,7 +333,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [8 * i + 5] << 16) |
 	                             (lbuf [8 * i + 6] << 8) | lbuf [8 * i + 7];
 	         float t2	=*(float *)(&temp_32_2);
-	         buffer [i] = std::complex<float> (t1, t2);
+	         buffer [i] = cmplx (t1, t2);
 	      }
 	   }
 	   else {
@@ -346,7 +346,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [8 * i + 6] << 16) |
 	                             (lbuf [8 * i + 5] << 8) | lbuf [8 * i + 4];
 	         float t2	=*(float *)(&temp_32_2);
-	         buffer [i] = std::complex<float> (t1, t2);
+	         buffer [i] = cmplx (t1, t2);
 	      }
 	   }
 	   return;
@@ -354,7 +354,7 @@ float	scaler	= float (shift (nrBits));
 }
 
 void	xml_Reader::readElements_QI (FILE *theFile, 
-	                             std::complex<float> *buffer,
+	                             cmplx *buffer,
 	                             int amount) {
 
 int	nrBits	= fd -> bitsperChannel;
@@ -364,7 +364,7 @@ float	scaler	= float (shift (nrBits));
 	   uint8_t lbuf [2 * amount];
 	   fread (lbuf, 1, 2 * amount, theFile);
 	   for (int i = 0; i < amount; i ++)
-	      buffer [i] = std::complex<float> (((int8_t)lbuf [2 * i + 1]) / 127.0,
+	      buffer [i] = cmplx (((int8_t)lbuf [2 * i + 1]) / 127.0,
 	                                        ((int8_t)lbuf [2 * i]) / 127.0);
 	   return;
 	}
@@ -373,7 +373,7 @@ float	scaler	= float (shift (nrBits));
 	   uint8_t lbuf [2 * amount];
 	   fread (lbuf, 1, 2 * amount, theFile);
 	   for (int i = 0; i < amount; i ++)
-	      buffer [i] = std::complex<float> (mapTable [2 * i + 1],
+	      buffer [i] = cmplx (mapTable [2 * i + 1],
 	                                        mapTable [2 * i]);
 	   return;
 	}
@@ -385,7 +385,7 @@ float	scaler	= float (shift (nrBits));
 	      for (int i = 0; i < amount; i ++) {
 	         int16_t temp_16_1 = (lbuf [4 * i] << 8) | lbuf [4 * i + 1];
 	         int16_t temp_16_2 = (lbuf [4 * i + 2] << 8) | lbuf [4 * i + 3];
-	         buffer [i] = std::complex<float> ((float)temp_16_2 / scaler,
+	         buffer [i] = cmplx ((float)temp_16_2 / scaler,
 	                                           (float)temp_16_1 / scaler);
 	      }
 	   }
@@ -393,7 +393,7 @@ float	scaler	= float (shift (nrBits));
 	      for (int i = 0; i < amount; i ++) {
 	         int16_t temp_16_1 = (lbuf [4 * i + 1] << 8) | lbuf [4 * i];
 	         int16_t temp_16_2 = (lbuf [4 * i + 3] << 8) | lbuf [4 * i + 2];
-	         buffer [i] = std::complex<float> ((float)temp_16_2 / scaler,
+	         buffer [i] = cmplx ((float)temp_16_2 / scaler,
 	                                           (float)temp_16_1 / scaler);
 	      }
 	   }
@@ -413,7 +413,7 @@ float	scaler	= float (shift (nrBits));
 	            temp_32_1 |= 0xFF000000;
 	   	 if (temp_32_2 & 0x800000) 
 	            temp_32_2 |= 0xFF000000;
-	         buffer [i] = std::complex<float> ((float)temp_32_2 / scaler,
+	         buffer [i] = cmplx ((float)temp_32_2 / scaler,
 	                                           (float)temp_32_1 / scaler);
 	      }
 	   }
@@ -427,7 +427,7 @@ float	scaler	= float (shift (nrBits));
 	            temp_32_1 |= 0xFF000000;
 	   	 if (temp_32_2 & 0x800000) 
 	            temp_32_2 |= 0xFF000000;
-	         buffer [i] = std::complex<float> ((float)temp_32_2 / scaler,
+	         buffer [i] = cmplx ((float)temp_32_2 / scaler,
 	                                           (float)temp_32_1 / scaler);
 	      }
 	   }
@@ -445,7 +445,7 @@ float	scaler	= float (shift (nrBits));
                  int32_t temp_32_2 = (lbuf [8 * i + 4] << 24) |
 	                             (lbuf [8 * i + 5] << 16) |
 	                             (lbuf [8 * i + 6] << 8) | lbuf [8 * i + 7];
-	         buffer [i] = std::complex<float> ((float)temp_32_2 / scaler,
+	         buffer [i] = cmplx ((float)temp_32_2 / scaler,
 	                                           (float)temp_32_1 / scaler);
 	      }
 	   }
@@ -457,7 +457,7 @@ float	scaler	= float (shift (nrBits));
                  int32_t temp_32_2 = (lbuf [8 * i + 7] << 24) |
 	                             (lbuf [8 * i + 6] << 16) |
 	                             (lbuf [8 * i + 5] << 8) | lbuf [8 * i + 4];
-	         buffer [i] = std::complex<float> ((float)temp_32_2 / scaler,
+	         buffer [i] = cmplx ((float)temp_32_2 / scaler,
 	                                           (float)temp_32_1 / scaler);
 	      }
 	   }
@@ -477,7 +477,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [8 * i + 5] << 16) |
 	                             (lbuf [8 * i + 6] << 8) | lbuf [8 * i + 7];
 	         float t2	=*(float *)(&temp_32_2);
-	         buffer [i] = std::complex<float> (t1, t2);
+	         buffer [i] = cmplx (t1, t2);
 	      }
 	   }
 	   else {
@@ -490,14 +490,14 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [8 * i + 6] << 16) |
 	                             (lbuf [8 * i + 5] << 8) | lbuf [8 * i + 4];
 	         float t2	=*(float *)(&temp_32_2);
-	         buffer [i] = std::complex<float> (t1, t2);
+	         buffer [i] = cmplx (t1, t2);
 	      }
 	   }
 	   return;
 	}
 }
 void	xml_Reader::readElements_I (FILE *theFile, 
-	                            std::complex<float> *buffer,
+	                            cmplx *buffer,
 	                            int amount) {
 
 int	nrBits	= fd -> bitsperChannel;
@@ -508,7 +508,7 @@ float	scaler	= float (shift (nrBits));
 	   fread (lbuf, 1, amount, theFile);
 	   for (int i = 0; i < amount; i ++)
 	      buffer [i] =
-	           std::complex<float> ((int8_t)lbuf [i] / 127.0, 0);
+	           cmplx ((int8_t)lbuf [i] / 127.0, 0);
 	   return;
 	}
 	
@@ -516,7 +516,7 @@ float	scaler	= float (shift (nrBits));
 	   uint8_t lbuf [amount];
 	   fread (lbuf, 1, amount, theFile);
 	   for (int i = 0; i < amount; i ++)
-	      buffer [i] = std::complex<float> (mapTable [lbuf [i]], 0);
+	      buffer [i] = cmplx (mapTable [lbuf [i]], 0);
 	   return;
 	}
 
@@ -527,14 +527,14 @@ float	scaler	= float (shift (nrBits));
 	      for (int i = 0; i < amount; i ++) {
 	         int16_t temp_16_1 = (lbuf [2 * i] << 8) | lbuf [2 * i + 1];
 	         buffer [i] =
-	               std::complex<float> ((float)temp_16_1 / scaler, 0);
+	               cmplx ((float)temp_16_1 / scaler, 0);
 	      }
 	   }
 	   else {
 	      for (int i = 0; i < amount; i ++) {
 	         int16_t temp_16_1 = (lbuf [2 * i + 1] << 8) | lbuf [2 * i];
 	         buffer [i] =
-	              std::complex<float> ((float)temp_16_1 / scaler, 0);
+	              cmplx ((float)temp_16_1 / scaler, 0);
 	      }
 	   }
 	   return;
@@ -550,7 +550,7 @@ float	scaler	= float (shift (nrBits));
 	   	 if (temp_32_1 & 0x800000) 
 	            temp_32_1 |= 0xFF000000;
 	         buffer [i] =
-	              std::complex<float> ((float)temp_32_1 / scaler, 0);
+	              cmplx ((float)temp_32_1 / scaler, 0);
 	      }
 	   }
 	   else {
@@ -560,7 +560,7 @@ float	scaler	= float (shift (nrBits));
 	   	 if (temp_32_1 & 0x800000) 
 	            temp_32_1 |= 0xFF000000;
 	         buffer [i] =
-	              std::complex<float> ((float)temp_32_1 / scaler, 0);
+	              cmplx ((float)temp_32_1 / scaler, 0);
 	      }
 	   }
 	   return;
@@ -575,7 +575,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [4 * i + 1] << 16) |
 	                             (lbuf [4 * i + 2] << 8) | lbuf [4 * i + 3];
 	         buffer [i] =
-	              std::complex<float> ((float)temp_32_1 / scaler, 0);
+	              cmplx ((float)temp_32_1 / scaler, 0);
 	      }
 	   }
 	   else {
@@ -584,7 +584,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [4 * i + 2] << 16) |
 	                             (lbuf [4 * i + 1] << 8) | lbuf [4 * i];
 	         buffer [i] =
-	               std::complex<float> ((float)temp_32_1 / scaler, 0);
+	               cmplx ((float)temp_32_1 / scaler, 0);
 	      }
 	   }
 	   return;
@@ -599,7 +599,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [4 * i + 1] << 16) |
 	                             (lbuf [4 * i + 2] << 8) | lbuf [4 * i + 3];
 	         float t1	=*(float *)(&temp_32_1);
-	         buffer [i] = std::complex<float> (t1, 0);
+	         buffer [i] = cmplx (t1, 0);
 	      }
 	   }
 	   else {
@@ -608,14 +608,14 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [4 * i + 2] << 16) |
 	                             (lbuf [4 * i + 1] << 8) | lbuf [4 * i];
 	         float t1	=*(float *)(&temp_32_1);
-	         buffer [i] = std::complex<float> (t1, 0);
+	         buffer [i] = cmplx (t1, 0);
 	      }
 	   }
 	   return;
 	}
 }
 void	xml_Reader::readElements_Q (FILE *theFile, 
-	                            std::complex<float> *buffer,
+	                            cmplx *buffer,
 	                            int amount) {
 
 int	nrBits	= fd -> bitsperChannel;
@@ -626,7 +626,7 @@ float	scaler	= float (shift (nrBits));
 	   fread (lbuf, 1, amount, theFile);
 	   for (int i = 0; i < amount; i ++)
 	      buffer [i] =
-	           std::complex<float> (127.0, ((int8_t)lbuf [i] / 127.0));
+	           cmplx (127.0, ((int8_t)lbuf [i] / 127.0));
 	   return;
 	}
 	
@@ -634,7 +634,7 @@ float	scaler	= float (shift (nrBits));
 	   uint8_t lbuf [amount];
 	   fread (lbuf, 1, amount, theFile);
 	   for (int i = 0; i < amount; i ++)
-	      buffer [i] = std::complex<float> (0, mapTable [lbuf [i]]);
+	      buffer [i] = cmplx (0, mapTable [lbuf [i]]);
 	   return;
 	}
 
@@ -645,14 +645,14 @@ float	scaler	= float (shift (nrBits));
 	      for (int i = 0; i < amount; i ++) {
 	         int16_t temp_16_1 = (lbuf [2 * i] << 8) | lbuf [2 * i + 1];
 	         buffer [i] =
-	               std::complex<float> (0, (float)temp_16_1 / scaler);
+	               cmplx (0, (float)temp_16_1 / scaler);
 	      }
 	   }
 	   else {
 	      for (int i = 0; i < amount; i ++) {
 	         int16_t temp_16_1 = (lbuf [2 * i + 1] << 8) | lbuf [2 * i];
 	         buffer [i] =
-	              std::complex<float> (0, (float)temp_16_1 / scaler);
+	              cmplx (0, (float)temp_16_1 / scaler);
 	      }
 	   }
 	   return;
@@ -668,7 +668,7 @@ float	scaler	= float (shift (nrBits));
 	   	 if (temp_32_1 & 0x800000) 
 	            temp_32_1 |= 0xFF000000;
 	         buffer [i] =
-	              std::complex<float> (0, (float)temp_32_1 / scaler);
+	              cmplx (0, (float)temp_32_1 / scaler);
 	      }
 	   }
 	   else {
@@ -678,7 +678,7 @@ float	scaler	= float (shift (nrBits));
 	   	 if (temp_32_1 & 0x800000) 
 	            temp_32_1 |= 0xFF000000;
 	         buffer [i] =
-	              std::complex<float> (0, (float)temp_32_1 / scaler);
+	              cmplx (0, (float)temp_32_1 / scaler);
 	      }
 	   }
 	   return;
@@ -693,7 +693,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [4 * i + 1] << 16) |
 	                             (lbuf [4 * i + 2] << 8) | lbuf [4 * i + 3];
 	         buffer [i] =
-	              std::complex<float> (0, (float)temp_32_1 / scaler);
+	              cmplx (0, (float)temp_32_1 / scaler);
 	      }
 	   }
 	   else {
@@ -702,7 +702,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [4 * i + 2] << 16) |
 	                             (lbuf [4 * i + 1] << 8) | lbuf [4 * i];
 	         buffer [i] =
-	               std::complex<float> (0, (float)temp_32_1 / scaler);
+	               cmplx (0, (float)temp_32_1 / scaler);
 	      }
 	   }
 	   return;
@@ -717,7 +717,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [4 * i + 1] << 16) |
 	                             (lbuf [4 * i + 2] << 8) | lbuf [4 * i + 3];
 	         float t1	=*(float *)(&temp_32_1);
-	         buffer [i] = std::complex<float> (0, t1);
+	         buffer [i] = cmplx (0, t1);
 	      }
 	   }
 	   else {
@@ -726,7 +726,7 @@ float	scaler	= float (shift (nrBits));
 	                             (lbuf [4 * i + 2] << 16) |
 	                             (lbuf [4 * i + 1] << 8) | lbuf [4 * i];
 	         float t1	=*(float *)(&temp_32_1);
-	         buffer [i] = std::complex<float> (0, t1);
+	         buffer [i] = cmplx (0, t1);
 	      }
 	   }
 	   return;

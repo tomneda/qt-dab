@@ -196,11 +196,11 @@ uint32_t	i;
 //
 //	putSample output comes from the FM receiver
 
-int32_t	audioSink::putSample	(std::complex<float> v) {
+int32_t	audioSink::putSample	(cmplx v) {
 	return putSamples (&v, 1);
 }
 
-int32_t	audioSink::putSamples		(std::complex<float> *V, int32_t n) {
+int32_t	audioSink::putSamples		(cmplx *V, int32_t n) {
 float	*buffer = (float *)alloca (2 * n * sizeof (float));
 int32_t	i;
 int32_t	available = _O_Buffer -> GetRingBufferWriteAvailable ();

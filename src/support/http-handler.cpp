@@ -47,7 +47,7 @@
 	httpHandler::httpHandler (RadioInterface *parent,
 	                          const QString & mapPort,
 	                          const QString &browserAddress,
-	                          std::complex<float> homeAddress,
+	                          cmplx homeAddress,
 	                          const QString &saveName,
 	                          bool autoBrowser_off) {
 	this	-> parent	= parent;
@@ -394,7 +394,7 @@ L1:	      if ((xx = recv (ClientSocket, buffer, 4096, 0)) < 0) {
 }
 #endif
 
-std::string	httpHandler::theMap (std::complex<float> homeAddress) {
+std::string	httpHandler::theMap (cmplx homeAddress) {
 std::string res;
 int	bodySize;
 char	*body;
@@ -454,8 +454,8 @@ std::string s = std::to_string (f);
 }
 //
 std::string httpHandler::coordinatesToJson (std::vector<httpData> &t) {
-std::complex<float> home;
-std::complex<float> target = std::complex<float> (0, 0);
+cmplx home;
+cmplx target = cmplx (0, 0);
 char buf [512];
 QString Jsontxt;
 
@@ -500,7 +500,7 @@ QString Jsontxt;
 }
 
 void	httpHandler::putData	(uint8_t	type,
-	                         std::complex<float> target,
+	                         cmplx target,
 	                         QString transmitterName,
 	                         QString channelName,
 	                         QString dateTime,

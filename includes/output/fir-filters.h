@@ -35,7 +35,7 @@ public:
 	                            int32_t	// samplerate
 	                           );
 			~LowPassFIR ();
-	std::complex<float>	Pass		(std::complex<float>);
+	cmplx	Pass		(cmplx);
 	float			Pass		(float);
 	void			resize		(int);
 	int			theSize		();
@@ -43,7 +43,7 @@ private:
 	int16_t		filterSize;
 	int16_t		ip;
 	std::vector<float>	filterKernel;
-	std::vector<std::complex<float>>	Buffer;
+	std::vector<cmplx>	Buffer;
 	float		frequency;
 };
 

@@ -35,8 +35,8 @@
         fftVector_out           = new kiss_fft_cpx [size];
         plan			= kiss_fft_alloc (size, dir, nullptr, nullptr);
 #elif	__FFTW3__
-	fftVector		= (std::complex<float> *)
-	                          fftwf_malloc (sizeof (std::complex<float>)* size);
+	fftVector		= (cmplx *)
+	                          fftwf_malloc (sizeof (cmplx)* size);
 	plan			= fftwf_plan_dft_1d (size,
 	                           reinterpret_cast <fftwf_complex *>(fftVector),
                                    reinterpret_cast <fftwf_complex *>(fftVector),
@@ -54,7 +54,7 @@
 #endif
 }
 
-void	fftHandler::fft		(std::vector<std::complex<float>> &v) {
+void	fftHandler::fft		(std::vector<cmplx> &v) {
 #ifdef	__KISS_FFT__
 	for (int i = 0; i < size; i ++) {
 	   fftVector_in [i]. r = real (v [i]);
@@ -62,7 +62,7 @@ void	fftHandler::fft		(std::vector<std::complex<float>> &v) {
 	}
 	kiss_fft (plan, fftVector_in, fftVector_out);
 	for (int i = 0; i < size; i ++) {
-	   v [i] = std::complex<float> (fftVector_out [i]. r,
+	   v [i] = cmplx (fftVector_out [i]. r,
 	                                fftVector_out [i]. i);
 	}
 #elif __FFTW3__
@@ -84,7 +84,7 @@ void	fftHandler::fft		(std::vector<std::complex<float>> &v) {
 #endif
 }
 
-void	fftHandler::fft		(std::complex<float>  *v) {
+void	fftHandler::fft		(cmplx  *v) {
 #ifdef	__KISS_FFT__
 	for (int i = 0; i < size; i ++) {
 	   fftVector_in [i]. r = real (v [i]);
@@ -92,7 +92,7 @@ void	fftHandler::fft		(std::complex<float>  *v) {
 	}
 	kiss_fft (plan, fftVector_in, fftVector_out);
 	for (int i = 0; i < size; i ++) {
-	   v [i] = std::complex<float> (fftVector_out [i]. r,
+	   v [i] = cmplx (fftVector_out [i]. r,
 	                                fftVector_out [i]. i);
 	}
 #elif	__FFTW3__

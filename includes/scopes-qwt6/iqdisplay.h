@@ -52,7 +52,7 @@ Q_OBJECT
 public:
   IQDisplay(QwtPlot * plot);
   ~IQDisplay();
-  void display_iq(const std::vector<std::complex<float>> & z, float scale, float ref);
+  void display_iq(const std::vector<cmplx> & z, float scale, float ref);
 private:
   static constexpr int32_t RADIUS{ 100 };
 

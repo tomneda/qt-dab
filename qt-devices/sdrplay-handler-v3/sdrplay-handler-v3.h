@@ -57,7 +57,7 @@ public:
 
 	bool		restartReader		(int32_t);
 	void		stopReader		();
-	int32_t		getSamples		(std::complex<float> *,
+	int32_t		getSamples		(cmplx *,
 	                                                          int32_t);
 	int32_t		Samples			();
 	void		resetBuffer		();

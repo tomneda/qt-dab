@@ -359,7 +359,7 @@ airspyHandler *p;
 int 	airspyHandler::data_available (void *buf, int buf_size) {	
 int16_t	*sbuf	= (int16_t *)buf;
 int nSamples	= buf_size / (sizeof (int16_t) * 2);
-std::complex<float> temp [2048];
+cmplx temp [2048];
 int32_t  i, j;
 
 	if (dumping. load ())
@@ -375,7 +375,7 @@ int32_t  i, j;
 	   }
 	   for (i = 0; i < nSamples; i ++) {
 	      convBuffer [convIndex ++] = theFilter -> Pass (
-	                                     std::complex<float> (
+	                                     cmplx (
 	                                        sbuf [2 * i] / (float)2048,
 	                                        sbuf [2 * i + 1] / (float)2048)
 	                                     );
@@ -398,7 +398,7 @@ int32_t  i, j;
 	}
 	else
 	for (i = 0; i < nSamples; i ++) {
-	   convBuffer [convIndex ++] = std::complex<float> (
+	   convBuffer [convIndex ++] = cmplx (
 	                                     sbuf [2 * i] / (float)2048,
 	                                     sbuf [2 * i + 1] / (float)2048);
 	   if (convIndex > convBufferSize) {
@@ -460,7 +460,7 @@ int16_t	airspyHandler::bitDepth		() {
 	return 13;
 }
 
-int32_t	airspyHandler::getSamples (std::complex<float> *v, int32_t size) {
+int32_t	airspyHandler::getSamples (cmplx *v, int32_t size) {
 
 	return _I_Buffer. getDataFromBuffer (v, size);
 }

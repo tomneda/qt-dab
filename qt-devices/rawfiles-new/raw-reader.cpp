@@ -37,7 +37,7 @@ struct timeval  tv;
 
 	rawReader::rawReader	(rawFiles *mr,
 	                         FILE	*filePointer,
-	                         RingBuffer<std::complex<float>> *_I_Buffer) {
+	                         RingBuffer<cmplx> *_I_Buffer) {
 	this	-> parent	= mr;
 	this	-> filePointer	= filePointer;
 	this	-> _I_Buffer	= _I_Buffer;
@@ -90,7 +90,7 @@ void	rawReader::run () {
 int64_t	nextStop;
 int	i;
 int	teller	= 0;
-std::complex<float> localBuffer [BUFFERSIZE / 2];
+cmplx localBuffer [BUFFERSIZE / 2];
 
 	connect (this, SIGNAL (setProgress (int, float)),
 	         parent,   SLOT   (setProgress (int, float)));
@@ -122,7 +122,7 @@ std::complex<float> localBuffer [BUFFERSIZE / 2];
               }
 
 	      for (i = 0; i < BUFFERSIZE / 2; i ++)
-	         localBuffer [i] = std::complex<float> (
+	         localBuffer [i] = cmplx (
 	                                       4 * mapTable [bi [2 * i]],
 	                                       4 * mapTable [bi [2 * i + 1]]);
               _I_Buffer -> putDataIntoBuffer (localBuffer, BUFFERSIZE / 2);

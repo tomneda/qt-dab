@@ -393,11 +393,11 @@ int	res;
 //
 //	The brave old getSamples. For the hackrf, we get
 //	size still in I/Q pairs
-int32_t	hackrfHandler::getSamples (std::complex<float> *V, int32_t size) { 
+int32_t	hackrfHandler::getSamples (cmplx *V, int32_t size) {
 std::complex<int8_t> temp [size];
 	int amount      = _I_Buffer. getDataFromBuffer (temp, size);
 	for (int i = 0; i < amount; i ++)
-	   V [i] = std::complex<float> (real (temp [i]) / 127.0,
+	   V [i] = cmplx (real (temp [i]) / 127.0,
 	                                imag (temp [i]) / 127.0);
 	if (dumping. load ())
 	   xmlWriter -> add (temp, amount);

@@ -18,13 +18,13 @@ float	sum	= 0.0;
 
 	this	-> sampleRate	= sampleRate;
 	this	-> filterSize	= filterSize;
-	this	-> kernel	= new std::complex<float> [filterSize];
-	this	-> buffer	= new std::complex<float> [filterSize];
+	this	-> kernel	= new cmplx [filterSize];
+	this	-> buffer	= new cmplx [filterSize];
 	this	-> ip		= 0;
 
 	for (int i = 0; i < filterSize; i ++) {
-	   kernel [i] = std::complex<float> (0, 0);
-	   buffer [i] = std::complex<float> (0, 0);
+	   kernel [i] = cmplx (0, 0);
+	   buffer [i] = cmplx (0, 0);
 	}
 
 	for (int i = 0; i < filterSize; i ++) {
@@ -43,7 +43,7 @@ float	sum	= 0.0;
 
 	for (int i = 0; i < filterSize; i ++) {	// shifting
 	   float v = (i - filterSize / 2) * (2 * M_PI * shift);
-	   kernel [i] = std::complex<float> (tmp [i] * cos (v) / sum, 
+	   kernel [i] = cmplx (tmp [i] * cos (v) / sum,
 	                                          tmp [i] * sin (v) / sum);
 	}
 }
@@ -56,9 +56,9 @@ float	sum	= 0.0;
 
 //	we process the samples backwards rather than reversing
 //	the kernel
-std::complex<float> BandPassFIR::Pass (std::complex<float> z) {
+cmplx BandPassFIR::Pass (cmplx z) {
 int16_t	i;
-std::complex<float>	tmp	= 0;
+cmplx	tmp	= 0;
 
 	buffer [ip]	= z;
 	for (i = 0; i < filterSize; i ++) {
@@ -76,7 +76,7 @@ float	BandPassFIR::Pass (float v) {
 int16_t		i;
 float	tmp	= 0;
 
-	buffer [ip] = std::complex<float> (v, 0);
+	buffer [ip] = cmplx (v, 0);
 	for (i = 0; i < filterSize; i ++) {
 	   int16_t index = ip - i;
 	   if (index < 0)

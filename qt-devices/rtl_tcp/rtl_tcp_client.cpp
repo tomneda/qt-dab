@@ -59,7 +59,7 @@
 	tcp_gain	-> setValue (theGain);
 	tcp_ppm		-> setValue (thePpm);
 	vfoFrequency	= DEFAULT_FREQUENCY;
-	_I_Buffer	= new RingBuffer<std::complex<float>>(32 * 32768);
+	_I_Buffer	= new RingBuffer<cmplx>(32 * 32768);
 	connected	= false;
 	hostLineEdit 	= new QLineEdit (nullptr);
 	dumping		= false;
@@ -195,7 +195,7 @@ void	rtl_tcp_client::stopReader() {
 //	The brave old getSamples. For the dab stick, we get
 //	size: still in I/Q pairs, but we have to convert the data from
 //	uint8_t to DSPCOMPLEX *
-int32_t	rtl_tcp_client::getSamples (std::complex<float> *V, int32_t size) { 
+int32_t	rtl_tcp_client::getSamples (cmplx *V, int32_t size) {
 int32_t	amount =  0;
 	amount = _I_Buffer	-> getDataFromBuffer (V, size);
 	return amount;
@@ -231,12 +231,12 @@ float mapTable [] = {
 //	These functions are typical for network use
 void	rtl_tcp_client::readData() {
 uint8_t	buffer [8192];
-std::complex<float> localBuffer [4096];
+cmplx localBuffer [4096];
 
 	while (toServer. bytesAvailable() > 8192) {
 	   toServer. read ((char *)buffer, 8192);
 	   for (int i = 0; i < 4096; i ++)
-	      localBuffer [i] = std::complex<float> (
+	      localBuffer [i] = cmplx (
 	                                    mapTable [buffer [2 * i]],
 	                                    mapTable [buffer [2 * i + 1]]);
 	   _I_Buffer -> putDataIntoBuffer (localBuffer, 4096);

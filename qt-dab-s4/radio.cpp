@@ -385,12 +385,12 @@ uint8_t	dabBand;
 	   }
 	}
 
-	channel. targetPos	= std::complex<float> (0, 0);
+	channel. targetPos	= cmplx (0, 0);
 	float local_lat		=
 	             dabSettings -> value ("latitude", 0). toFloat ();
 	float local_lon		=
 	             dabSettings -> value ("longitude", 0). toFloat ();
-	channel. localPos	= std::complex<float> (local_lat, local_lon);
+	channel. localPos	= cmplx (local_lat, local_lon);
 	connect (configWidget. loadTableButton, SIGNAL (clicked ()),
 	         this, SLOT (loadTable ()));
 
@@ -2148,7 +2148,7 @@ void	RadioInterface::setStereo	(bool b) {
 //	mainId and subId did not change
 
 void	RadioInterface::show_null (int amount) {
-std::complex<float> B [amount];
+cmplx B [amount];
 QVector<float> V (amount);
 	nullBuffer. getDataFromBuffer (B, amount);
 	if (my_spectrumViewer. isHidden ())
@@ -2258,7 +2258,7 @@ bool	tiiChange	= false;
 	                                  channel. channelName :
 	                                  "any",
 	                               theName);
-	channel. targetPos	= std::complex<float> (latitude, longitude);
+	channel. targetPos	= cmplx (latitude, longitude);
 	LOG ("transmitter ", channel. transmitterName);
 	LOG ("coordinates ", QString::number (latitude) + " " +
 	                        QString::number (longitude));
@@ -2300,7 +2300,7 @@ bool	tiiChange	= false;
 	}
 //
 //	to be certain, we check
-	if (channel. targetPos == std::complex<float> (0, 0) ||
+	if (channel. targetPos == cmplx (0, 0) ||
 	                                  (distance == 0) || (hoek == 0))
 	   return;
 
@@ -3536,12 +3536,12 @@ int	tunedFrequency	=
 	channel. subId		= 0;
 	channel. channelName	= theChannel;
 	channel. frequency	= tunedFrequency / 1000;
-	channel. targetPos	= std::complex<float> (0, 0);
+	channel. targetPos	= cmplx (0, 0);
 	if (transmitterTags_local  && (mapHandler != nullptr))
-	   mapHandler -> putData (MAP_RESET, std::complex<float> (0, 0), "", "","", 0, 0, 0, 0);
+	   mapHandler -> putData (MAP_RESET, cmplx (0, 0), "", "","", 0, 0, 0, 0);
 	else
 	if (mapHandler != nullptr)
-	   mapHandler -> putData (MAP_FRAME, std::complex<float>(-1, -1), "", "", "", 0, 0, 0, 0);
+	   mapHandler -> putData (MAP_FRAME, cmplx(-1, -1), "", "", "", 0, 0, 0, 0);
 	show_for_safety ();
 	int	switchDelay	=
 	                  dabSettings -> value ("switchDelay", 8). toInt ();
@@ -3596,7 +3596,7 @@ void	RadioInterface::stopChannel	() {
 	channel. ensembleName	= "";
 	channel. has_ecc	= false;
 	channel. transmitterName = "";
-	channel. targetPos	= std::complex<float> (0, 0);
+	channel. targetPos	= cmplx (0, 0);
 	if (transmitterTags_local && (mapHandler != nullptr))
 	   mapHandler -> putData (MAP_RESET, channel. targetPos, "", "", "", 0, 0, 0, 0);
 	transmitter_country     -> setText ("");
@@ -4733,7 +4733,7 @@ coordinates theCoordinator (dabSettings);
 	             dabSettings -> value ("latitude", 0). toFloat ();
 	float local_lon		=
 	             dabSettings -> value ("longitude", 0). toFloat ();
-	channel. localPos	= std::complex<float> (local_lat, local_lon);
+	channel. localPos	= cmplx (local_lat, local_lon);
 }
 
 void	RadioInterface::loadTable	 () {
@@ -4815,7 +4815,7 @@ void	RadioInterface::handle_transmitterTags  (int d) {
 	maxDistance = -1;
 	transmitterTags_local = configWidget. transmitterTags -> isChecked ();
 	dabSettings -> setValue ("transmitterTags", transmitterTags_local  ? 1 : 0);
-	channel. targetPos	= std::complex<float> (0, 0);
+	channel. targetPos	= cmplx (0, 0);
 	if ((transmitterTags_local) && (mapHandler != nullptr))
 	   mapHandler -> putData (MAP_RESET, channel. targetPos, "", "", "", 0, 0, 0, 0);
 }

@@ -120,7 +120,7 @@ void	xml_fileReader::stopReader () {
 }
 
 //	size is in "samples"
-int32_t	xml_fileReader::getSamples	(std::complex<float> *V,
+int32_t	xml_fileReader::getSamples	(cmplx *V,
 	                                 int32_t size) {
 
 	if (theFile == nullptr)		// should not happen

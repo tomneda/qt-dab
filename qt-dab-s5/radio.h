@@ -132,8 +132,8 @@ public:
 	QString		transmitterName;
 	QString		countryName;
 	int		nrTransmitters;
-	std::complex<float> localPos;
-	std::complex<float> targetPos;
+	cmplx localPos;
+	cmplx targetPos;
 	int		snr;
 	QByteArray	transmitters;
 
@@ -144,7 +144,7 @@ public:
 	ensembleName	=  "";
 	nrTransmitters	= 0;
 	countryName	= "";
-	targetPos	= std::complex<float> (0, 0);
+	targetPos	= cmplx (0, 0);
 	mainId		= 0;
 	subId		= 0;
 	Eid		= 0;
@@ -174,10 +174,10 @@ protected:
 	bool			eventFilter (QObject *obj, QEvent *event);
 private:
 	FILE			*dlTextFile;
-	RingBuffer<std::complex<float>>  spectrumBuffer;
-	RingBuffer<std::complex<float>>  iqBuffer;
-	RingBuffer<std::complex<float>>  tiiBuffer;
-	RingBuffer<std::complex<float>>  nullBuffer;
+	RingBuffer<cmplx>  spectrumBuffer;
+	RingBuffer<cmplx>  iqBuffer;
+	RingBuffer<cmplx>  tiiBuffer;
+	RingBuffer<cmplx>  nullBuffer;
 	RingBuffer<float>	snrBuffer;
 	RingBuffer<float>	responseBuffer;
 	RingBuffer<uint8_t>	frameBuffer;

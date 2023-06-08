@@ -24,19 +24,19 @@
 #ifndef	__HTTP_HANDLER_H
 #define	__HTTP_HANDLER_H
 
+#include "dab-constants.h"
 #include	<QObject>
 #include	<thread>
 #include	<atomic>
 #include	<string>
 #include	<vector>
-#include	<complex>
 #include	<mutex>
 #include	<QString>
 class	RadioInterface;
 
 typedef struct {
 	uint8_t	type;
-	std::complex<float> coords;
+	cmplx coords;
 	QString transmitterName;
 	QString channelName;
 	QString	dateTime;
@@ -52,7 +52,7 @@ public:
 		httpHandler	(RadioInterface *,
 	                         const QString &mapPort,
 	                         const QString &browserAddress,
-	                         std::complex<float> address,
+	                         cmplx address,
 	                         const QString &saveName,
 	                         bool	autoBrowse);
 		~httpHandler	();
@@ -60,7 +60,7 @@ public:
 	void	stop		();
 	void	run		();
 	void	putData		(uint8_t	type,
-	                         std::complex<float>target,
+	                         cmplx target,
 	                         QString transmittername,
 	                         QString channelName,
 	                         QString dateTime,
@@ -71,7 +71,7 @@ private:
 	QString			*saveName;
 	RadioInterface		*parent;
 	QString			mapPort;
-	std::complex<float> homeAddress;
+	cmplx homeAddress;
 	std::vector<httpData> transmitterVector;
 
 #ifdef	__MINGW32__
@@ -81,7 +81,7 @@ private:
 #endif
 	std::atomic<bool>	running;
 	std::thread	threadHandle;
-	std::string     theMap		(std::complex<float> address);
+	std::string     theMap		(cmplx address);
 	std::string	coordinatesToJson (std::vector<httpData> &t);
 	std::vector<httpData>	transmitterList;
 	std::mutex	locker;

@@ -24,9 +24,9 @@
 #ifndef	__TII_DETECTOR__
 #define	__TII_DETECTOR__
 
+#include "dab-constants.h"
 #include	<cstdint>
 #include	"dab-params.h"
-#include	<complex>
 #include	<vector>
 
 class	TII_Detector {
@@ -35,19 +35,18 @@ public:
 			~TII_Detector();
 	void		reset		();
 	void		setMode		(bool);
-	void		addBuffer	(std::vector<std::complex<float>>);
+	void		addBuffer	(std::vector<cmplx>);
 	uint16_t	processNULL	();
 
 private:
-	void			collapse	(std::complex<float> *,
-	                                         float *);
+	void			collapse	(cmplx *, float *);
 	bool			detectMode_new;
 	int16_t			depth;
 	uint8_t			invTable [256];
 	dabParams		params;
 	int16_t			T_u;
 	int16_t			carriers;
-	std::vector<std::complex<float> >	theBuffer;
+	std::vector<cmplx >	theBuffer;
 	std::vector<float>	window;
 };
 

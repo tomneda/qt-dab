@@ -198,7 +198,7 @@ bool	soapyHandler::restartReader		(int32_t freq) {
 }
 
 void	soapyHandler::stopReader		(void) {}
-int32_t	soapyHandler::getSamples		(std::complex<float> *v,
+int32_t	soapyHandler::getSamples		(cmplx *v,
                                                              int32_t a) {
 	if (worker == nullptr)
 	   return 0;

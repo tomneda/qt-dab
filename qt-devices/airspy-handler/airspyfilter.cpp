@@ -65,7 +65,7 @@ int16_t	i;
 
 //      we process the samples backwards rather than reversing
 //      the kernel
-std::complex<float>	airspyFilter::Pass (float re, float im) {
+cmplx	airspyFilter::Pass (float re, float im) {
 int16_t i;
 float	tmp_1	= 0;
 float	tmp_2	= 0;
@@ -81,6 +81,6 @@ float	tmp_2	= 0;
         }
 
         ip = (ip + 1) % firSize;
-        return std::complex<float> (tmp_1, tmp_2);;
+        return cmplx (tmp_1, tmp_2);;
 }
 

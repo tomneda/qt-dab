@@ -566,7 +566,7 @@ void	plutoHandler::run	() {
 char	*p_end, *p_dat;
 int	p_inc;
 int	nbytes_rx;
-std::complex<float> localBuf [DAB_RATE / DIVIDER];
+cmplx localBuf [DAB_RATE / DIVIDER];
 std::complex<int16_t> dumpBuf [DAB_RATE / DIVIDER];
 
 	state -> setText ("running");
@@ -582,7 +582,7 @@ std::complex<int16_t> dumpBuf [DAB_RATE / DIVIDER];
 	      const int16_t q_p = ((int16_t *)p_dat) [1];
 	      std::complex<int16_t>dumpS = std::complex<int16_t> (i_p, q_p);
 	      dumpBuf [convIndex] = dumpS;
-	      std::complex<float>sample = std::complex<float> (i_p / 2048.0,
+	      cmplxsample = cmplx (i_p / 2048.0,
 	                                                       q_p / 2048.0);
 	      convBuffer [convIndex ++] = sample;
 	      if (convIndex > CONV_SIZE) {
@@ -604,7 +604,7 @@ std::complex<int16_t> dumpBuf [DAB_RATE / DIVIDER];
 	}
 }
 
-int32_t	plutoHandler::getSamples (std::complex<float> *V, int32_t size) { 
+int32_t	plutoHandler::getSamples (cmplx *V, int32_t size) {
 	if (!isRunning ())
 	   return 0;
 	return _I_Buffer. getDataFromBuffer (V, size);

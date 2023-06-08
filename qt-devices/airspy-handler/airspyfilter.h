@@ -32,7 +32,7 @@ class	airspyFilter {
 public:
 			airspyFilter	(int16_t, int32_t, int32_t);
 	                ~airspyFilter();
-	std::complex<float> Pass	(float re, float im);
+	cmplx Pass	(float re, float im);
 	int16_t		firSize;
 	int16_t		ip;
 	int32_t		sampleRate;

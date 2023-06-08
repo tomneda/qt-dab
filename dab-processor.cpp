@@ -139,7 +139,7 @@ void dabProcessor::run()
 {
   int32_t startIndex;
   int32_t i;
-  std::complex<float> FreqCorr;
+  cmplx FreqCorr;
   timeSyncer myTimeSyncer(&myReader);
   int attempts;
   std::vector<int16_t> ibits;
@@ -150,7 +150,7 @@ void dabProcessor::run()
   int cCount = 0;
   bool null_shower;
 
-  QVector<std::complex<float>> tester(T_u / 2);
+  QVector<cmplx> tester(T_u / 2);
   ibits.resize(2 * params.get_carriers());
   fineOffset = 0;
   coarseOffset = 0;
@@ -265,7 +265,7 @@ void dabProcessor::run()
       *	Once here, we are synchronized, we need to copy the data we
       *	used for synchronization for block 0
       */
-    memmove(ofdmBuffer.data(), &((ofdmBuffer.data())[startIndex]), (T_u - startIndex) * sizeof(std::complex<float>));
+    memmove(ofdmBuffer.data(), &((ofdmBuffer.data())[startIndex]), (T_u - startIndex) * sizeof(cmplx));
     int ofdmBufferIndex = T_u - startIndex;
 
     //Block_0:
@@ -323,7 +323,7 @@ void dabProcessor::run()
       */
     cCount = 0;
     cLevel = 0;
-    FreqCorr = std::complex<float>(0, 0);
+    FreqCorr = cmplx(0, 0);
     for (int ofdmSymbolCount = 1; ofdmSymbolCount < nrBlocks; ofdmSymbolCount++)
     {
       myReader.getSamples(ofdmBuffer, 0, T_s, coarseOffset + fineOffset);

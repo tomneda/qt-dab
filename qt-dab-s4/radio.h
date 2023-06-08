@@ -124,10 +124,10 @@ protected:
 	bool			eventFilter (QObject *obj, QEvent *event);
 private:
 	FILE			*dlTextFile;
-	RingBuffer<std::complex<float>>  spectrumBuffer;
-	RingBuffer<std::complex<float>>  iqBuffer;
-	RingBuffer<std::complex<float>>  tiiBuffer;
-	RingBuffer<std::complex<float>>  nullBuffer;
+	RingBuffer<cmplx>  spectrumBuffer;
+	RingBuffer<cmplx>  iqBuffer;
+	RingBuffer<cmplx>  tiiBuffer;
+	RingBuffer<cmplx>  nullBuffer;
 	RingBuffer<float>	snrBuffer;
 	RingBuffer<float>	responseBuffer;
 	RingBuffer<uint8_t>	frameBuffer;
@@ -316,8 +316,8 @@ private:
 	   uint8_t	subId;
 	   QString	countryName;
 	   int		nrTransmitters;
-	   std::complex<float> localPos;
-	   std::complex<float> targetPos;
+	   cmplx localPos;
+	   cmplx targetPos;
 	} channel;
 enum direction {FORWARD, BACKWARDS};
 

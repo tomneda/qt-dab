@@ -188,13 +188,13 @@ stopRequest r;
         messageHandler (&r);
 }
 //
-int32_t	sdrplayHandler_v3::getSamples (std::complex<float> *V, int32_t size) { 
+int32_t	sdrplayHandler_v3::getSamples (cmplx *V, int32_t size) {
 std::complex<int16_t> temp [size];
 int	i;
 
 	int amount      = _I_Buffer. getDataFromBuffer (temp, size);
         for (i = 0; i < amount; i ++)
-           V [i] = std::complex<float> (real (temp [i]) / (float) denominator,
+           V [i] = cmplx (real (temp [i]) / (float) denominator,
                                         imag (temp [i]) / (float) denominator);
         if (dumping. load ())
            xmlWriter -> add (temp, amount);

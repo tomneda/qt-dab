@@ -45,14 +45,14 @@ public:
 			phaseReference 		(RadioInterface *,
 	                                         processParams *);
 			~phaseReference		();
-	int32_t		findIndex		(std::vector<std::complex<float>>, int);
-	int16_t		estimate_CarrierOffset	(std::vector<std::complex<float>>);
-	float		phase			(std::vector<std::complex<float>>&, int);
+	int32_t		findIndex		(std::vector<cmplx>, int);
+	int16_t		estimate_CarrierOffset	(std::vector<cmplx>);
+	float		phase			(std::vector<cmplx>&, int);
 #ifdef	__WITH_JAN__
-	void		estimate		(std::vector<std::complex<float>>);
+	void		estimate		(std::vector<cmplx>);
 #endif
 //	This one is used in the ofdm decoder
-	std::vector<std::complex<float>> refTable;
+	std::vector<cmplx> refTable;
 private:
 	dabParams	params;
 #ifdef	__WITH_JAN__

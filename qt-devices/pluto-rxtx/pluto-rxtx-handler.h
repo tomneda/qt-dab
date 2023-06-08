@@ -146,10 +146,10 @@ public:
 	int32_t		getVFOFrequency		();
 	bool		restartReader		(int32_t);
 	void		stopReader		();
-	int32_t		getSamples		(std::complex<float> *,
+	int32_t		getSamples		(cmplx *,
 	                                                          int32_t);
 	int32_t		Samples			();
-	void		sendSample		(std::complex<float>, float);
+	void		sendSample		(cmplx, float);
 	void		startTransmitter	(int);
 	void		stopTransmitter		();
 	void		resetBuffer		();
@@ -163,8 +163,8 @@ private:
 	bool			loadFunctions	();
 	HINSTANCE		Handle;
 	QFrame			myFrame;
-	RingBuffer<std::complex<float>>	_I_Buffer;
-	RingBuffer<std::complex<float>>	_O_Buffer;
+	RingBuffer<cmplx>	_I_Buffer;
+	RingBuffer<cmplx>	_O_Buffer;
 	upFilter		theFilter;
 	int			fmFrequency;
 	QSettings		*plutoSettings;
@@ -191,7 +191,7 @@ private:
 
 	float		window	[8192];
 	QwtPlot         *plotgrid;
-	std::complex<float>*	fftBuffer;
+	cmplx*	fftBuffer;
 
 	void		showBuffer		(float *);
 //      configuration items
@@ -294,7 +294,7 @@ private:
         struct  stream_cfg      tx_cfg;
 
 	bool			connected;
-	std::complex<float>	convBuffer	[CONV_SIZE + 1];
+	cmplx	convBuffer	[CONV_SIZE + 1];
 	int			convIndex;
 	int16_t			mapTable_int	[DAB_RATE / DIVIDER];
 	float			mapTable_float	[DAB_RATE / DIVIDER];

@@ -36,7 +36,7 @@ public:
 	soapy_CS8	(SoapySDR::Device *);
 	~soapy_CS8	(void);
 int	Samples		(void);
-int	getSamples	(std::complex<float> *, int);
+int	getSamples	(cmplx *, int);
 void	run		(void);
 private:
 SoapySDR::Device	*theDevice;

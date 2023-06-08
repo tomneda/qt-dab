@@ -42,8 +42,8 @@ public:
 	QString		outputChannelwithRate	(int16_t, int32_t);
 	void		stop			(void);
 	void		restart			(void);
-	int32_t		putSample		(std::complex<float>);
-	int32_t		putSamples		(std::complex<float> *, int32_t);
+	int32_t		putSample		(cmplx);
+	int32_t		putSamples		(cmplx *, int32_t);
 	int16_t		invalidDevice		(void);
 	bool		isValidDevice		(int16_t);
 

@@ -27,7 +27,7 @@
 //	This is the - almost empty - default implementation
 #include	"virtual-reader.h"
 
-	virtualReader::virtualReader	(RingBuffer<std::complex<float>> *p,
+	virtualReader::virtualReader	(RingBuffer<cmplx> *p,
 	                                                       int32_t rate) {
 	theBuffer	= p;
 	blockSize	= -1;
@@ -60,15 +60,15 @@ int32_t	i;
 
 	this	-> inSize	= inRate / 1000;
 	this	-> outSize	= outRate / 1000;
-	inTable			= new std::complex<float> [inSize];
-	outTable		= new std::complex<float> [outSize];
+	inTable			= new cmplx [inSize];
+	outTable		= new cmplx [outSize];
 	mapTable		= new float [outSize];
 	for (i = 0; i < outSize; i ++)
 	   mapTable [i] = (float) i * inRate / outRate;
 	conv	= 0;
 }
 
-void	virtualReader::convertandStore (std::complex<float> *s,
+void	virtualReader::convertandStore (cmplx *s,
 	                                             int32_t amount) {
 int32_t	i, j;
 

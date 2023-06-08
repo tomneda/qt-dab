@@ -43,7 +43,7 @@ virtual		bool	restartReader	(int32_t freq);
 virtual		void	stopReader	();
 virtual		void	setVFOFrequency	(int32_t);
 virtual		int32_t	getVFOFrequency() {return 0;}
-virtual		int32_t	getSamples	(std::complex<float> *, int32_t);
+virtual		int32_t	getSamples	(cmplx *, int32_t);
 virtual		int32_t	Samples		();
 virtual		void	resetBuffer	();
 virtual		int16_t	bitDepth	() { return 10;}

@@ -24,7 +24,7 @@
  *      from Jan Roemisch (github.com/maxx23), all rights acknowledged
  */
 
-#include        <stdio.h>
+#include        <cstdio>
 #include        <cstring>
 #include        <signal.h>
 #include        <stdlib.h>

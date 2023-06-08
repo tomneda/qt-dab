@@ -28,7 +28,7 @@
 #include	"dab-constants.h"
 #include	<QHeaderView>
 #include	<QDomDocument>
-#include	<stdio.h>
+#include	<cstdio>
 
 static
 dabFrequencies frequencies_1 [] = {

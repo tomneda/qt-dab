@@ -4,7 +4,7 @@
 
 #include	<QObject>
 #include	<stdint.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<sdrplay_api.h>
 
 class	sdrplayHandler_v3;

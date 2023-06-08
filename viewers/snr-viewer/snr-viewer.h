@@ -33,7 +33,7 @@
 #include	<QObject>
 #include	<vector>
 #include	<atomic>
-#include	<stdio.h>
+#include	<cstdio>
 #include	"ui_snr-widget.h"
 #include	<qwt.h>
 #include	<qwt_plot.h>

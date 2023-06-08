@@ -20,7 +20,7 @@
  *    along with Qt-TAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include	<stdio.h>
+#include	<cstdio>
 #include	<stdint.h>
 #include	<stdlib.h>
 #include	"epg-decoder.h"
@@ -2112,7 +2112,7 @@ int length	= v [index + 1];
         if (ensFlag == 1)
            if (sidFlag == 0)
               fprintf (stderr, "SId = %X\n", getBits (v, 8 * index + 32, 16));
-	else // to whom was this else indented?
+	//else // to whom was this else indented?
         if (ensFlag == 0)
            if (sidFlag == 0)
               fprintf (stderr, "SId = %X\n", getBits (v, 8 * index + 8, 16));

@@ -24,7 +24,7 @@
 #define	__EPG_DECODER__
 
 #include	<QObject>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<stdint.h>
 #include	<stdlib.h>
 #include	<QString>

@@ -44,7 +44,7 @@ static uint16_t const crctab_1021[256] = {
 static
 uint16_t calc_crc (unsigned char *data,
 	           int length,
-	           uint16_t const *crctab, unsigned int crc) { 
+	           uint16_t const *crctab, unsigned int crc) {
 int count;
 unsigned int temp;
 
@@ -54,7 +54,7 @@ unsigned int temp;
 	}
 
 	return crc & 0xffff;
-} 
+}
 
 int16_t cif_In    [55296];
 int16_t	cifVector [16][55296];
@@ -161,7 +161,7 @@ void	etiGenerator::processBlock	(std::vector <int16_t> &ibits,
 	   Minor	= 0;
 	   my_ficHandler -> get_CIFcount  (&CIFCount_hi, &CIFCount_lo);
 	}
-//	
+//
 //	adding the MSC blocks. Blocks 5 .. 76 are "transformed"
 //	into the "soft" bits arrays
 	int CIF_index	= (blkno - 4) % numberofblocksperCIF;
@@ -291,7 +291,7 @@ channel_data data;
 	      int SCID	= data. id;
 	      int  SAD	= data. start_cu;
 	      int  TPL;
-	      if (data. uepFlag) 
+	      if (data. uepFlag)
 	         TPL = 0x10 | (data. protlev - 1);
 	      else
 	         TPL = 0x20 | data. protlev;
@@ -360,7 +360,7 @@ std::vector<parameter *> theParameters;
 	         else
 	            protTable [i] = new eep_protection (t -> bitRate,
 	                                                    t -> protLevel);
-	         
+
 	         memset (shiftRegister, 1, 9);
 	         descrambler [i] = new uint8_t [24 * t -> bitRate];
 
@@ -380,7 +380,7 @@ std::vector<parameter *> theParameters;
 	return offset;
 }
 
-static void	process_subCh (int nr, parameter *p,
+/*static*/ void	process_subCh (int nr, parameter *p,
 	                       protection *prot,
 	                       uint8_t *desc) {
 	std::unique_ptr<uint8_t[]> outVector{ new uint8_t[24 * p->bitRate] };

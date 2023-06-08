@@ -31,7 +31,7 @@
 #include	<QTableWidget>
 #include	<QFile>
 #include	<QtXml>
-#include	<stdio.h>
+#include	<cstdio>
 //
 //	a simple convenience class
 //

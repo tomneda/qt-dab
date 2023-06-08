@@ -24,7 +24,7 @@
 #include	"xml-descriptor.h"
 #include	"xml-filereader.h"
 #include	<sys/time.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 static	int shift (int a) {
 int r	= 1;

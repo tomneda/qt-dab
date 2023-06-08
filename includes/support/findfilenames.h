@@ -31,7 +31,7 @@
 #include	<QDir>
 #include	<QFileDialog>
 #include	<QMessageBox>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<sndfile.h>
 
 class	findfileNames {

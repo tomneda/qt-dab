@@ -29,7 +29,7 @@
 #include	<QSettings>
 #include	<QSemaphore>
 #include	<atomic>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<queue>
 #include	"dab-constants.h"
 #include	"ringbuffer.h"

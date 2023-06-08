@@ -1,7 +1,7 @@
 
 
 #include	"xml-handler.h"
-#include	<stdio.h>
+#include	<cstdio>
 #include	<time.h>
 
 struct kort_woord {

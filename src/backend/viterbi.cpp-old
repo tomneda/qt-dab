@@ -24,7 +24,7 @@
  *	as given by the Spiral Project. All rights gratefully acknowledged.
  *	decoder
  */
-#include	<stdio.h>
+#include	<cstdio>
 #include	<stdlib.h>
 #include	"mm_malloc.h"
 #include	"viterbi.h"

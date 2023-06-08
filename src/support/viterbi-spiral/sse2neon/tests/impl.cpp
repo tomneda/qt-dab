@@ -3,7 +3,7 @@
 #include <float.h>
 #include <math.h>
 #include <stdint.h>
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 #include <utility>
 #include "binding.h"

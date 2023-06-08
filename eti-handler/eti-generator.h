@@ -38,9 +38,9 @@
 
 #ifndef	__ETI_GENERATOR_H
 #define	__ETI_GENERATOR_H
-#include	<stdio.h>
+#include	<cstdio>
 #include	<stdint.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<vector>
 #include	<atomic>
 #include	"dab-constants.h"

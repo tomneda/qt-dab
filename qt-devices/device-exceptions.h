@@ -1,5 +1,5 @@
 
-#include	<stdio.h>
+#include	<cstdio>
 #include <stdexcept>
 
 #define MAX_MESSAGE_SIZE 256

@@ -31,7 +31,7 @@
 
 #include	<QString>
 #include	<stdint.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<complex>
 
 class Blocks	{

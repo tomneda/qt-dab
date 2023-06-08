@@ -1,6 +1,6 @@
 #include "binding.h"
 
-#include <stdio.h>
+#include <cstdio>
 #include <stdlib.h>
 
 namespace SSE2NEON

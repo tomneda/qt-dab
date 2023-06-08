@@ -27,7 +27,7 @@
 #include "dab-constants.h"
 #include	<QThread>
 #include	<QMessageBox>
-#include	<stdio.h>
+#include	<cstdio>
 #include	"ringbuffer.h"
 #include	<stdint.h>
 #include	<vector>

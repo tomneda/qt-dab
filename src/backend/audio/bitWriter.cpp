@@ -18,7 +18,7 @@
  */
 
 #include	"bitWriter.h"
-#include	<stdio.h>
+#include	<cstdio>
 
 
 // --- BitWriter -------------------------------------------------------------

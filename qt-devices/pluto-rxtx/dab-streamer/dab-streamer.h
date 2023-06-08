@@ -29,7 +29,7 @@
 
 #include	<thread>
 #include	<stdint.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<complex>
 #include	<atomic>
 #include	"ringbuffer.h"

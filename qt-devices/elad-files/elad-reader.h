@@ -24,7 +24,7 @@
 #define	__ELAD_READER__
 
 #include	<QThread>
-#include	<stdio.h>
+#include	<cstdio>
 #include	"dab-constants.h"
 #include	"ringbuffer.h"
 #include	<atomic>

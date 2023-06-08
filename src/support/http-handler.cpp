@@ -21,7 +21,7 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include	<stdio.h>
+#include	<cstdio>
 #include	<stdlib.h>
 #include	<unistd.h>
 #include	<sys/types.h>
@@ -93,7 +93,8 @@ void	httpHandler::start	() {
 	                                   nullptr, nullptr, SW_SHOWNORMAL);
 #else
 	std::string x = "xdg-open " + browserAddress;
-	system (x. c_str ());
+	const int result = system (x. c_str ());
+  (void)result;
 #endif
 }
 
@@ -213,7 +214,7 @@ std::string	ctype;
 //	and send the reply
 	      if (write (ClientSocket, hdr, hdrlen) != hdrlen ||
 	          write (ClientSocket, content. c_str (),
-	                      content. size ()) != content. size ())  {
+	                      content. size ()) != (signed)content. size ())  {
 //	         fprintf (stderr, "WRITE PROBLEM\n");
 //	         break;
 	      }
@@ -444,7 +445,7 @@ int params	= 0;
 std::string dotNumber (float f) {
 char temp [256];
 std::string s = std::to_string (f);
-	for (int i = 0; i < s. size (); i ++)
+	for (uint32_t i = 0; i < s. size (); i ++)
 	   if (s. c_str () [i] == ',')
 	      temp [i] = '.';
 	   else
@@ -454,8 +455,6 @@ std::string s = std::to_string (f);
 }
 //
 std::string httpHandler::coordinatesToJson (std::vector<httpData> &t) {
-cmplx home;
-cmplx target = cmplx (0, 0);
 char buf [512];
 QString Jsontxt;
 
@@ -528,7 +527,7 @@ void	httpHandler::putData	(uint8_t	type,
 	transmitterList. push_back (t);
 	locker. unlock ();
 
-	for (int i = 0; i < transmitterVector. size (); i ++) {
+	for (uint32_t i = 0; i < transmitterVector. size (); i ++) {
 	   if ((transmitterVector. at (i). transmitterName == transmitterName) &&
 	       (transmitterVector. at (i). channelName == channelName))
 	      return;

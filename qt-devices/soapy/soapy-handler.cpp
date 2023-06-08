@@ -21,7 +21,7 @@
  */
 #include	<QMessageBox>
 #include	"soapy-handler.h"
-#include	<stdio.h> //printf
+#include	<cstdio> //printf
 #include	<stdlib.h> //free
 #include	<complex.h>
 #include	"soapy_CS8.h"

@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <stdio.h>
+#include <cstdio>
 #include "impl.h"
 
 int main(int /*argc*/, const char ** /*argv*/)

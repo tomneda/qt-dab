@@ -29,7 +29,7 @@
 
 #include	<QString>
 #include	<stdint.h>
-#include	<stdio.h>
+#include	<cstdio>
 
 class Blocks	{
 public:

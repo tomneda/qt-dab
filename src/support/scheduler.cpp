@@ -21,7 +21,7 @@
  */
 #include	"scheduler.h"
 #include	"radio.h"
-#include	<stdio.h>
+#include	<cstdio>
 #include	<iostream>
 #include	<fstream>
 #include	<string>

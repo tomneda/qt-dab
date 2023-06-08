@@ -80,7 +80,7 @@ rtlsdrHandler	*theStick	= (rtlsdrHandler *)ctx;
 	}
 
 	if (theStick -> isActive. load ()) {
-	   if (theStick -> _I_Buffer. GetRingBufferWriteAvailable () < len / 2)
+	   if (theStick -> _I_Buffer. GetRingBufferWriteAvailable () < (signed)len / 2)
 	      fprintf (stderr, "xx? ");
 	   (void)theStick -> _I_Buffer.
 	             putDataIntoBuffer ((std::complex<uint8_t> *)buf, len / 2);

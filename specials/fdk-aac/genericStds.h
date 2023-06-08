@@ -386,7 +386,7 @@ void FDKprintf(const char *szFmt, ...);
 
 void FDKprintfErr(const char *szFmt, ...);
 
-/** Wrapper for <stdio.h>'s getchar(). */
+/** Wrapper for <cstdio>'s getchar(). */
 int FDKgetchar(void);
 
 INT FDKfprintf(void *stream, const char *format, ...);

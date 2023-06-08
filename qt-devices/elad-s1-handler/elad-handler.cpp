@@ -31,7 +31,7 @@
 #include	"elad-handler.h"	// our header
 #include	"elad-worker.h"		// the thread, reading in the data
 #include	"elad-loader.h"		// function loader
-#include	<stdio.h>
+#include	<cstdio>
 
 //	Currently, we do not have lots of settings,
 //	it just might change suddenly, but not today

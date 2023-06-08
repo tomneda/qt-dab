@@ -8,7 +8,7 @@
 #define		__COMP_ATAN
 
 #include	<math.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<stdint.h>
 #include	<cstdlib>
 #include	<limits>

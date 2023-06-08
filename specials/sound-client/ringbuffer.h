@@ -68,7 +68,7 @@
 #ifndef __RINGBUFFER
 #define	__RINGBUFFER
 #include	<stdlib.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<string.h>
 #include	<stdint.h>
 /*

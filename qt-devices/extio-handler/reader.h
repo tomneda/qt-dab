@@ -28,7 +28,7 @@
 #define	__READER
 
 #include	<stdint.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	"ringbuffer.h"
 #include	"dab-constants.h"
 

@@ -25,7 +25,7 @@
  *
  */
 
-#include	<stdio.h>
+#include	<cstdio>
 #include	"Qt-audiodevice.h"
 #include	"Qt-audio.h"
 

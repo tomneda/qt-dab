@@ -26,7 +26,7 @@
 #include	"sound-constants.h"
 #include	<QString>
 #include	<portaudio.h>
-#include	<stdio.h>
+#include	<cstdio>
 #include	<QComboBox>
 #include	"ringbuffer.h"
 

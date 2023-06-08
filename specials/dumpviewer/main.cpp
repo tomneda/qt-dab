@@ -23,7 +23,7 @@
  *	Main program
  */
 #include	<QApplication>
-#include	<stdio.h>
+#include	<cstdio>
 #include	"dump-viewer.h"
 
 int	main (int argc, char **argv) {

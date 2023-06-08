@@ -26,7 +26,7 @@
  */
 #ifndef __QT_AUDIO__
 #define	__QT_AUDIO__
-#include	<stdio.h>
+#include	<cstdio>
 #include	<QAudioOutput>
 #include	 <QTimer>
 #include	"dab-constants.h"

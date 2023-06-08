@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013, 2014, 2015, 2016, 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,38 +19,48 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
+#ifndef  DAB_PARAMS_H
+#define  DAB_PARAMS_H
 
-#ifndef	__DAB_PARAMS__
-#define	__DAB_PARAMS__
+#include  <cstdint>
+#include  <array>
 
-#include	<cstdint>
-
-class	dabParams {
+class dabParams
+{
 public:
-			dabParams	(uint8_t);
-			~dabParams();
-	int16_t		get_dabMode();
-	int16_t		get_L();
-	int16_t		get_carriers();
-	int16_t		get_T_null();
-	int16_t		get_T_s();
-	int16_t		get_T_u();
-	int16_t		get_T_g();
-	int32_t		get_T_F();
-	int32_t		get_carrierDiff();
-	int16_t		get_CIFs();
+  explicit dabParams(uint8_t iDabMode);
+  ~dabParams() = default;
+
+  struct SDabPar
+  {
+    int16_t L;   // blocks per frame
+    int16_t K;   // number carriers
+    int16_t T_n; // null length
+    int32_t T_F; // samples per frame
+    int16_t T_s; // block length
+    int16_t T_u; // useful part
+    int16_t T_g;
+    int16_t CarrDiff;
+    int16_t CIFs;
+  };
+
+  [[nodiscard]] const SDabPar & get_dab_par() const { return msDabPar[mDabMode]; }
+
+  [[nodiscard]] int16_t get_dabMode()     const { return mDabMode; }
+  [[nodiscard]] int16_t get_L()           const { return get_dab_par().L; }
+  [[nodiscard]] int16_t get_carriers()    const { return get_dab_par().K; }
+  [[nodiscard]] int16_t get_T_null()      const { return get_dab_par().T_n; }
+  [[nodiscard]] int16_t get_T_s()         const { return get_dab_par().T_s; }
+  [[nodiscard]] int16_t get_T_u()         const { return get_dab_par().T_u; }
+  [[nodiscard]] int16_t get_T_g()         const { return get_dab_par().T_g; }
+  [[nodiscard]] int32_t get_T_F()         const { return get_dab_par().T_F; }
+  [[nodiscard]] int32_t get_carrierDiff() const { return get_dab_par().CarrDiff; }
+  [[nodiscard]] int16_t get_CIFs()        const { return get_dab_par().CIFs; }
+
 private:
-	uint8_t		dabMode;
-	int16_t		L;
-	int16_t		K;
-	int16_t		T_null;
-	int32_t		T_F;
-	int16_t		T_s;
-	int16_t		T_u;
-	int16_t		T_g;
-	int16_t		carrierDiff;
-	int16_t		CIFs;
+  uint8_t mDabMode{ 0 };
+  using TArrDabPar = std::array<SDabPar, 5>;
+  static const TArrDabPar msDabPar;
 };
 
 #endif
-

@@ -118,9 +118,6 @@ cmplx	tmp	= 0;
 }
 
 float	LowPassFIR::Pass (float v) {
-int16_t		i;
-float	tmp	= 0;
-
 	return real (Pass (cmplx (v, 0)));
 }
 

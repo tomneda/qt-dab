@@ -135,7 +135,7 @@ int	tiiHandler::distance_2 (float latitude1, float longitude1,
 double	R	= 6371;
 double	Phi1	= latitude1 * M_PI / 180;
 double	Phi2	= latitude2 * M_PI / 180;
-double	dPhi	= (latitude2 - latitude1) * M_PI / 180;
+//double	dPhi	= (latitude2 - latitude1) * M_PI / 180;
 double	dDelta	= (longitude2 - longitude1) * M_PI / 180;
 
 	if ((latitude2 == 0) || (longitude2 == 0))
@@ -193,7 +193,7 @@ double dy	= distance (latitude1, longitude2,
 
 bool	tiiHandler::is_black		(uint16_t Eid,
 	                                 uint8_t mainId, uint8_t subId) {
-	for (int i = 0; i < blackList. size (); i ++)
+	for (uint32_t i = 0; i < blackList. size (); i ++)
 	   if ((blackList [i]. Eid == Eid) &&
 	       (blackList [i]. mainId == mainId) &&
 	       (blackList [i]. subId == subId))
@@ -247,7 +247,7 @@ uint16_t res;
 }
 
 void	tiiHandler::readFile (FILE *f) {
-int	count = 0; 
+uint32_t	count = 0;
 char	buffer [1024];
 std::vector<QString> columnVector;
 

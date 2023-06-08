@@ -58,8 +58,8 @@ private:
   int32_t nrBlocks;
   int32_t carriers;
   int32_t cnt = 0;
-  std::vector<complex<float>> phaseReference;
-  std::vector<complex<float>> fft_buffer;
+  std::vector<std::complex<float>> phaseReference;
+  std::vector<std::complex<float>> fft_buffer;
   std::vector<std::complex<float>> dataVector;
  
   float compute_mod_quality(const std::vector<std::complex<float>> & v);

@@ -74,7 +74,7 @@ private:
 	RingBuffer<uint8_t>	*dataBuffer;
 	RingBuffer<uint8_t>	*frameBuffer;
 	dabParams	params;
-	std::vector<complex<float>>     phaseReference;
+	std::vector<std::complex<float>>     phaseReference;
 
         interLeaver     myMapper;
 	QMutex		locker;

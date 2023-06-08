@@ -57,7 +57,6 @@ typedef void * HINSTANCE;
 #ifndef  M_PI
 # define M_PI           3.14159265358979323846  /* pi */
 #endif
-using namespace std;
 
 #define  Hz(x)     (x)
 #define  kHz(x)    (x * 1000)
@@ -114,7 +113,7 @@ static inline bool isIndeterminate(float x)
 
 static inline bool isInfinite(float x)
 {
-  return x == numeric_limits<float>::infinity();
+  return x == std::numeric_limits<float>::infinity();
 }
 
 static inline std::complex<float> cmul(std::complex<float> x, float y)

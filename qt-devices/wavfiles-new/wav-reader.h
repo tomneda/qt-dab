@@ -42,7 +42,7 @@ public:
 private:
 virtual void		run		();
 	SNDFILE		*filePointer;
-	RingBuffer<cmplx >	*theBuffer;
+	RingBuffer<cmplx>	*theBuffer;
 	uint64_t	period;
 	std::atomic<bool>	running;
 	wavFiles	*parent;

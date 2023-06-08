@@ -40,7 +40,7 @@
  *	carriers and map them on (soft) bits
  */
 ofdmDecoder::ofdmDecoder(RadioInterface *mr, uint8_t dabMode, int16_t bitDepth,
-                         RingBuffer<cmplx > *iqBuffer)
+                         RingBuffer<cmplx> *iqBuffer)
   : params(dabMode)
   , myMapper(dabMode)
   , fft(params.get_T_u(), false)
@@ -73,7 +73,7 @@ void ofdmDecoder::reset()
 
 /**
  */
-void ofdmDecoder::processBlock_0(std::vector<cmplx > buffer)
+void ofdmDecoder::processBlock_0(std::vector<cmplx> buffer)
 {
   fft.fft(buffer);
   /**
@@ -91,7 +91,7 @@ void ofdmDecoder::processBlock_0(std::vector<cmplx > buffer)
  *	only to spare a test. The mapping code is the same
  */
 
-void ofdmDecoder::decode(const std::vector<cmplx > &buffer, int32_t blkno, std::vector<int16_t> &oBits)
+void ofdmDecoder::decode(const std::vector<cmplx> &buffer, int32_t blkno, std::vector<int16_t> &oBits)
 {
   memcpy(fft_buffer.data(), &((buffer.data())[T_g]), T_u * sizeof(cmplx));
 

@@ -94,7 +94,7 @@ private:
 	int		nrBlocks;
 #ifdef	__MSC_THREAD__
         void            processBlock_0	();
-        std::vector<std::vector<cmplx > > command;
+        std::vector<std::vector<cmplx> > command;
         int16_t         amount;
 	void            run();
         QSemaphore      bufferSpace;

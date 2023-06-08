@@ -152,8 +152,8 @@ cmplx temp [2048];
 	      for (int j = 0; j < 2048; j ++) {
 	         int16_t  inpBase	= p -> mapTable_int [j];
 	         float	inpRatio	= p ->  mapTable_float [j];
-                 temp [j]  = cmul (p -> convBuffer [inpBase + 1], inpRatio) +
-                             cmul (p -> convBuffer [inpBase], 1 - inpRatio);
+                 temp [j]  = p -> convBuffer [inpBase + 1] * inpRatio +
+                             p -> convBuffer [inpBase] * (1 - inpRatio);
               }
 
               p -> _I_Buffer. putDataIntoBuffer (temp, 2048);

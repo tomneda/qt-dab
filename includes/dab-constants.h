@@ -115,16 +115,6 @@ static inline bool isInfinite(float x)
   return x == std::numeric_limits<float>::infinity();
 }
 
-static inline cmplx cmul(cmplx x, float y)
-{
-  return cmplx(real(x) * y, imag(x) * y);
-}
-
-static inline cmplx cdiv(cmplx x, float y)
-{
-  return cmplx(real(x) / y, imag(x) / y);
-}
-
 static inline float get_db(float x)
 {
   return 20 * log10((x + 0.005) / (float)(256));

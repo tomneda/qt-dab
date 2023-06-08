@@ -36,9 +36,7 @@ complex<float> createExp (float s) {
 	for (int pilotIndex = 0; pilotIndex < numberofPilots; pilotIndex ++) {
 	   for (int tap = 0; tap < numberofTaps; tap ++)
 	      F_p (pilotIndex, tap) =
-	         cdiv (createExp (2 * M_PI *
-	                        (fftSize / 2 + pilotTable [pilotIndex]) *
-	                                          tap / fftSize), sqrt (fftSize));
+	         createExp (2 * M_PI * (fftSize / 2 + pilotTable [pilotIndex]) * tap / fftSize) / sqrt (fftSize);
 	}
 	S_pxF_p                 = S_p * F_p;
 }

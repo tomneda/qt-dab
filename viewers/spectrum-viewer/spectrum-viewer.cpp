@@ -127,7 +127,7 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
     }
     else
     {
-      spectrum[i] = cmul(spectrum[i], Window[i]);
+      spectrum[i] = spectrum[i] * Window[i];
     }
   }
 

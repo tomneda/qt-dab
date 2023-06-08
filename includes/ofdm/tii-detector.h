@@ -46,7 +46,7 @@ private:
 	dabParams		params;
 	int16_t			T_u;
 	int16_t			carriers;
-	std::vector<cmplx >	theBuffer;
+	std::vector<cmplx>	theBuffer;
 	std::vector<float>	window;
 };
 

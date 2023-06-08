@@ -36,7 +36,7 @@ struct timeval  tv;
 
 	wavReader::wavReader	(wavFiles	*mr,
 	                         SNDFILE	*filePointer,
-	                         RingBuffer<cmplx > *theBuffer) {
+	                         RingBuffer<cmplx> *theBuffer) {
 	this	-> parent	= mr;
 	this	-> filePointer	= filePointer;
 	this	-> theBuffer	= theBuffer;

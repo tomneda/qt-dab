@@ -74,7 +74,7 @@ private:
 //	for the conversion - if any
 	int16_t         convBufferSize;
         int16_t         convIndex;
-        std::vector <cmplx >   convBuffer;
+        std::vector <cmplx>   convBuffer;
         int16_t         mapTable_int   [2048];
         float           mapTable_float [2048];
 

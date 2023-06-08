@@ -288,8 +288,8 @@ cmplx temp [2048];
 	         for (j = 0; j < 2048; j ++) {
 	            int16_t  inpBase		= mapTable_int [j];
 	            float    inpRatio		= mapTable_float [j];
-	            temp [j]  = cmul (convBuffer [inpBase + 1], inpRatio) +
-                                cmul (convBuffer [inpBase], 1 - inpRatio);
+	            temp [j]  = convBuffer [inpBase + 1] * inpRatio +
+                          convBuffer [inpBase] * (1 - inpRatio);
 	            sum += abs (temp [j]);
                  }
 	         if (++teller > 1000) {

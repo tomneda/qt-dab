@@ -74,7 +74,7 @@ private:
 	QFrame		*myFrame;
 	uhd::usrp::multi_usrp::sptr m_usrp;
 	uhd::rx_streamer::sptr m_rx_stream;
-	RingBuffer<cmplx > *theBuffer;
+	RingBuffer<cmplx> *theBuffer;
 	uhd_streamer* m_workerHandle;
 	int32_t		inputRate;
 	int32_t		ringbufferSize;

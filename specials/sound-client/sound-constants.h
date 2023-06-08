@@ -63,16 +63,6 @@ static inline
 bool	isInfinite (double x) {
 	return x == numeric_limits<DSPFLOAT>::infinity ();
 }
-//
-static inline
-DSPCOMPLEX cmul (DSPCOMPLEX x, float y) {
-	return DSPCOMPLEX (real (x) * y, imag (x) * y);
-}
-
-static inline
-DSPCOMPLEX cdiv (DSPCOMPLEX x, float y) {
-	return DSPCOMPLEX (real (x) / y, imag (x) / y);
-}
 
 static inline
 float	get_db (DSPFLOAT x) {

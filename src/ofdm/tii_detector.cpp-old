@@ -144,12 +144,12 @@ void	TII_Detector::addBuffer (std::vector<cmplx> v) {
 int	i;
 
 	for (i = 0; i < T_u; i ++)
-	   fft_buffer [i] = cmul (v [i], window [i]);
+	   fft_buffer [i] = v [i] * window [i];
 	my_fftHandler. do_FFT();
 
 	for (i = 0; i < T_u; i ++)
-//	   theBuffer [i] = cmul (theBuffer [i], 0.9) +
-//	                   cmul (fft_buffer [i], 0.1);
+//	   theBuffer [i] = theBuffer [i] * 0.9 +
+//	                   fft_buffer [i] * 0.1;
 	   theBuffer [i] += fft_buffer [i];
 }
 //

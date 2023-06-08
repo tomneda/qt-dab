@@ -26,18 +26,6 @@
 # define M_PI           3.14159265358979323846  /* pi */
 #endif
 
-static inline
-cmplx cmul (cmplx in, float y) {
-	return cmplx (real (in) * y,
-	                            imag (in) * y);
-}
-
-static inline 
-cmplx cdiv (cmplx in, float y) {
-	return cmplx (real (in) / y,
-	                            imag (in) / y);
-}
-
 	upFilter::upFilter (int bufferSize, int  inRate, int outRate):
 	                                    kernel (bufferSize * (outRate / inRate)),
 	                                    buffer (bufferSize) {

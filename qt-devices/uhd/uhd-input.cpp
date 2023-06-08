@@ -124,7 +124,7 @@ void	uhd_streamer::run (void) {
 	   std::cout << boost::format("Actual RX Rate: %f Msps...") % (inputRate/1e6) << std::endl << std::endl;
 
 //	allocate the rx buffer
-	   theBuffer	= new RingBuffer<cmplx >(ringbufferSize * 1024);
+	   theBuffer	= new RingBuffer<cmplx>(ringbufferSize * 1024);
 	}
 	catch (...) {
 	   fprintf (stderr, "No luck with uhd\n");

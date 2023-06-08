@@ -19,8 +19,8 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef  __DAB_PROCESSOR__
-#define  __DAB_PROCESSOR__
+#ifndef  DAB_PROCESSOR_H
+#define  DAB_PROCESSOR_H
 /*
  *	dabProcessor is the embodying of all functionality related
  *	to the actual DAB processing.
@@ -51,8 +51,8 @@ class dabProcessor : public QThread
 {
 Q_OBJECT
 public:
-  dabProcessor(RadioInterface *, deviceHandler *, processParams *);
-  ~dabProcessor();
+  dabProcessor(RadioInterface * mr, deviceHandler * inputDevice, processParams * p);
+  ~dabProcessor() override;
   void start();
 
   //	void		start			(int32_t);
@@ -97,46 +97,44 @@ public:
   void set_tiiDetectorMode(bool);
 
 private:
-  int mThreshold{ 0 };
-  int mTotalFrames{ 0 };
-  int mGoodFrames{ 0 };
-  int mBadFrames{ 0 };
-
-  deviceHandler * inputDevice;
-  dabParams params;
-  RingBuffer<cmplx> * tiiBuffer;
-  RingBuffer<cmplx> * nullBuffer;
-  RingBuffer<float> * snrBuffer;
-  int16_t tii_delay;
-  int16_t tii_counter;
-  bool eti_on;
-
-  sampleReader myReader;
-  RadioInterface * myRadioInterface;
+  const int32_t mThreshold;
+  deviceHandler * const mpInputDevice;
+  const dabParams mParams;
+  RingBuffer<cmplx> * const mpTiiBuffer;
+  RingBuffer<cmplx> * const mpNullBuffer;
+  RingBuffer<float> * const mpSnrBuffer;
+  RadioInterface * const myRadioInterface;
+  sampleReader mReader;
   ficHandler my_ficHandler;
   mscHandler my_mscHandler;
   phaseReference phaseSynchronizer;
   TII_Detector my_TII_Detector;
   ofdmDecoder my_ofdmDecoder;
   etiGenerator my_etiGenerator;
-
-  int16_t mAttempts{ 0 };
+  const int16_t tii_delay;
+  const int32_t T_null;
+  const int32_t T_u;
+  const int32_t T_s;
+  const int32_t T_g;
+  const int32_t T_F;
+  const int32_t nrBlocks;
+  const int32_t mK;
+  const int32_t carrierDiff;
   bool mScanMode{ false };
-  int32_t T_null;
-  int32_t T_u;
-  int32_t T_s;
-  int32_t T_g;
-  int32_t T_F;
-  int32_t nrBlocks;
-  int32_t carriers;
-  int32_t carrierDiff;
+
+  int32_t mTotalFrames{ 0 };
+  int32_t mGoodFrames{ 0 };
+  int32_t mBadFrames{ 0 };
+  int16_t tii_counter{ 0 };
+  bool mEti_on{ false };
   int32_t mFineOffset{ 0 };
   int32_t mCoarseOffset{ 0 };
-  QByteArray transmitters;
-  bool correctionNeeded;
+  //QByteArray transmitters;
+  bool correctionNeeded{ true };
   std::vector<cmplx> ofdmBuffer;
-  bool wasSecond(int32_t cf, dabParams * p) const;
-  virtual void run();
+  bool wasSecond(int32_t cf, const dabParams * p) const;
+
+  void run() override;
 
 signals:
   void setSynced(bool);

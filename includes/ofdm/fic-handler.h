@@ -46,7 +46,7 @@ Q_OBJECT
 public:
 		ficHandler		(RadioInterface *, uint8_t);
 		~ficHandler();
-	void	process_ficBlock	(std::vector<int16_t> &, int16_t);
+	void	process_ficBlock	(std::vector<int16_t> & data, int32_t blkno);
 	void	stop			();
 	void	restart			();
 	void	start_ficDump		(FILE *);

@@ -128,7 +128,7 @@ int16_t	shiftRegister [9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
   *	for each time 2304 bits are in, we call process_ficInput
   */
 void	ficHandler::process_ficBlock (std::vector<int16_t> &data,
-	                              int16_t blkno) {
+                                    int32_t blkno) {
 int32_t	i;
 
 	if (blkno == 1) {

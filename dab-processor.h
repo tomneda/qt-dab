@@ -42,12 +42,9 @@
 #include  "ringbuffer.h"
 #include  "tii-detector.h"
 #include  "eti-generator.h"
-//
 
 class RadioInterface;
-
 class dabParams;
-
 class processParams;
 
 class dabProcessor : public QThread
@@ -66,8 +63,8 @@ public:
   void stop_etiGenerator();
   void reset_etiGenerator();
   void set_scanMode(bool);
-  void get_frameQuality(int *, int *, int *);
-  //
+  void get_frame_quality(int32_t & oTotalFrames, int32_t & oGoodFrames, int32_t & oBadFrames);
+
   //	inheriting from our delegates
   //	for the ficHandler:
   QString findService(uint32_t, int);
@@ -100,13 +97,11 @@ public:
   void set_tiiDetectorMode(bool);
 
 private:
-  int threshold;
-  int totalFrames;
-  int goodFrames;
-  int badFrames;
-  bool tiiSwitch;
-  int16_t tii_depth;
-  int16_t echo_depth;
+  int mThreshold{ 0 };
+  int mTotalFrames{ 0 };
+  int mGoodFrames{ 0 };
+  int mBadFrames{ 0 };
+
   deviceHandler * inputDevice;
   dabParams params;
   RingBuffer<cmplx> * tiiBuffer;
@@ -125,8 +120,8 @@ private:
   ofdmDecoder my_ofdmDecoder;
   etiGenerator my_etiGenerator;
 
-  int16_t attempts;
-  bool scanMode;
+  int16_t mAttempts{ 0 };
+  bool mScanMode{ false };
   int32_t T_null;
   int32_t T_u;
   int32_t T_s;
@@ -135,12 +130,12 @@ private:
   int32_t nrBlocks;
   int32_t carriers;
   int32_t carrierDiff;
-  int16_t fineOffset;
-  int32_t coarseOffset;
+  int32_t mFineOffset{ 0 };
+  int32_t mCoarseOffset{ 0 };
   QByteArray transmitters;
   bool correctionNeeded;
   std::vector<cmplx> ofdmBuffer;
-  bool wasSecond(int16_t, dabParams *);
+  bool wasSecond(int32_t cf, dabParams * p) const;
   virtual void run();
 
 signals:

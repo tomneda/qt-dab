@@ -36,48 +36,41 @@
   */
 
 dabProcessor::dabProcessor(RadioInterface * const mr, deviceHandler * const inputDevice, processParams * const p)
-  : mThreshold(p->threshold),
-    mpInputDevice(inputDevice),
-    mParams(p->dabMode),
+  : mpInputDevice(inputDevice),
     mpTiiBuffer(p->tiiBuffer),
     mpNullBuffer(p->nullBuffer),
     mpSnrBuffer(p->snrBuffer),
-    myRadioInterface(mr),
-    mReader(mr, inputDevice, p->spectrumBuffer),
-    my_ficHandler(mr, p->dabMode),
-    my_mscHandler(mr, p->dabMode, p->frameBuffer),
-    phaseSynchronizer(mr, p),
-    my_TII_Detector(p->dabMode, p->tii_depth),
-    my_ofdmDecoder(mr, p->dabMode, inputDevice->bitDepth(), p->iqBuffer),
-    my_etiGenerator(p->dabMode, &my_ficHandler),
-    tii_delay(p->tii_delay),
-    T_null(mParams.get_T_null()),
-    T_u(mParams.get_T_u()),
-    T_s(mParams.get_T_s()),
-    T_g(T_s - T_u),
-    T_F(mParams.get_T_F()),
-    nrBlocks(mParams.get_L()),
-    mK(mParams.get_K()),
-    carrierDiff(mParams.get_carrierDiff())
+    mpRadioInterface(mr),
+    mSampleReader(mr, inputDevice, p->spectrumBuffer),
+    mFicHandler(mr, p->dabMode),
+    mMscHandler(mr, p->dabMode, p->frameBuffer),
+    mPhaseSynchronizer(mr, p),
+    mTiiDetector(p->dabMode, p->tii_depth),
+    mOfdmDecoder(mr, p->dabMode, inputDevice->bitDepth(), p->iqBuffer),
+    mEtiGenerator(p->dabMode, &mFicHandler),
+    mcDabMode(p->dabMode),
+    mcThreshold(p->threshold),
+    mcTiiDelay(p->tii_delay),
+    mDabPar(dabParams(p->dabMode).get_dab_par())
 {
-  connect(this, SIGNAL (setSynced(bool)), myRadioInterface, SLOT (setSynced(bool)));
-  connect(this, SIGNAL (setSyncLost(void)), myRadioInterface, SLOT (setSyncLost(void)));
-  connect(this, SIGNAL (show_Spectrum(int)), myRadioInterface, SLOT (showSpectrum(int)));
-  connect(this, SIGNAL (show_tii(int, int)), myRadioInterface, SLOT (show_tii(int, int)));
-  connect(this, SIGNAL (show_tii_spectrum()), myRadioInterface, SLOT (show_tii_spectrum()));
+  connect(this, SIGNAL (setSynced(bool)), mpRadioInterface, SLOT (setSynced(bool)));
+  connect(this, SIGNAL (setSyncLost(void)), mpRadioInterface, SLOT (setSyncLost(void)));
+  connect(this, SIGNAL (show_Spectrum(int)), mpRadioInterface, SLOT (showSpectrum(int)));
+  connect(this, SIGNAL (show_tii(int, int)), mpRadioInterface, SLOT (show_tii(int, int)));
+  connect(this, SIGNAL (show_tii_spectrum()), mpRadioInterface, SLOT (show_tii_spectrum()));
   connect(this, SIGNAL (show_snr(int)), mr, SLOT (show_snr(int)));
   connect(this, SIGNAL (show_clockErr(int)), mr, SLOT (show_clockError(int)));
   connect(this, SIGNAL (show_null(int)), mr, SLOT (show_null(int)));
 
-  ofdmBuffer.resize(2 * T_s);
-  my_TII_Detector.reset();
+  mOfdmBuffer.resize(2 * mDabPar.T_s);
+  mTiiDetector.reset();
 }
 
 dabProcessor::~dabProcessor()
 {
   if (isRunning())
   {
-    mReader.setRunning(false);
+    mSampleReader.setRunning(false);
     // exception to be raised
     // through the getSample(s) functions.
     msleep(100);
@@ -90,29 +83,28 @@ dabProcessor::~dabProcessor()
 
 void dabProcessor::set_tiiDetectorMode(bool b)
 {
-  my_TII_Detector.setMode(b);
+  mTiiDetector.setMode(b);
 }
 
 void dabProcessor::start()
 {
-  my_ficHandler.restart();
-  //transmitters.clear();
+  mFicHandler.restart();
   if (!mScanMode)
   {
-    my_mscHandler.reset_Channel();
+    mMscHandler.reset_Channel();
   }
   QThread::start();
 }
 
 void dabProcessor::stop()
 {
-  mReader.setRunning(false);
+  mSampleReader.setRunning(false);
   while (isRunning())
   {
     wait();
   }
   usleep(10000);
-  my_ficHandler.stop();
+  mFicHandler.stop();
 }
 
 /***
@@ -127,7 +119,7 @@ void dabProcessor::run()
 {
   int32_t startIndex;
   cmplx FreqCorr;
-  timeSyncer myTimeSyncer(&mReader);
+  timeSyncer myTimeSyncer(&mSampleReader);
   int attempts;
   std::vector<int16_t> ibits;
   int frameCount = 0;
@@ -137,20 +129,20 @@ void dabProcessor::run()
   int cCount = 0;
   bool null_shower;
 
-  QVector<cmplx> tester(T_u / 2);
-  ibits.resize(2 * mParams.get_K());
+  QVector<cmplx> tester(mDabPar.T_u / 2);
+  ibits.resize(2 * mDabPar.K);
   mFineOffset = 0;
   mCoarseOffset = 0;
-  correctionNeeded = true;
+  mCorrectionNeeded = true;
   attempts = 0;
-  mReader.setRunning(true);  // useful after a restart
+  mSampleReader.setRunning(true);  // useful after a restart
   //
   //	to get some idea of the signal strength
   try
   {
-    for (int32_t i = 0; i < T_F / 5; i++)
+    for (int32_t i = 0; i < mDabPar.T_F / 5; i++)
     {
-      mReader.getSample(0);
+      mSampleReader.getSample(0);
     }
     //Initing:
     notSynced:
@@ -160,8 +152,9 @@ void dabProcessor::run()
     sampleCount = 0;
 
     setSynced(false);
-    my_TII_Detector.reset();
-    switch (myTimeSyncer.sync(T_null, T_F))
+    mTiiDetector.reset();
+
+    switch (myTimeSyncer.sync(mDabPar.T_n, mDabPar.T_F))
     {
     case TIMESYNC_ESTABLISHED: break;      // yes, we are ready
 
@@ -176,16 +169,16 @@ void dabProcessor::run()
     default:      // does not happen
     case NO_END_OF_DIP_FOUND: goto notSynced;
     }
-    mReader.getSamples(ofdmBuffer, 0, T_u, mCoarseOffset + mFineOffset);
+    mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
     /**
-      *	Looking for the first sample of the T_u part of the sync block.
+      *	Looking for the first sample of the mcT_u part of the sync block.
       *	Note that we probably already had 30 to 40 samples of the T_g
       *	part
       */
-    startIndex = phaseSynchronizer.findIndex(ofdmBuffer, mThreshold);
+    startIndex = mPhaseSynchronizer.findIndex(mOfdmBuffer, mcThreshold);
     if (startIndex < 0)
     { // no sync, try again
-      if (!correctionNeeded)
+      if (!mCorrectionNeeded)
       {
         setSyncLost();
       }
@@ -210,33 +203,33 @@ void dabProcessor::run()
 
     if (null_shower)
     {
-      for (int i = 0; i < T_u / 4; i++)
+      for (int i = 0; i < mDabPar.T_u / 4; i++)
       {
-        tester[i] = ofdmBuffer[T_null - T_u / 4 + i];
+        tester[i] = mOfdmBuffer[mDabPar.T_n - mDabPar.T_u / 4 + i];
       }
     }
 
-    mReader.getSamples(ofdmBuffer, 0, T_u, mCoarseOffset + mFineOffset);
+    mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
 
     if (null_shower)
     {
-      for (int i = 0; i < T_u / 4; i++)
+      for (int i = 0; i < mDabPar.T_u / 4; i++)
       {
-        tester[1 * T_u / 4 + i] = ofdmBuffer[i];
+        tester[1 * mDabPar.T_u / 4 + i] = mOfdmBuffer[i];
       }
-      mpNullBuffer->putDataIntoBuffer(tester.data(), T_u / 2);
-      show_null(T_u / 2);
+      mpNullBuffer->putDataIntoBuffer(tester.data(), mDabPar.T_u / 2);
+      show_null(mDabPar.T_u / 2);
     }
     /**
       *	We now have to find the exact first sample of the non-null period.
       *	We use a correlation that will find the first sample after the
       *	cyclic prefix.
       */
-    startIndex = phaseSynchronizer.findIndex(ofdmBuffer, 3 * mThreshold);
+    startIndex = mPhaseSynchronizer.findIndex(mOfdmBuffer, 3 * mcThreshold);
 
     if (startIndex < 0)
     { // no sync, try again
-      if (!correctionNeeded)
+      if (!mCorrectionNeeded)
       {
         setSyncLost();
       }
@@ -254,8 +247,8 @@ void dabProcessor::run()
       *	Once here, we are synchronized, we need to copy the data we
       *	used for synchronization for block 0
       */
-    memmove(ofdmBuffer.data(), &(ofdmBuffer[startIndex]), (T_u - startIndex) * sizeof(cmplx));
-    int ofdmBufferIndex = T_u - startIndex;
+    memmove(mOfdmBuffer.data(), &(mOfdmBuffer[startIndex]), (mDabPar.T_u - startIndex) * sizeof(cmplx));
+    int ofdmBufferIndex = mDabPar.T_u - startIndex;
 
     //Block_0:
     /**
@@ -266,32 +259,32 @@ void dabProcessor::run()
       *	We read the missing samples in the ofdm buffer
       */
     setSynced(true);
-    mReader.getSamples(ofdmBuffer, ofdmBufferIndex, T_u - ofdmBufferIndex, mCoarseOffset + mFineOffset);
+    mSampleReader.getSamples(mOfdmBuffer, ofdmBufferIndex, mDabPar.T_u - ofdmBufferIndex, mCoarseOffset + mFineOffset);
 
 #ifdef  __WITH_JAN__
     static int abc = 0;
     if (++abc > 10) {
-       phaseSynchronizer. estimate (ofdmBuffer);
+       mPhaseSynchronizer. estimate (mOfdmBuffer);
        abc = 0;
     }
 #endif
-    sampleCount += T_u;
-    my_ofdmDecoder.processBlock_0(ofdmBuffer);
+    sampleCount += mDabPar.T_u;
+    mOfdmDecoder.processBlock_0(mOfdmBuffer);
     if (!mScanMode)
     {
-      my_mscHandler.processBlock_0(ofdmBuffer.data());
+      mMscHandler.processBlock_0(mOfdmBuffer.data());
     }
 
     //	Here we look only at the block_0 when we need a coarse
     //	frequency synchronization.
-    correctionNeeded = !my_ficHandler.syncReached();
-    if (correctionNeeded)
+    mCorrectionNeeded = !mFicHandler.syncReached();
+    if (mCorrectionNeeded)
     {
-      const int32_t correction = phaseSynchronizer.estimate_carrier_offset(ofdmBuffer);
+      const int32_t correction = mPhaseSynchronizer.estimate_carrier_offset(mOfdmBuffer);
 
       if (correction != 100)
       {
-        mCoarseOffset += (int32_t)(0.4 * correction * carrierDiff);
+        mCoarseOffset += (int32_t)(0.4 * correction * mDabPar.CarrDiff);
 
         if (abs(mCoarseOffset) > kHz(35))
         {
@@ -315,51 +308,51 @@ void dabProcessor::run()
     cCount = 0;
     cLevel = 0;
     FreqCorr = cmplx(0, 0);
-    for (int ofdmSymbolCount = 1; ofdmSymbolCount < nrBlocks; ofdmSymbolCount++)
+    for (int ofdmSymbolCount = 1; ofdmSymbolCount < mDabPar.L; ofdmSymbolCount++)
     {
-      mReader.getSamples(ofdmBuffer, 0, T_s, mCoarseOffset + mFineOffset);
-      sampleCount += T_s;
+      mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_s, mCoarseOffset + mFineOffset);
+      sampleCount += mDabPar.T_s;
 
-      for (int32_t i = T_u; i < T_s; i++)
+      for (int32_t i = mDabPar.T_u; i < mDabPar.T_s; i++)
       {
-        FreqCorr += ofdmBuffer[i] * conj(ofdmBuffer[i - T_u]);
-        cLevel += abs(ofdmBuffer[i]) + abs(ofdmBuffer[i - T_u]);
+        FreqCorr += mOfdmBuffer[i] * conj(mOfdmBuffer[i - mDabPar.T_u]);
+        cLevel += abs(mOfdmBuffer[i]) + abs(mOfdmBuffer[i - mDabPar.T_u]);
       }
-      cCount += 2 * T_g;
+      cCount += 2 * mDabPar.T_g;
 
       if ((ofdmSymbolCount <= 3) || mEti_on)
       {
-        my_ofdmDecoder.decode(ofdmBuffer, ofdmSymbolCount, ibits);
+        mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbolCount, ibits);
       }
 
 
       if (ofdmSymbolCount <= 3)
       {
-        my_ficHandler.process_ficBlock(ibits, ofdmSymbolCount);
+        mFicHandler.process_ficBlock(ibits, ofdmSymbolCount);
       }
       if (mEti_on)
       {
-        my_etiGenerator.processBlock(ibits, ofdmSymbolCount);
+        mEtiGenerator.processBlock(ibits, ofdmSymbolCount);
       }
 
       if (!mScanMode)
       {
-        my_mscHandler.process_Msc(&(ofdmBuffer[T_g]), ofdmSymbolCount);
+        mMscHandler.process_Msc(&(mOfdmBuffer[mDabPar.T_g]), ofdmSymbolCount);
       }
     }
     /**
       *	OK,  here we are at the end of the frame
-      *	Assume everything went well and skip T_null samples
+      *	Assume everything went well and skip mcT_null samples
       */
-    mReader.getSamples(ofdmBuffer, 0, T_null, mCoarseOffset + mFineOffset);
-    sampleCount += T_null;
+    mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_n, mCoarseOffset + mFineOffset);
+    sampleCount += mDabPar.T_n;
     float sum = 0;
 
-    for (int32_t i = 0; i < T_null; i++)
+    for (int32_t i = 0; i < mDabPar.T_n; i++)
     {
-      sum += abs(ofdmBuffer[i]);
+      sum += abs(mOfdmBuffer[i]);
     }
-    sum /= (float)T_null;
+    sum /= (float)mDabPar.T_n;
 
     if (this->mpSnrBuffer != nullptr)
     {
@@ -372,31 +365,44 @@ void dabProcessor::run()
     if (ccc >= 5)
     {
       ccc = 0;
-      snr = (float)(0.9 * snr + 0.1 * 20 * log10((mReader.get_sLevel() + 0.005) / (sum + 0.005)));
+      snr = (float)(0.9 * snr + 0.1 * 20 * log10((mSampleReader.get_sLevel() + 0.005) / (sum + 0.005)));
       show_snr((int)snr);
     }
     /*
      *	The TII data is encoded in the null period of the
      *	odd frames
      */
-    if (mParams.get_dabMode() == 1)
+
+    auto wasSecond = [](int32_t iCF, uint8_t iDabMode) -> bool
     {
-      if (wasSecond(my_ficHandler.get_CIFcount(), &mParams))
+      switch (iDabMode)
       {
-        my_TII_Detector.addBuffer(ofdmBuffer);
-        if (++tii_counter >= tii_delay)
+      default:
+      case 1: return (iCF & 07) >= 4;
+      case 2:
+      case 3: return (iCF & 02);
+      case 4: return (iCF & 03) >= 2;
+      }
+    };
+
+    if (mcDabMode == 1)
+    {
+      if (wasSecond(mFicHandler.get_CIFcount(), mcDabMode))
+      {
+        mTiiDetector.addBuffer(mOfdmBuffer);
+        if (++mTiiCounter >= mcTiiDelay)
         {
-          mpTiiBuffer->putDataIntoBuffer(ofdmBuffer.data(), T_u);
+          mpTiiBuffer->putDataIntoBuffer(mOfdmBuffer.data(), mDabPar.T_u);
           show_tii_spectrum();
-          uint16_t res = my_TII_Detector.processNULL();
+          uint16_t res = mTiiDetector.processNULL();
           if (res != 0)
           {
             uint8_t mainId = res >> 8;
             uint8_t subId = res & 0xFF;
             show_tii(mainId, subId);
           }
-          tii_counter = 0;
-          my_TII_Detector.reset();
+          mTiiCounter = 0;
+          mTiiDetector.reset();
         }
       }
     }
@@ -410,17 +416,17 @@ void dabProcessor::run()
     //     existing frequency error.
     //
 
-    mFineOffset += (int32_t)(0.05 * arg(FreqCorr) / (2 * M_PI) * carrierDiff);
+    mFineOffset += (int32_t)(0.05 * arg(FreqCorr) / (2 * M_PI) * mDabPar.CarrDiff);
 
-    if (mFineOffset > carrierDiff / 2)
+    if (mFineOffset > mDabPar.CarrDiff / 2)
     {
-      mCoarseOffset += carrierDiff;
-      mFineOffset -= carrierDiff;
+      mCoarseOffset += mDabPar.CarrDiff;
+      mFineOffset -= mDabPar.CarrDiff;
     }
-    else if (mFineOffset < -carrierDiff / 2)
+    else if (mFineOffset < -mDabPar.CarrDiff / 2)
     {
-      mCoarseOffset -= carrierDiff;
-      mFineOffset += carrierDiff;
+      mCoarseOffset -= mDabPar.CarrDiff;
+      mFineOffset += mDabPar.CarrDiff;
     }
 
     //ReadyForNewFrame:
@@ -455,91 +461,91 @@ void dabProcessor::get_frame_quality(int32_t & oTotalFrames, int32_t & oGoodFram
 
 QString dabProcessor::findService(uint32_t SId, int SCIds)
 {
-  return my_ficHandler.findService(SId, SCIds);
+  return mFicHandler.findService(SId, SCIds);
 }
 
 void dabProcessor::getParameters(const QString & s, uint32_t * p_SId, int * p_SCIds)
 {
-  my_ficHandler.getParameters(s, p_SId, p_SCIds);
+  mFicHandler.getParameters(s, p_SId, p_SCIds);
 }
 
 std::vector<serviceId> dabProcessor::getServices(int n)
 {
-  return my_ficHandler.getServices(n);
+  return mFicHandler.getServices(n);
 }
 
 int dabProcessor::getSubChId(const QString & s, uint32_t SId)
 {
-  return my_ficHandler.getSubChId(s, SId);
+  return mFicHandler.getSubChId(s, SId);
 }
 
 bool dabProcessor::is_audioService(const QString & s)
 {
   audiodata ad;
-  my_ficHandler.dataforAudioService(s, &ad);
+  mFicHandler.dataforAudioService(s, &ad);
   return ad.defined;
 }
 
 bool dabProcessor::is_packetService(const QString & s)
 {
   packetdata pd;
-  my_ficHandler.dataforPacketService(s, &pd, 0);
+  mFicHandler.dataforPacketService(s, &pd, 0);
   return pd.defined;
 }
 
 void dabProcessor::dataforAudioService(const QString & s, audiodata * d)
 {
-  my_ficHandler.dataforAudioService(s, d);
+  mFicHandler.dataforAudioService(s, d);
 }
 
 void dabProcessor::dataforPacketService(const QString & s, packetdata * pd, int16_t compnr)
 {
-  my_ficHandler.dataforPacketService(s, pd, compnr);
+  mFicHandler.dataforPacketService(s, pd, compnr);
 }
 
 uint8_t dabProcessor::get_ecc()
 {
-  return my_ficHandler.get_ecc();
+  return mFicHandler.get_ecc();
 }
 
 [[maybe_unused]] uint16_t dabProcessor::get_countryName()
 {
-  return my_ficHandler.get_countryName();
+  return mFicHandler.get_countryName();
 }
 
 int32_t dabProcessor::get_ensembleId()
 {
-  return my_ficHandler.get_ensembleId();
+  return mFicHandler.get_ensembleId();
 }
 
 [[maybe_unused]] QString dabProcessor::get_ensembleName()
 {
-  return my_ficHandler.get_ensembleName();
+  return mFicHandler.get_ensembleName();
 }
 
 void dabProcessor::set_epgData(int SId, int32_t theTime, const QString & s, const QString & d)
 {
-  my_ficHandler.set_epgData(SId, theTime, s, d);
+  mFicHandler.set_epgData(SId, theTime, s, d);
 }
 
 bool dabProcessor::has_timeTable(uint32_t SId)
 {
-  return my_ficHandler.has_timeTable(SId);
+  return mFicHandler.has_timeTable(SId);
 }
 
 std::vector<epgElement> dabProcessor::find_epgData(uint32_t SId)
 {
-  return my_ficHandler.find_epgData(SId);
+  return mFicHandler.find_epgData(SId);
 }
 
 QStringList dabProcessor::basicPrint()
 {
-  return my_ficHandler.basicPrint();
+  return mFicHandler.basicPrint();
 }
 
 int dabProcessor::scanWidth()
 {
-  return my_ficHandler.scanWidth();
+  return mFicHandler.scanWidth();
 }
 
 //
@@ -548,7 +554,7 @@ int dabProcessor::scanWidth()
 {
   if (!mScanMode)
   {
-    my_mscHandler.reset_Channel();
+    mMscHandler.reset_Channel();
   }
 }
 
@@ -557,7 +563,7 @@ int dabProcessor::scanWidth()
   fprintf(stderr, "function obsolete\n");
   if (!mScanMode)
   {
-    my_mscHandler.stop_service(d->subchId, flag);
+    mMscHandler.stop_service(d->subchId, flag);
   }
 }
 
@@ -565,7 +571,7 @@ void dabProcessor::stop_service(int subChId, int flag)
 {
   if (!mScanMode)
   {
-    my_mscHandler.stop_service(subChId, flag);
+    mMscHandler.stop_service(subChId, flag);
   }
 }
 
@@ -573,7 +579,7 @@ bool dabProcessor::set_audioChannel(audiodata * d, RingBuffer<int16_t> * b, FILE
 {
   if (!mScanMode)
   {
-    return my_mscHandler.set_Channel(d, b, (RingBuffer<uint8_t> *)nullptr, dump, flag);
+    return mMscHandler.set_Channel(d, b, (RingBuffer<uint8_t> *)nullptr, dump, flag);
   }
   else
   {
@@ -585,7 +591,7 @@ bool dabProcessor::set_dataChannel(packetdata * d, RingBuffer<uint8_t> * b, int 
 {
   if (!mScanMode)
   {
-    return my_mscHandler.set_Channel(d, (RingBuffer<int16_t> *)nullptr, b, nullptr, flag);
+    return mMscHandler.set_Channel(d, (RingBuffer<int16_t> *)nullptr, b, nullptr, flag);
   }
   else
   {
@@ -595,44 +601,32 @@ bool dabProcessor::set_dataChannel(packetdata * d, RingBuffer<uint8_t> * b, int 
 
 void dabProcessor::startDumping(SNDFILE * f)
 {
-  mReader.startDumping(f);
+  mSampleReader.startDumping(f);
 }
 
 void dabProcessor::stopDumping()
 {
-  mReader.stopDumping();
-}
-
-bool dabProcessor::wasSecond(int32_t cf, const dabParams * p) const
-{
-  switch (p->get_dabMode())
-  {
-  default:
-  case 1: return (cf & 07) >= 4;
-  case 2:
-  case 3: return (cf & 02);
-  case 4: return (cf & 03) >= 2;
-  }
+  mSampleReader.stopDumping();
 }
 
 void dabProcessor::start_ficDump(FILE * f)
 {
-  my_ficHandler.start_ficDump(f);
+  mFicHandler.start_ficDump(f);
 }
 
 void dabProcessor::stop_ficDump()
 {
-  my_ficHandler.stop_ficDump();
+  mFicHandler.stop_ficDump();
 }
 
 uint32_t dabProcessor::julianDate()
 {
-  return my_ficHandler.julianDate();
+  return mFicHandler.julianDate();
 }
 
 [[maybe_unused]] bool dabProcessor::start_etiGenerator(const QString & s)
 {
-  if (my_etiGenerator.start_etiGenerator(s))
+  if (mEtiGenerator.start_etiGenerator(s))
   {
     mEti_on = true;
   }
@@ -641,12 +635,12 @@ uint32_t dabProcessor::julianDate()
 
 [[maybe_unused]] void dabProcessor::stop_etiGenerator()
 {
-  my_etiGenerator.stop_etiGenerator();
+  mEtiGenerator.stop_etiGenerator();
   mEti_on = false;
 }
 
 [[maybe_unused]] void dabProcessor::reset_etiGenerator()
 {
-  my_etiGenerator.reset();
+  mEtiGenerator.reset();
 }
 

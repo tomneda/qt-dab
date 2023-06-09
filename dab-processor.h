@@ -53,9 +53,8 @@ Q_OBJECT
 public:
   dabProcessor(RadioInterface * mr, deviceHandler * inputDevice, processParams * p);
   ~dabProcessor() override;
-  void start();
 
-  //	void		start			(int32_t);
+  void start();
   void stop();
   void startDumping(SNDFILE *);
   void stopDumping();
@@ -97,42 +96,32 @@ public:
   void set_tiiDetectorMode(bool);
 
 private:
-  const int32_t mThreshold;
   deviceHandler * const mpInputDevice;
-  const dabParams mParams;
   RingBuffer<cmplx> * const mpTiiBuffer;
   RingBuffer<cmplx> * const mpNullBuffer;
   RingBuffer<float> * const mpSnrBuffer;
-  RadioInterface * const myRadioInterface;
-  sampleReader mReader;
-  ficHandler my_ficHandler;
-  mscHandler my_mscHandler;
-  phaseReference phaseSynchronizer;
-  TII_Detector my_TII_Detector;
-  ofdmDecoder my_ofdmDecoder;
-  etiGenerator my_etiGenerator;
-  const int16_t tii_delay;
-  const int32_t T_null;
-  const int32_t T_u;
-  const int32_t T_s;
-  const int32_t T_g;
-  const int32_t T_F;
-  const int32_t nrBlocks;
-  const int32_t mK;
-  const int32_t carrierDiff;
+  RadioInterface * const mpRadioInterface;
+  sampleReader mSampleReader;
+  ficHandler mFicHandler;
+  mscHandler mMscHandler;
+  phaseReference mPhaseSynchronizer;
+  TII_Detector mTiiDetector;
+  ofdmDecoder mOfdmDecoder;
+  etiGenerator mEtiGenerator;
+  const uint8_t mcDabMode;
+  const int32_t mcThreshold;
+  const int16_t mcTiiDelay;
+  const dabParams::SDabPar mDabPar;
   bool mScanMode{ false };
-
   int32_t mTotalFrames{ 0 };
   int32_t mGoodFrames{ 0 };
   int32_t mBadFrames{ 0 };
-  int16_t tii_counter{ 0 };
+  int16_t mTiiCounter{ 0 };
   bool mEti_on{ false };
   int32_t mFineOffset{ 0 };
   int32_t mCoarseOffset{ 0 };
-  //QByteArray transmitters;
-  bool correctionNeeded{ true };
-  std::vector<cmplx> ofdmBuffer;
-  bool wasSecond(int32_t cf, const dabParams * p) const;
+  bool mCorrectionNeeded{ true };
+  std::vector<cmplx> mOfdmBuffer;
 
   void run() override;
 

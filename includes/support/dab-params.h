@@ -39,7 +39,7 @@ public:
     int32_t T_F; // samples per frame
     int16_t T_s; // block length
     int16_t T_u; // useful part
-    int16_t T_g;
+    int16_t T_g; // guard length (T_s - T_u)
     int16_t CarrDiff;
     int16_t CIFs;
   };

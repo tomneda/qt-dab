@@ -22,7 +22,7 @@
 #ifndef  DAB_PROCESSOR_H
 #define  DAB_PROCESSOR_H
 /*
- *	dabProcessor is the embodying of all functionality related
+ *	DabProcessor is the embodying of all functionality related
  *	to the actual DAB processing.
  */
 #include  "dab-constants.h"
@@ -47,12 +47,12 @@ class RadioInterface;
 class dabParams;
 class processParams;
 
-class dabProcessor : public QThread
+class DabProcessor : public QThread
 {
 Q_OBJECT
 public:
-  dabProcessor(RadioInterface * mr, deviceHandler * inputDevice, processParams * p);
-  ~dabProcessor() override;
+  DabProcessor(RadioInterface * mr, deviceHandler * inputDevice, processParams * p);
+  ~DabProcessor() override;
 
   void start();
   void stop();
@@ -104,7 +104,7 @@ private:
   sampleReader mSampleReader;
   ficHandler mFicHandler;
   mscHandler mMscHandler;
-  phaseReference mPhaseSynchronizer;
+  PhaseReference mPhaseSynchronizer;
   TII_Detector mTiiDetector;
   ofdmDecoder mOfdmDecoder;
   etiGenerator mEtiGenerator;

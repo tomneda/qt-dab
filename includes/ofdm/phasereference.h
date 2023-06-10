@@ -21,8 +21,8 @@
  */
 #
 
-#ifndef  __PHASEREFERENCE__
-#define  __PHASEREFERENCE__
+#ifndef  PHASEREFERENCE_H
+#define  PHASEREFERENCE_H
 
 #include  <QObject>
 #include  <cstdio>
@@ -43,43 +43,35 @@ class	channel;
 
 #include  "fft-handler.h"
 
-class phaseReference : public QObject, public phaseTable
+class PhaseReference : public QObject, public phaseTable
 {
 Q_OBJECT
 public:
-  phaseReference(RadioInterface *, processParams *);
-  ~phaseReference();
+  PhaseReference(RadioInterface *, processParams *);
+  ~PhaseReference() override = default;
 
-  int32_t findIndex(std::vector<cmplx>, int);
-  int16_t estimate_carrier_offset(std::vector<cmplx> v) const;
-  float phase(const std::vector<cmplx> & iV, const int32_t iTs) const;
-#ifdef  __WITH_JAN__
-  void		estimate		(std::vector<cmplx>);
-#endif
-  //	This one is used in the ofdm decoder
-  std::vector<cmplx> refTable;
+  [[nodiscard]] int32_t find_index(std::vector<cmplx> iV, float iThreshold);
+  [[nodiscard]] int16_t estimate_carrier_offset(std::vector<cmplx> v) const;
+  [[nodiscard]] float phase(const std::vector<cmplx> & iV, int32_t iTs) const;
+
+  static constexpr int16_t IDX_NOT_FOUND = 100;
+
 private:
-  dabParams params;
-#ifdef  __WITH_JAN__
-  channel		*theEstimator;
-#endif
-  RingBuffer<float> * response;
-  std::vector<float> phaseDifferences;
-  int16_t diff_length;
-  int16_t depth;
-  int32_t T_u;
-  int32_t T_g;
-  int16_t carriers;
+  const dabParams::SDabPar mDabPar;
+  const int16_t mDiffLength = 128;
+  const int32_t mFramesPerSecond;
+  int32_t mDisplayCounter = 0;
 
-  int32_t fft_counter;
-  int32_t framesperSecond;
-  int32_t displayCounter;
+  fftHandler mFftForward;
+  fftHandler mFftBackwards;
 
-  fftHandler fft_forward;
-  fftHandler fft_backwards;
+  RingBuffer<float> * const mResponse;
+  std::vector<cmplx> mRefTable;
+  std::vector<float> mPhaseDifferences;
+  std::vector<float> mLBuf;
 
 signals:
-  void showCorrelation(int, int, QVector<int>);
+  void show_correlation(int, int, QVector<int>);
 };
 
 #endif

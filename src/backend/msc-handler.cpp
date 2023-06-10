@@ -28,7 +28,7 @@
 #include	"dab-params.h"
 //
 //	Interface program for processing the MSC.
-//	The dabProcessor assumes the existence of an msc-handler, whether
+//	The DabProcessor assumes the existence of an msc-handler, whether
 //	a service is selected or not. 
 
 #define	CUSize	(4 * 16)

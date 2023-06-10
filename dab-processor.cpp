@@ -28,14 +28,14 @@
 #include  "timesyncer.h"
 
 /**
-  *	\brief dabProcessor
-  *	The dabProcessor class is the driver of the processing
+  *	\brief DabProcessor
+  *	The DabProcessor class is the driver of the processing
   *	of the samplestream.
   *	It is the main interface to the qt-dab program,
   *	local are classes ofdmDecoder, ficHandler and mschandler.
   */
 
-dabProcessor::dabProcessor(RadioInterface * const mr, deviceHandler * const inputDevice, processParams * const p)
+DabProcessor::DabProcessor(RadioInterface * const mr, deviceHandler * const inputDevice, processParams * const p)
   : mpInputDevice(inputDevice),
     mpTiiBuffer(p->tiiBuffer),
     mpNullBuffer(p->nullBuffer),
@@ -66,7 +66,7 @@ dabProcessor::dabProcessor(RadioInterface * const mr, deviceHandler * const inpu
   mTiiDetector.reset();
 }
 
-dabProcessor::~dabProcessor()
+DabProcessor::~DabProcessor()
 {
   if (isRunning())
   {
@@ -81,12 +81,12 @@ dabProcessor::~dabProcessor()
   }
 }
 
-void dabProcessor::set_tiiDetectorMode(bool b)
+void DabProcessor::set_tiiDetectorMode(bool b)
 {
   mTiiDetector.setMode(b);
 }
 
-void dabProcessor::start()
+void DabProcessor::start()
 {
   mFicHandler.restart();
   if (!mScanMode)
@@ -96,7 +96,7 @@ void dabProcessor::start()
   QThread::start();
 }
 
-void dabProcessor::stop()
+void DabProcessor::stop()
 {
   mSampleReader.setRunning(false);
   while (isRunning())
@@ -115,10 +115,9 @@ void dabProcessor::stop()
    *	and sending them to the ofdmDecoder who will transfer the results
    *	Finally, estimating the small freqency error
    */
-void dabProcessor::run()
+void DabProcessor::run()
 {
   int32_t startIndex;
-  cmplx FreqCorr;
   timeSyncer myTimeSyncer(&mSampleReader);
   int attempts;
   std::vector<int16_t> ibits;
@@ -170,12 +169,14 @@ void dabProcessor::run()
     case NO_END_OF_DIP_FOUND: goto notSynced;
     }
     mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
+
     /**
       *	Looking for the first sample of the mcT_u part of the sync block.
       *	Note that we probably already had 30 to 40 samples of the T_g
       *	part
       */
-    startIndex = mPhaseSynchronizer.findIndex(mOfdmBuffer, mcThreshold);
+    startIndex = mPhaseSynchronizer.find_index(mOfdmBuffer, mcThreshold);
+
     if (startIndex < 0)
     { // no sync, try again
       if (!mCorrectionNeeded)
@@ -225,7 +226,7 @@ void dabProcessor::run()
       *	We use a correlation that will find the first sample after the
       *	cyclic prefix.
       */
-    startIndex = mPhaseSynchronizer.findIndex(mOfdmBuffer, 3 * mcThreshold);
+    startIndex = mPhaseSynchronizer.find_index(mOfdmBuffer, 3 * mcThreshold);
 
     if (startIndex < 0)
     { // no sync, try again
@@ -282,7 +283,7 @@ void dabProcessor::run()
     {
       const int32_t correction = mPhaseSynchronizer.estimate_carrier_offset(mOfdmBuffer);
 
-      if (correction != 100)
+      if (correction != mPhaseSynchronizer.IDX_NOT_FOUND)
       {
         mCoarseOffset += (int32_t)(0.4 * correction * mDabPar.CarrDiff);
 
@@ -307,7 +308,8 @@ void dabProcessor::run()
       */
     cCount = 0;
     cLevel = 0;
-    FreqCorr = cmplx(0, 0);
+    cmplx freqCorr = cmplx(0, 0);
+
     for (int ofdmSymbolCount = 1; ofdmSymbolCount < mDabPar.L; ofdmSymbolCount++)
     {
       mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_s, mCoarseOffset + mFineOffset);
@@ -315,7 +317,7 @@ void dabProcessor::run()
 
       for (int32_t i = mDabPar.T_u; i < mDabPar.T_s; i++)
       {
-        FreqCorr += mOfdmBuffer[i] * conj(mOfdmBuffer[i - mDabPar.T_u]);
+        freqCorr += mOfdmBuffer[i] * conj(mOfdmBuffer[i - mDabPar.T_u]);
         cLevel += abs(mOfdmBuffer[i]) + abs(mOfdmBuffer[i - mDabPar.T_u]);
       }
       cCount += 2 * mDabPar.T_g;
@@ -324,7 +326,6 @@ void dabProcessor::run()
       {
         mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbolCount, ibits);
       }
-
 
       if (ofdmSymbolCount <= 3)
       {
@@ -416,7 +417,7 @@ void dabProcessor::run()
     //     existing frequency error.
     //
 
-    mFineOffset += (int32_t)(0.05 * arg(FreqCorr) / (2 * M_PI) * mDabPar.CarrDiff);
+    mFineOffset += (int32_t)(0.05 * arg(freqCorr) / (2 * M_PI) * mDabPar.CarrDiff);
 
     if (mFineOffset > mDabPar.CarrDiff / 2)
     {
@@ -435,17 +436,17 @@ void dabProcessor::run()
   }
   catch (int e)
   {
-    fprintf(stderr, "dabProcessor is stopping\n");
+    fprintf(stderr, "DabProcessor is stopping\n");
   }
   //	inputDevice	-> stopReader ();
 }
 
-void dabProcessor::set_scanMode(bool b)
+void DabProcessor::set_scanMode(bool b)
 {
   mScanMode = b;
 }
 
-void dabProcessor::get_frame_quality(int32_t & oTotalFrames, int32_t & oGoodFrames, int32_t & oBadFrames)
+void DabProcessor::get_frame_quality(int32_t & oTotalFrames, int32_t & oGoodFrames, int32_t & oBadFrames)
 {
   oTotalFrames = mTotalFrames;
   oGoodFrames = mGoodFrames;
@@ -459,98 +460,98 @@ void dabProcessor::get_frame_quality(int32_t & oTotalFrames, int32_t & oGoodFram
 //	just convenience functions
 //	ficHandler abstracts channel data
 
-QString dabProcessor::findService(uint32_t SId, int SCIds)
+QString DabProcessor::findService(uint32_t SId, int SCIds)
 {
   return mFicHandler.findService(SId, SCIds);
 }
 
-void dabProcessor::getParameters(const QString & s, uint32_t * p_SId, int * p_SCIds)
+void DabProcessor::getParameters(const QString & s, uint32_t * p_SId, int * p_SCIds)
 {
   mFicHandler.getParameters(s, p_SId, p_SCIds);
 }
 
-std::vector<serviceId> dabProcessor::getServices(int n)
+std::vector<serviceId> DabProcessor::getServices(int n)
 {
   return mFicHandler.getServices(n);
 }
 
-int dabProcessor::getSubChId(const QString & s, uint32_t SId)
+int DabProcessor::getSubChId(const QString & s, uint32_t SId)
 {
   return mFicHandler.getSubChId(s, SId);
 }
 
-bool dabProcessor::is_audioService(const QString & s)
+bool DabProcessor::is_audioService(const QString & s)
 {
   audiodata ad;
   mFicHandler.dataforAudioService(s, &ad);
   return ad.defined;
 }
 
-bool dabProcessor::is_packetService(const QString & s)
+bool DabProcessor::is_packetService(const QString & s)
 {
   packetdata pd;
   mFicHandler.dataforPacketService(s, &pd, 0);
   return pd.defined;
 }
 
-void dabProcessor::dataforAudioService(const QString & s, audiodata * d)
+void DabProcessor::dataforAudioService(const QString & s, audiodata * d)
 {
   mFicHandler.dataforAudioService(s, d);
 }
 
-void dabProcessor::dataforPacketService(const QString & s, packetdata * pd, int16_t compnr)
+void DabProcessor::dataforPacketService(const QString & s, packetdata * pd, int16_t compnr)
 {
   mFicHandler.dataforPacketService(s, pd, compnr);
 }
 
-uint8_t dabProcessor::get_ecc()
+uint8_t DabProcessor::get_ecc()
 {
   return mFicHandler.get_ecc();
 }
 
-[[maybe_unused]] uint16_t dabProcessor::get_countryName()
+[[maybe_unused]] uint16_t DabProcessor::get_countryName()
 {
   return mFicHandler.get_countryName();
 }
 
-int32_t dabProcessor::get_ensembleId()
+int32_t DabProcessor::get_ensembleId()
 {
   return mFicHandler.get_ensembleId();
 }
 
-[[maybe_unused]] QString dabProcessor::get_ensembleName()
+[[maybe_unused]] QString DabProcessor::get_ensembleName()
 {
   return mFicHandler.get_ensembleName();
 }
 
-void dabProcessor::set_epgData(int SId, int32_t theTime, const QString & s, const QString & d)
+void DabProcessor::set_epgData(int SId, int32_t theTime, const QString & s, const QString & d)
 {
   mFicHandler.set_epgData(SId, theTime, s, d);
 }
 
-bool dabProcessor::has_timeTable(uint32_t SId)
+bool DabProcessor::has_timeTable(uint32_t SId)
 {
   return mFicHandler.has_timeTable(SId);
 }
 
-std::vector<epgElement> dabProcessor::find_epgData(uint32_t SId)
+std::vector<epgElement> DabProcessor::find_epgData(uint32_t SId)
 {
   return mFicHandler.find_epgData(SId);
 }
 
-QStringList dabProcessor::basicPrint()
+QStringList DabProcessor::basicPrint()
 {
   return mFicHandler.basicPrint();
 }
 
-int dabProcessor::scanWidth()
+int DabProcessor::scanWidth()
 {
   return mFicHandler.scanWidth();
 }
 
 //
 //	for the mscHandler:
-[[maybe_unused]] void dabProcessor::reset_Services()
+[[maybe_unused]] void DabProcessor::reset_Services()
 {
   if (!mScanMode)
   {
@@ -558,7 +559,7 @@ int dabProcessor::scanWidth()
   }
 }
 
-[[maybe_unused]] void dabProcessor::stop_service(descriptorType * d, int flag)
+[[maybe_unused]] void DabProcessor::stop_service(descriptorType * d, int flag)
 {
   fprintf(stderr, "function obsolete\n");
   if (!mScanMode)
@@ -567,7 +568,7 @@ int dabProcessor::scanWidth()
   }
 }
 
-void dabProcessor::stop_service(int subChId, int flag)
+void DabProcessor::stop_service(int subChId, int flag)
 {
   if (!mScanMode)
   {
@@ -575,7 +576,7 @@ void dabProcessor::stop_service(int subChId, int flag)
   }
 }
 
-bool dabProcessor::set_audioChannel(audiodata * d, RingBuffer<int16_t> * b, FILE * dump, int flag)
+bool DabProcessor::set_audioChannel(audiodata * d, RingBuffer<int16_t> * b, FILE * dump, int flag)
 {
   if (!mScanMode)
   {
@@ -587,7 +588,7 @@ bool dabProcessor::set_audioChannel(audiodata * d, RingBuffer<int16_t> * b, FILE
   }
 }
 
-bool dabProcessor::set_dataChannel(packetdata * d, RingBuffer<uint8_t> * b, int flag)
+bool DabProcessor::set_dataChannel(packetdata * d, RingBuffer<uint8_t> * b, int flag)
 {
   if (!mScanMode)
   {
@@ -599,32 +600,32 @@ bool dabProcessor::set_dataChannel(packetdata * d, RingBuffer<uint8_t> * b, int 
   }
 }
 
-void dabProcessor::startDumping(SNDFILE * f)
+void DabProcessor::startDumping(SNDFILE * f)
 {
   mSampleReader.startDumping(f);
 }
 
-void dabProcessor::stopDumping()
+void DabProcessor::stopDumping()
 {
   mSampleReader.stopDumping();
 }
 
-void dabProcessor::start_ficDump(FILE * f)
+void DabProcessor::start_ficDump(FILE * f)
 {
   mFicHandler.start_ficDump(f);
 }
 
-void dabProcessor::stop_ficDump()
+void DabProcessor::stop_ficDump()
 {
   mFicHandler.stop_ficDump();
 }
 
-uint32_t dabProcessor::julianDate()
+uint32_t DabProcessor::julianDate()
 {
   return mFicHandler.julianDate();
 }
 
-[[maybe_unused]] bool dabProcessor::start_etiGenerator(const QString & s)
+[[maybe_unused]] bool DabProcessor::start_etiGenerator(const QString & s)
 {
   if (mEtiGenerator.start_etiGenerator(s))
   {
@@ -633,13 +634,13 @@ uint32_t dabProcessor::julianDate()
   return mEti_on;
 }
 
-[[maybe_unused]] void dabProcessor::stop_etiGenerator()
+[[maybe_unused]] void DabProcessor::stop_etiGenerator()
 {
   mEtiGenerator.stop_etiGenerator();
   mEti_on = false;
 }
 
-[[maybe_unused]] void dabProcessor::reset_etiGenerator()
+[[maybe_unused]] void DabProcessor::reset_etiGenerator()
 {
   mEtiGenerator.reset();
 }

@@ -182,7 +182,7 @@ private:
 	dabStreamer		*streamerOut;
 #endif
 //	textMapper		the_textMapper;
-	dabProcessor		*my_dabProcessor;
+	DabProcessor		*my_dabProcessor;
 	audioBase		*soundOut;
 #ifdef	DATA_STREAMER
 	tcpServer		*dataStreamer;

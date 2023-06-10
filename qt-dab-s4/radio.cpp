@@ -261,7 +261,7 @@ uint8_t	dabBand;
 	my_scanTable		= nullptr;
 	mapHandler		= nullptr;
 //	"globals" is introduced to reduce the number of parameters
-//	for the dabProcessor
+//	for the DabProcessor
 	globals. spectrumBuffer	= &spectrumBuffer;
 	globals. iqBuffer	= &iqBuffer;
 	globals. responseBuffer	= &responseBuffer;
@@ -843,7 +843,7 @@ bool	RadioInterface::doStart	() {
 	else
 	   channelSelector -> setCurrentIndex (0);
 
-	my_dabProcessor	= new dabProcessor  (this, inputDevice, &globals);
+	my_dabProcessor	= new DabProcessor  (this, inputDevice, &globals);
 
 //	Some buttons should not be touched before we have a device
 	connectGUI ();
@@ -2061,7 +2061,7 @@ void	RadioInterface::show_motHandling (bool b) {
 	                   "QLabel {background-color : red; color : white}");
 }
 	
-//	called from the dabProcessor
+//	called from the DabProcessor
 void	RadioInterface::show_snr (int s) {
 	if (!running. load ())
 	   return;
@@ -3948,7 +3948,7 @@ std::vector<serviceId> k;
 }
 //
 //	In those case we are sure not to have an operating
-//	dabProcessor, we hide some buttons
+//	DabProcessor, we hide some buttons
 void	RadioInterface::hide_for_safety () {
 	dumpButton		->	hide ();
 	techData. framedumpButton	->	hide ();

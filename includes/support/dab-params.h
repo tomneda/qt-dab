@@ -32,16 +32,16 @@ public:
   ~dabParams() = default;
 
   struct SDabPar
-  {
-    int16_t L;   // blocks per frame
-    int16_t K;   // number carriers
-    int16_t T_n; // null length
-    int32_t T_F; // samples per frame
-    int16_t T_s; // block length
-    int16_t T_u; // useful part
-    int16_t T_g; // guard length (T_s - T_u)
-    int16_t CarrDiff;
-    int16_t CIFs;
+  {                   //  Mode 1
+    int16_t L;        //      76 blocks per frame
+    int16_t K;        //    1536 number carriers
+    int16_t T_n;      //    2656 null length
+    int32_t T_F;      //  196608 samples per frame
+    int16_t T_s;      //    2552 block length
+    int16_t T_u;      //    2048 useful part, FFT length
+    int16_t T_g;      //     504 guard length (T_s - T_u)
+    int16_t CarrDiff; //    1000
+    int16_t CIFs;     //       4
   };
 
   [[nodiscard]] const SDabPar & get_dab_par() const { return msDabPar[mDabMode]; }

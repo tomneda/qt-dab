@@ -35,14 +35,14 @@
 PhaseReference::PhaseReference(RadioInterface * const mr, processParams * const p)
   : phaseTable(p->dabMode),
     mDabPar(dabParams(p->dabMode).get_dab_par()),
-    //mDiffLength(p->diff_length), // use default
+  //mDiffLength(p->diff_length), // use default
     mFramesPerSecond(2048000 / mDabPar.T_F),
     mFftForward(mDabPar.T_u, false),
     mFftBackwards(mDabPar.T_u, true),
     mResponse(p->responseBuffer),
     mRefTable(mDabPar.T_u, { 0, 0 }),
     mPhaseDifferences(mDiffLength),
-    mLBuf(mDabPar.T_u / 2)
+    mCorrPeakValues(mDabPar.T_u / 2)
 {
   for (int32_t i = 1; i <= mDabPar.K / 2; i++)
   {
@@ -57,8 +57,7 @@ PhaseReference::PhaseReference(RadioInterface * const mr, processParams * const 
   // the ones with a null
   for (int32_t i = 1; i <= mDiffLength; i++)
   {
-    mPhaseDifferences[i - 1] = abs(arg(mRefTable[(mDabPar.T_u + i + 0) % mDabPar.T_u]
-                                * conj(mRefTable[(mDabPar.T_u + i + 1) % mDabPar.T_u])));
+    mPhaseDifferences[i - 1] = abs(arg(mRefTable[(mDabPar.T_u + i + 0) % mDabPar.T_u] * conj(mRefTable[(mDabPar.T_u + i + 1) % mDabPar.T_u])));
   }
 
   connect(this, &PhaseReference::show_correlation, mr, &RadioInterface::showCorrelation);
@@ -74,42 +73,50 @@ PhaseReference::PhaseReference(RadioInterface * const mr, processParams * const 
   *	looking for.
   */
 
-int32_t PhaseReference::find_index(std::vector<cmplx> iV, float iThreshold)
+int32_t PhaseReference::find_index(std::vector<cmplx> iV, float iThreshold) // copy of iV is indented
 {
-  int32_t maxIndex = -1;
-  float sum = 0;
-  float Max = -1000;
-
-  mFftForward.fft(iV);
+  mFftForward.fft(iV); // in-place FFT
 
   //	into the frequency domain, now correlate
   for (int32_t i = 0; i < mDabPar.T_u; i++)
   {
-    iV[i] = iV[i] * conj(mRefTable[i]);
+    iV[i] *= conj(mRefTable[i]);
   }
 
   //	and, again, back into the time domain
-  mFftBackwards.fft(iV);
+  mFftBackwards.fft(iV); // in-place IFFT
+
   /**
     *	We compute the average and the max signal values
     */
+  float sum = 0;
+
   for (int32_t i = 0; i < mDabPar.T_u / 2; i++)
   {
-    mLBuf[i] = jan_abs(iV[i]);
-    sum += mLBuf[i];
+    mCorrPeakValues[i] = jan_abs(iV[i]);
+    sum += mCorrPeakValues[i];
   }
 
   sum /= (float)(mDabPar.T_u) / 2;
   QVector<int> indices;
+  int32_t maxIndex = -1;
+  float maxL = -1000;
+  constexpr int16_t GAP_SEARCH_WIDTH = 10;
+  constexpr int16_t EXTENDED_SEARCH_REGION = 250;
+  const int16_t idxStart = mDabPar.T_g - EXTENDED_SEARCH_REGION;
+  const int16_t idxStop  = mDabPar.T_g + EXTENDED_SEARCH_REGION;
+  assert(idxStart >= 0);
+  assert(idxStop <= (signed)mCorrPeakValues.size());
 
-  for (int32_t i = mDabPar.T_g - 250; i < mDabPar.T_g + 250; i++)
+  for (int16_t i = idxStart; i < idxStop; i++)  // TODO: underflow with other DabModes != 1!
   {
-    if (mLBuf[i] / sum > iThreshold)
+    if (mCorrPeakValues[i] / sum > iThreshold)
     {
       bool foundOne = true;
-      for (int j = 1; (j < 10) && (i + j < mDabPar.T_g + 250); j++)
+
+      for (int16_t j = 1; (j < GAP_SEARCH_WIDTH) && (i + j < idxStop); j++)
       {
-        if (mLBuf[i + j] > mLBuf[i])
+        if (mCorrPeakValues[i + j] > mCorrPeakValues[i])
         {
           foundOne = false;
           break;
@@ -118,33 +125,35 @@ int32_t PhaseReference::find_index(std::vector<cmplx> iV, float iThreshold)
       if (foundOne)
       {
         indices.push_back(i);
-        if (mLBuf[i] > Max)
+
+        if (mCorrPeakValues[i] > maxL)
         {
-          Max = mLBuf[i];
+          maxL = mCorrPeakValues[i];
           maxIndex = i;
         }
-        i += 10;
+        i += GAP_SEARCH_WIDTH;
       }
     }
   }
 
-  if (Max / sum < iThreshold)
+  if (maxL / sum < iThreshold)
   {
-    return (int32_t)(-abs(Max / sum) - 1);
+    return (int32_t)(-abs(maxL / sum) - 1);
   }
 
   if (mResponse != nullptr)
   {
     if (++mDisplayCounter > mFramesPerSecond / 2)
     {
-      mResponse->putDataIntoBuffer(mLBuf.data(), mLBuf.size());
-      emit show_correlation(mLBuf.size(), mDabPar.T_g, indices);
+      mResponse->putDataIntoBuffer(mCorrPeakValues.data(), mCorrPeakValues.size());
+      emit show_correlation(mCorrPeakValues.size(), mDabPar.T_g, indices);
       mDisplayCounter = 0;
     }
   }
 
   return maxIndex;
 }
+
 //
 //
 //	an approach that works fine is to correlate the phasedifferences
@@ -162,8 +171,7 @@ int16_t PhaseReference::estimate_carrier_offset(std::vector<cmplx> v) const
 
   for (int16_t i = idxStart; i < idxStop + mDiffLength; i++)
   {
-    computedDiffs[i - idxStart] = abs(arg(v[(i + 0) % mDabPar.T_u]
-                                   * conj(v[(i + 1) % mDabPar.T_u])));
+    computedDiffs[i - idxStart] = abs(arg(v[(i + 0) % mDabPar.T_u] * conj(v[(i + 1) % mDabPar.T_u])));
   }
 
   float mmin = 1000;

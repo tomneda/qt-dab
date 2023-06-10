@@ -19,8 +19,6 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#
-
 #ifndef  PHASEREFERENCE_H
 #define  PHASEREFERENCE_H
 
@@ -63,7 +61,7 @@ private:
   RingBuffer<float> * const mResponse;
   std::vector<cmplx> mRefTable;
   std::vector<float> mPhaseDifferences;
-  std::vector<float> mLBuf;
+  std::vector<float> mCorrPeakValues;
 
 signals:
   void show_correlation(int, int, const QVector<int> &);

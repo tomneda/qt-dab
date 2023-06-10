@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014.. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,26 +19,31 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef	__TIMESYNCER__
-#define	__TIMESYNCER__
+#ifndef  TIMESYNCER_H
+#define  TIMESYNCER_H
 
-#include	"dab-constants.h"
+#include  "dab-constants.h"
 
-#define	TIMESYNC_ESTABLISHED	0100
-#define	NO_DIP_FOUND		0101
-#define	NO_END_OF_DIP_FOUND	0102
+class SampleReader;
 
-class	SampleReader;
-
-class	timeSyncer {
+class TimeSyncer
+{
 public:
-	timeSyncer	(SampleReader *mr);
-	~timeSyncer();
-int	sync		(int, int);
+  enum class EState
+  {
+    TIMESYNC_ESTABLISHED, NO_DIP_FOUND, NO_END_OF_DIP_FOUND
+  };
+
+  TimeSyncer(SampleReader * mr);
+  ~TimeSyncer() = default;
+
+  EState read_samples_until_end_of_level_drop(int, int);
+
 private:
-	SampleReader	*myReader;
-	int32_t         syncBufferIndex = 0;
-const	int32_t         syncBufferSize  = 4096;
+  SampleReader * const mpSampleReader;
+  const int32_t mcSyncBufferSize = 4096;
+  int32_t mSyncBufferIndex = 0;
 };
+
 #endif
 

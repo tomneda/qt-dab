@@ -118,7 +118,7 @@ void DabProcessor::stop()
 void DabProcessor::run()
 {
   int32_t startIndex;
-  timeSyncer myTimeSyncer(&mSampleReader);
+  TimeSyncer myTimeSyncer(&mSampleReader);
   int attempts;
   std::vector<int16_t> ibits;
   int frameCount = 0;
@@ -153,32 +153,32 @@ void DabProcessor::run()
     setSynced(false);
     mTiiDetector.reset();
 
-    switch (myTimeSyncer.sync(mDabPar.T_n, mDabPar.T_F))
+    switch (myTimeSyncer.read_samples_until_end_of_level_drop(mDabPar.T_n, mDabPar.T_F))
     {
-    case TIMESYNC_ESTABLISHED: break;      // yes, we are ready
-
-    case NO_DIP_FOUND:
+    case TimeSyncer::EState::TIMESYNC_ESTABLISHED:
+      break;      // yes, we are ready
+    case TimeSyncer::EState::NO_DIP_FOUND:
       if (++attempts >= 8)
       {
-        emit (No_Signal_Found());
+        emit No_Signal_Found();
         attempts = 0;
       }
       goto notSynced;
-
     default:      // does not happen
-    case NO_END_OF_DIP_FOUND: goto notSynced;
+    case TimeSyncer::EState::NO_END_OF_DIP_FOUND:
+      goto notSynced;
     }
     mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
 
     /**
-      *	Looking for the first sample of the mcT_u part of the sync block.
+      *	Looking for the first sample of the mcT_u part of the read_samples_until_end_of_level_drop block.
       *	Note that we probably already had 30 to 40 samples of the T_g
       *	part
       */
     startIndex = mPhaseSynchronizer.find_index(mOfdmBuffer, mcThreshold);
 
     if (startIndex < 0)
-    { // no sync, try again
+    { // no read_samples_until_end_of_level_drop, try again
       if (!mCorrectionNeeded)
       {
         setSyncLost();
@@ -229,7 +229,7 @@ void DabProcessor::run()
     startIndex = mPhaseSynchronizer.find_index(mOfdmBuffer, 3 * mcThreshold);
 
     if (startIndex < 0)
-    { // no sync, try again
+    { // no read_samples_until_end_of_level_drop, try again
       if (!mCorrectionNeeded)
       {
         setSyncLost();
@@ -262,13 +262,6 @@ void DabProcessor::run()
     setSynced(true);
     mSampleReader.getSamples(mOfdmBuffer, ofdmBufferIndex, mDabPar.T_u - ofdmBufferIndex, mCoarseOffset + mFineOffset);
 
-#ifdef  __WITH_JAN__
-    static int abc = 0;
-    if (++abc > 10) {
-       mPhaseSynchronizer. estimate (mOfdmBuffer);
-       abc = 0;
-    }
-#endif
     sampleCount += mDabPar.T_u;
     mOfdmDecoder.processBlock_0(mOfdmBuffer);
     if (!mScanMode)

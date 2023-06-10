@@ -34,14 +34,9 @@
 #include  "dab-params.h"
 #include  "process-params.h"
 #include  "ringbuffer.h"
+#include  "fft-handler.h"
 
 class RadioInterface;
-
-#ifdef  __WITH_JAN__
-class	channel;
-#endif
-
-#include  "fft-handler.h"
 
 class PhaseReference : public QObject, public phaseTable
 {

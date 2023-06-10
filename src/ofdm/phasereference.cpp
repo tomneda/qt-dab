@@ -62,10 +62,6 @@ PhaseReference::PhaseReference(RadioInterface * const mr, processParams * const 
   }
 
   connect(this, &PhaseReference::show_correlation, mr, &RadioInterface::showCorrelation);
-
-#ifdef  __WITH_JAN__
-  theEstimator	= new channel (mRefTable, PILOTS, TAPS);
-#endif
 }
 
 /**

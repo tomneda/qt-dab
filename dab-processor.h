@@ -44,7 +44,7 @@
 #include  "eti-generator.h"
 
 class RadioInterface;
-class dabParams;
+class DabParams;
 class processParams;
 
 class DabProcessor : public QThread
@@ -65,7 +65,7 @@ public:
   void get_frame_quality(int32_t & oTotalFrames, int32_t & oGoodFrames, int32_t & oBadFrames);
 
   //	inheriting from our delegates
-  //	for the ficHandler:
+  //	for the FicHandler:
   QString findService(uint32_t, int);
   void getParameters(const QString &, uint32_t *, int *);
   std::vector<serviceId> getServices(int);
@@ -102,24 +102,27 @@ private:
   RingBuffer<float> * const mpSnrBuffer;
   RadioInterface * const mpRadioInterface;
   SampleReader mSampleReader;
-  ficHandler mFicHandler;
+  FicHandler mFicHandler;
   mscHandler mMscHandler;
-  PhaseReference mPhaseSynchronizer;
+  PhaseReference mPhaseReference;
   TII_Detector mTiiDetector;
   ofdmDecoder mOfdmDecoder;
   etiGenerator mEtiGenerator;
   const uint8_t mcDabMode;
-  const int32_t mcThreshold;
+  const float mcThreshold;
   const int16_t mcTiiDelay;
-  const dabParams::SDabPar mDabPar;
+  const DabParams::SDabPar mDabPar;
   bool mScanMode{ false };
-  int32_t mTotalFrames{ 0 };
-  int32_t mGoodFrames{ 0 };
-  int32_t mBadFrames{ 0 };
-  int16_t mTiiCounter{ 0 };
-  bool mEti_on{ false };
-  int32_t mFineOffset{ 0 };
-  int32_t mCoarseOffset{ 0 };
+  int32_t mTotalFrames = 0;
+  int32_t mGoodFrames = 0;
+  int32_t mBadFrames = 0;
+  int16_t mTiiCounter = 0;
+  bool mEti_on = false;
+  int32_t mFineOffset = 0;
+  int32_t mCoarseOffset = 0;
+  int mSnrCounter = 0;
+  float mSnrdB = 0;
+
   bool mCorrectionNeeded{ true };
   std::vector<cmplx> mOfdmBuffer;
 

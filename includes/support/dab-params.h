@@ -25,11 +25,11 @@
 #include  <cstdint>
 #include  <array>
 
-class dabParams
+class DabParams
 {
 public:
-  explicit dabParams(uint8_t iDabMode);
-  ~dabParams() = default;
+  explicit DabParams(uint8_t iDabMode);
+  ~DabParams() = default;
 
   struct SDabPar
   {                   //  Mode 1

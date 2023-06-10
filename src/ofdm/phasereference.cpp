@@ -34,7 +34,7 @@
 
 PhaseReference::PhaseReference(RadioInterface * const mr, processParams * const p)
   : phaseTable(p->dabMode),
-    mDabPar(dabParams(p->dabMode).get_dab_par()),
+    mDabPar(DabParams(p->dabMode).get_dab_par()),
   //mDiffLength(p->diff_length), // use default
     mFramesPerSecond(2048000 / mDabPar.T_F),
     mFftForward(mDabPar.T_u, false),
@@ -151,6 +151,7 @@ int32_t PhaseReference::find_index(std::vector<cmplx> iV, float iThreshold) // c
     }
   }
 
+  assert(maxIndex >= 0);
   return maxIndex;
 }
 

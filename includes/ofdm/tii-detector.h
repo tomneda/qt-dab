@@ -43,7 +43,7 @@ private:
 	bool			detectMode_new;
 	int16_t			depth;
 	uint8_t			invTable [256];
-	dabParams		params;
+	DabParams		params;
 	int16_t			T_u;
 	int16_t			carriers;
 	std::vector<cmplx>	theBuffer;

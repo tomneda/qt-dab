@@ -32,7 +32,7 @@
   *	The DabProcessor class is the driver of the processing
   *	of the samplestream.
   *	It is the main interface to the qt-dab program,
-  *	local are classes ofdmDecoder, ficHandler and mschandler.
+  *	local are classes ofdmDecoder, FicHandler and mschandler.
   */
 
 DabProcessor::DabProcessor(RadioInterface * const mr, deviceHandler * const inputDevice, processParams * const p)
@@ -44,14 +44,14 @@ DabProcessor::DabProcessor(RadioInterface * const mr, deviceHandler * const inpu
     mSampleReader(mr, inputDevice, p->spectrumBuffer),
     mFicHandler(mr, p->dabMode),
     mMscHandler(mr, p->dabMode, p->frameBuffer),
-    mPhaseSynchronizer(mr, p),
+    mPhaseReference(mr, p),
     mTiiDetector(p->dabMode, p->tii_depth),
     mOfdmDecoder(mr, p->dabMode, inputDevice->bitDepth(), p->iqBuffer),
     mEtiGenerator(p->dabMode, &mFicHandler),
     mcDabMode(p->dabMode),
     mcThreshold(p->threshold),
     mcTiiDelay(p->tii_delay),
-    mDabPar(dabParams(p->dabMode).get_dab_par())
+    mDabPar(DabParams(p->dabMode).get_dab_par())
 {
   connect(this, SIGNAL (setSynced(bool)), mpRadioInterface, SLOT (setSynced(bool)));
   connect(this, SIGNAL (setSyncLost(void)), mpRadioInterface, SLOT (setSyncLost(void)));
@@ -144,7 +144,7 @@ void DabProcessor::run()
       mSampleReader.getSample(0);
     }
     //Initing:
-    notSynced:
+notSynced:
     mTotalFrames++;
     totalSamples = 0;
     frameCount = 0;
@@ -168,17 +168,19 @@ void DabProcessor::run()
     case TimeSyncer::EState::NO_END_OF_DIP_FOUND:
       goto notSynced;
     }
+
+    // get first OFDM symbol after time sync marker
     mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
 
     /**
-      *	Looking for the first sample of the mcT_u part of the read_samples_until_end_of_level_drop block.
+      *	Looking for the first sample of the T_u part of the sync block.
       *	Note that we probably already had 30 to 40 samples of the T_g
       *	part
       */
-    startIndex = mPhaseSynchronizer.find_index(mOfdmBuffer, mcThreshold);
+    startIndex = mPhaseReference.find_index(mOfdmBuffer, mcThreshold);
 
     if (startIndex < 0)
-    { // no read_samples_until_end_of_level_drop, try again
+    { // no sync, try again
       if (!mCorrectionNeeded)
       {
         setSyncLost();
@@ -188,15 +190,15 @@ void DabProcessor::run()
     }
     sampleCount = startIndex;
     goto SyncOnPhase;
-    //
-    Check_endofNULL:
+
+Check_endofNULL:
     mTotalFrames++;
     frameCount++;
     null_shower = false;
     totalSamples += sampleCount;
     if (frameCount > 10)
     {
-      show_clockErr(totalSamples - frameCount * 196608);
+      show_clockErr(totalSamples - frameCount * mDabPar.T_F);
       totalSamples = 0;
       frameCount = 0;
       null_shower = true;
@@ -221,15 +223,16 @@ void DabProcessor::run()
       mpNullBuffer->putDataIntoBuffer(tester.data(), mDabPar.T_u / 2);
       show_null(mDabPar.T_u / 2);
     }
+
     /**
       *	We now have to find the exact first sample of the non-null period.
       *	We use a correlation that will find the first sample after the
       *	cyclic prefix.
       */
-    startIndex = mPhaseSynchronizer.find_index(mOfdmBuffer, 3 * mcThreshold);
+    startIndex = mPhaseReference.find_index(mOfdmBuffer, 3 * mcThreshold);
 
     if (startIndex < 0)
-    { // no read_samples_until_end_of_level_drop, try again
+    { // no sync, try again
       if (!mCorrectionNeeded)
       {
         setSyncLost();
@@ -240,7 +243,7 @@ void DabProcessor::run()
 
     sampleCount = startIndex;
 
-    SyncOnPhase:
+SyncOnPhase:
     mGoodFrames++;
     cLevel = 0;
     cCount = 0;
@@ -248,8 +251,9 @@ void DabProcessor::run()
       *	Once here, we are synchronized, we need to copy the data we
       *	used for synchronization for block 0
       */
-    memmove(mOfdmBuffer.data(), &(mOfdmBuffer[startIndex]), (mDabPar.T_u - startIndex) * sizeof(cmplx));
-    int ofdmBufferIndex = mDabPar.T_u - startIndex;
+    const int32_t ofdmBufferIndex = mDabPar.T_u - startIndex;
+    assert(ofdmBufferIndex >= 0);
+    memmove(mOfdmBuffer.data(), &(mOfdmBuffer[startIndex]), ofdmBufferIndex * sizeof(cmplx));
 
     //Block_0:
     /**
@@ -264,19 +268,20 @@ void DabProcessor::run()
 
     sampleCount += mDabPar.T_u;
     mOfdmDecoder.processBlock_0(mOfdmBuffer);
+
     if (!mScanMode)
     {
       mMscHandler.processBlock_0(mOfdmBuffer.data());
     }
 
-    //	Here we look only at the block_0 when we need a coarse
-    //	frequency synchronization.
+    // Here we look only at the block_0 when we need a coarse frequency synchronization.
     mCorrectionNeeded = !mFicHandler.syncReached();
+
     if (mCorrectionNeeded)
     {
-      const int32_t correction = mPhaseSynchronizer.estimate_carrier_offset(mOfdmBuffer);
+      const int32_t correction = mPhaseReference.estimate_carrier_offset(mOfdmBuffer);
 
-      if (correction != mPhaseSynchronizer.IDX_NOT_FOUND)
+      if (correction != PhaseReference::IDX_NOT_FOUND)
       {
         mCoarseOffset += (int32_t)(0.4 * correction * mDabPar.CarrDiff);
 
@@ -353,14 +358,13 @@ void DabProcessor::run()
       auto snrV = (float)(20 * log10((cLevel / cCount + 0.005) / (sum + 0.005)));
       mpSnrBuffer->putDataIntoBuffer(&snrV, 1);
     }
-    static float snr = 0;
-    static int ccc = 0;
-    ccc++;
-    if (ccc >= 5)
+
+    if (++mSnrCounter >= 5)
     {
-      ccc = 0;
-      snr = (float)(0.9 * snr + 0.1 * 20 * log10((mSampleReader.get_sLevel() + 0.005) / (sum + 0.005)));
-      show_snr((int)snr);
+      constexpr float ALPHA_SNR = 0.1f;
+      mSnrCounter = 0;
+      mSnrdB = (1.0f - ALPHA_SNR) * mSnrdB + ALPHA_SNR * 20.0f * log10f((mSampleReader.get_sLevel() + 0.005f) / (sum + 0.005f));
+      show_snr((int)mSnrdB);
     }
     /*
      *	The TII data is encoded in the null period of the
@@ -451,7 +455,7 @@ void DabProcessor::get_frame_quality(int32_t & oTotalFrames, int32_t & oGoodFram
 }
 
 //	just convenience functions
-//	ficHandler abstracts channel data
+//	FicHandler abstracts channel data
 
 QString DabProcessor::findService(uint32_t SId, int SCIds)
 {

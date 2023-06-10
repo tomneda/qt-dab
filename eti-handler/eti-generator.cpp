@@ -85,7 +85,7 @@ uint8_t	theVector [6144];
 //	Note CIF counts from 0 .. 3
 //
 		etiGenerator::etiGenerator	(uint8_t   dabMode,
-	                                        ficHandler *my_ficHandler):
+                                 FicHandler *my_ficHandler):
 	                                            params (dabMode) {
 	this	-> my_ficHandler	= my_ficHandler;
 

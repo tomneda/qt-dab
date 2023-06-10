@@ -66,7 +66,7 @@ typedef	struct {
 class etiGenerator {
 public:
                 etiGenerator		(uint8_t  dabMode,
-                                         ficHandler     *my_ficHandler);
+                                 FicHandler     *my_ficHandler);
 		~etiGenerator		();
 	void	newFrame		();
 	void	processBlock		(std::vector<int16_t> &fbits,
@@ -75,9 +75,9 @@ public:
 	bool	start_etiGenerator	(const QString &);
 	void	stop_etiGenerator	();
 private:
-	ficHandler	*my_ficHandler;
+	FicHandler	*my_ficHandler;
 	FILE		*etiFile;
-	dabParams	params;
+	DabParams	params;
 	bool		running;
 	int16_t		index_Out;
 	int		Minor;

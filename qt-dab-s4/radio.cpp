@@ -1930,7 +1930,7 @@ const char *monthTable [] = {
 	"jul", "aug", "sep", "oct", "nov", "dec"
 };
 //
-//	called from the fibDecoder
+//	called from the FibDecoder
 void	RadioInterface::clockTime (int year, int month, int day,
 	                           int hours, int minutes,
 	                               int d2, int h2, int m2, int seconds){
@@ -2027,7 +2027,7 @@ void	RadioInterface::show_aacErrors (int s) {
 	techData. aacError_display	-> setValue (100 - 4 * s);
 }
 //
-//	called from the ficHandler
+//	called from the FicHandler
 void	RadioInterface::show_ficSuccess (bool b) {
 	if (!running. load ())	
 	   return;
@@ -3700,8 +3700,7 @@ int	scanMode	= configWidget. scanmodeSelector -> currentIndex ();
 	presetTimer. stop ();
 	channelTimer. stop ();
 	epgTimer. stop ();
-	connect (my_dabProcessor, SIGNAL (No_Signal_Found ()),
-	         this, SLOT (No_Signal_Found ()));
+	connect (my_dabProcessor, SIGNAL (No_Signal_Found ()), this, SLOT (No_Signal_Found ()));
 	new_presetIndex (0);
 	stopChannel     ();
 	int  cc      = channelSelector -> currentIndex ();

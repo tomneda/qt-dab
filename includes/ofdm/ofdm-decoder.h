@@ -47,7 +47,7 @@ public:
 
 private:
   RadioInterface *myRadioInterface;
-  dabParams params;
+  DabParams params;
   interLeaver myMapper;
   fftHandler fft;
   RingBuffer<cmplx> *iqBuffer;

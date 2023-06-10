@@ -50,7 +50,7 @@ public:
   static constexpr int16_t IDX_NOT_FOUND = 100;
 
 private:
-  const dabParams::SDabPar mDabPar;
+  const DabParams::SDabPar mDabPar;
   const int16_t mDiffLength = 128;
   const int32_t mFramesPerSecond;
   int32_t mDisplayCounter = 0;

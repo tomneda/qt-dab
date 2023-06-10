@@ -25,7 +25,7 @@
 
 #define C_LEVEL_SIZE    50
 
-	timeSyncer::timeSyncer (sampleReader *mr) {
+	timeSyncer::timeSyncer (SampleReader *mr) {
 	myReader	= mr;
 }
 

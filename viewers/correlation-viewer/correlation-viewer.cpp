@@ -155,7 +155,7 @@ bool	correlationViewer::isHidden() {
 
 static int lcount = 0;
 void	correlationViewer::showCorrelation (int32_t dots,
-	                                          int marker, QVector<int> &v) {
+                                          int marker, const QVector<int> & v) {
 uint16_t	i;
 float data	[dots];
 float	mmax	= 0;

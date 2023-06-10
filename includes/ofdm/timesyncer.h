@@ -29,15 +29,15 @@
 #define	NO_DIP_FOUND		0101
 #define	NO_END_OF_DIP_FOUND	0102
 
-class	sampleReader;
+class	SampleReader;
 
 class	timeSyncer {
 public:
-	timeSyncer	(sampleReader *mr);
+	timeSyncer	(SampleReader *mr);
 	~timeSyncer();
 int	sync		(int, int);
 private:
-	sampleReader	*myReader;
+	SampleReader	*myReader;
 	int32_t         syncBufferIndex = 0;
 const	int32_t         syncBufferSize  = 4096;
 };

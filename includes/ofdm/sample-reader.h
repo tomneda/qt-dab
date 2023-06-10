@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013 .. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,64 +20,65 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #
-#ifndef	__SAMPLE_READER__
-#define	__SAMPLE_READER__
+
+#ifndef  SAMPLE_READER_H
+#define  SAMPLE_READER_H
 /*
  *	Reading the samples from the input device. Since it has its own
  *	"state", we embed it into its own class
  */
-#include	"dab-constants.h"
-#include	<QObject>
-#include	<sndfile.h>
-#include	<cstdint>
-#include	<atomic>
-#include	<vector>
-#include	"device-handler.h"
-#include	"ringbuffer.h"
+#include  "dab-constants.h"
+#include  <QObject>
+#include  <sndfile.h>
+#include  <cstdint>
+#include  <atomic>
+#include  <vector>
+#include  "device-handler.h"
+#include  "ringbuffer.h"
 //
 //      Note:
 //      It was found that enlarging the buffersize to e.g. 8192
 //      cannot be handled properly by the underlying system.
 #define DUMPSIZE                4096
 
-class	RadioInterface;
-class	sampleReader : public QObject {
+class RadioInterface;
+
+class SampleReader : public QObject
+{
 Q_OBJECT
 public:
-			sampleReader	(RadioInterface *mr,
-	                         	deviceHandler *theRig,
-	                         	RingBuffer<cmplx> *spectrumBuffer = nullptr);
+  SampleReader(RadioInterface * mr, deviceHandler * theRig, RingBuffer<cmplx> * spectrumBuffer = nullptr);
 
-			~sampleReader();
-		void	setRunning	(bool b);
-		float	get_sLevel	();
-		cmplx getSample	(int32_t);
-	        void	getSamples	(std::vector<cmplx> &v,
-	                                 int index,
-	                                 int32_t n, int32_t phase);
-	        void	startDumping	(SNDFILE *);
-	        void	stopDumping();
+  ~SampleReader();
+  void setRunning(bool b);
+  float get_sLevel();
+  cmplx getSample(int32_t);
+  void getSamples(std::vector<cmplx> & v, int index, int32_t n, int32_t phase);
+  void startDumping(SNDFILE *);
+  void stopDumping();
+
 private:
-		RadioInterface	*myRadioInterface;
-		deviceHandler	*theRig;
-		RingBuffer<cmplx> *spectrumBuffer;
-		std::vector<cmplx> localBuffer;
-		int32_t		localCounter;
-		int32_t		bufferSize;
-		int32_t		currentPhase;
-		std::atomic<bool>	running;
-		int32_t		bufferContent;
-		float		sLevel;
-		int32_t		sampleCount;
-	        int32_t		corrector;
-		bool		dumping;
-		int16_t         dumpIndex;
-		int16_t         dumpScale;
-		int16_t         dumpBuffer [DUMPSIZE];
-		std::atomic<SNDFILE *>	dumpfilePointer;
+  RadioInterface * myRadioInterface;
+  deviceHandler * theRig;
+  RingBuffer<cmplx> * spectrumBuffer;
+  std::vector<cmplx> localBuffer;
+  int32_t localCounter;
+  int32_t bufferSize;
+  int32_t currentPhase;
+  std::atomic<bool> running;
+  int32_t bufferContent;
+  float sLevel;
+  int32_t sampleCount;
+  int32_t corrector;
+  bool dumping;
+  int16_t dumpIndex;
+  int16_t dumpScale;
+  int16_t dumpBuffer[DUMPSIZE];
+  std::atomic<SNDFILE *> dumpfilePointer;
+
 signals:
-		void		show_Spectrum (int);
-	        void		show_Corrector (int);
+  void show_Spectrum(int);
+  void show_Corrector(int);
 };
 
 #endif

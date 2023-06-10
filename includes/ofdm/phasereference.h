@@ -71,7 +71,7 @@ private:
   std::vector<float> mLBuf;
 
 signals:
-  void show_correlation(int, int, QVector<int>);
+  void show_correlation(int, int, const QVector<int> &);
 };
 
 #endif

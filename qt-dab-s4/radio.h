@@ -359,8 +359,8 @@ public slots:
 	void			No_Signal_Found		();
 	void			show_motHandling	(bool);
 	void			setSyncLost		();
-	void			showCorrelation		(int, int, 
-	                                                      QVector<int>);
+	void			showCorrelation		(int amount, int marker,
+                                const QVector<int> & v);
 	void			showSpectrum		(int);
 	void			showIQ			(int);
 	void			showQuality		(float, float, float);

@@ -57,8 +57,8 @@ public:
 	                                         QSettings	*,
 	                                         RingBuffer<float> *);
 			~correlationViewer	();
-	void		showCorrelation		(int32_t, int32_t,
-	                                                QVector<int> &);
+	void		showCorrelation		(int32_t dots, int marker,
+                              const QVector<int> & v);
 	void		showIndex		(int32_t);
 	void		show			();
 	void		hide			();

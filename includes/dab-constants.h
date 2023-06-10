@@ -41,14 +41,16 @@
 #endif
 
 #ifdef  __MINGW32__
-  //#include	"iostream.h"
+//#include	"iostream.h"
   #include	"windows.h"
 #else
   #ifndef  __FREEBSD__
-    //#include	"alloca.h"
+//#include	"alloca.h"
   #endif
+
   #include  "dlfcn.h"
-  typedef void * HINSTANCE;
+
+typedef void * HINSTANCE;
 #endif
 
 using cmplx = std::complex<float>;
@@ -128,10 +130,15 @@ static inline float jan_abs(cmplx z)
 {
   float re = real(z);
   float im = imag(z);
+
   if (re < 0)
-  { re = -re; }
+  {
+    re = -re;
+  }
   if (im < 0)
-  { im = -im; }
+  {
+    im = -im;
+  }
   if (re > im)
   {
     return re + 0.5 * im;

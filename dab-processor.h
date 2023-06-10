@@ -101,7 +101,7 @@ private:
   RingBuffer<cmplx> * const mpNullBuffer;
   RingBuffer<float> * const mpSnrBuffer;
   RadioInterface * const mpRadioInterface;
-  sampleReader mSampleReader;
+  SampleReader mSampleReader;
   ficHandler mFicHandler;
   mscHandler mMscHandler;
   PhaseReference mPhaseSynchronizer;

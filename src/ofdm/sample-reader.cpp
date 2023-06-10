@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,182 +20,209 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #
-#include	"sample-reader.h"
-#include	"radio.h"
 
-static  inline
-int16_t valueFor (int16_t b) {
-int16_t res     = 1;
-        while (--b > 0)
-           res <<= 1;
-        return res;
+
+#include  "sample-reader.h"
+#include  "radio.h"
+
+static inline int16_t valueFor(int16_t b)
+{
+  int16_t res = 1;
+  while (--b > 0)
+  {
+    res <<= 1;
+  }
+  return res;
 }
 
-static
-cmplx oscillatorTable [INPUT_RATE];
+static cmplx oscillatorTable[INPUT_RATE];
 
-	sampleReader::sampleReader (RadioInterface *mr,
-	                            deviceHandler	*theRig,
-	                            RingBuffer<cmplx> *spectrumBuffer
-	                           ) {
-int	i;
-	this	-> theRig	= theRig;
-        bufferSize		= 32768;
-        this    -> spectrumBuffer       = spectrumBuffer;
-        connect (this, SIGNAL (show_Spectrum (int)),
-                 mr, SLOT (showSpectrum (int)));
-        localBuffer. resize (bufferSize);
-        localCounter		= 0;
-	connect (this, SIGNAL (show_Corrector (int)),
-	         mr, SLOT (set_CorrectorDisplay (int)));
-	currentPhase	= 0;
-	sLevel		= 0;
-	sampleCount	= 0;
-        for (i = 0; i < INPUT_RATE; i ++)
-           oscillatorTable [i] = cmplx
-	                            (cos (2.0 * M_PI * i / INPUT_RATE),
-                                     sin (2.0 * M_PI * i / INPUT_RATE));
+SampleReader::SampleReader(RadioInterface * mr, deviceHandler * theRig, RingBuffer<cmplx> * spectrumBuffer)
+{
+  int i;
+  this->theRig = theRig;
+  bufferSize = 32768;
+  this->spectrumBuffer = spectrumBuffer;
+  connect(this, SIGNAL (show_Spectrum(int)), mr, SLOT (showSpectrum(int)));
+  localBuffer.resize(bufferSize);
+  localCounter = 0;
+  connect(this, SIGNAL (show_Corrector(int)), mr, SLOT (set_CorrectorDisplay(int)));
+  currentPhase = 0;
+  sLevel = 0;
+  sampleCount = 0;
+  for (i = 0; i < INPUT_RATE; i++)
+  {
+    oscillatorTable[i] = cmplx(cos(2.0 * M_PI * i / INPUT_RATE),
+                               sin(2.0 * M_PI * i / INPUT_RATE));
+  }
 
-	bufferContent	= 0;
-	corrector	= 0;
-	dumpfilePointer. store (nullptr);
-	dumpIndex	= 0;
-	dumpScale	= valueFor (theRig -> bitDepth());
-	running. store (true);
+  bufferContent = 0;
+  corrector = 0;
+  dumpfilePointer.store(nullptr);
+  dumpIndex = 0;
+  dumpScale = valueFor(theRig->bitDepth());
+  running.store(true);
 }
 
-	sampleReader::~sampleReader() {
+SampleReader::~SampleReader()
+{
 }
 
-void	sampleReader::setRunning (bool b) {
-	running. store (b);
+void SampleReader::setRunning(bool b)
+{
+  running.store(b);
 }
 
-float	sampleReader::get_sLevel() {
-	return sLevel;
+float SampleReader::get_sLevel()
+{
+  return sLevel;
 }
 
-cmplx sampleReader::getSample (int32_t phaseOffset) {
-cmplx temp;
+cmplx SampleReader::getSample(int32_t phaseOffset)
+{
+  cmplx temp;
 
-	corrector	= phaseOffset;
-	if (!running. load())
-	   throw 21;
+  corrector = phaseOffset;
+  if (!running.load())
+  {
+    throw 21;
+  }
 
-///	bufferContent is an indicator for the value of ... -> Samples()
-	if (bufferContent == 0) {
-	   bufferContent = theRig -> Samples();
-	   while ((bufferContent <= 2048) && running. load()) {
-	      usleep (10);
-	      bufferContent = theRig -> Samples(); 
-	   }
-	}
+  ///	bufferContent is an indicator for the value of ... -> Samples()
+  if (bufferContent == 0)
+  {
+    bufferContent = theRig->Samples();
+    while ((bufferContent <= 2048) && running.load())
+    {
+      usleep(10);
+      bufferContent = theRig->Samples();
+    }
+  }
 
-	if (!running. load())	
-	   throw 20;
-//
-//	so here, bufferContent > 0
-	theRig -> getSamples (&temp, 1);
-	bufferContent --;
-	if (dumpfilePointer. load() != nullptr) {
-	   dumpBuffer [2 * dumpIndex    ] = real (temp) * dumpScale;
-	   dumpBuffer [2 * dumpIndex + 1] = imag (temp) * dumpScale;
-	   if ( ++dumpIndex >= DUMPSIZE / 2) {
-	      sf_writef_short (dumpfilePointer. load(),
-	                       dumpBuffer, dumpIndex);
-	      dumpIndex = 0;
-	   }
-	}
+  if (!running.load())
+  {
+    throw 20;
+  }
+  //
+  //	so here, bufferContent > 0
+  theRig->getSamples(&temp, 1);
+  bufferContent--;
+  if (dumpfilePointer.load() != nullptr)
+  {
+    dumpBuffer[2 * dumpIndex] = real(temp) * dumpScale;
+    dumpBuffer[2 * dumpIndex + 1] = imag(temp) * dumpScale;
+    if (++dumpIndex >= DUMPSIZE / 2)
+    {
+      sf_writef_short(dumpfilePointer.load(), dumpBuffer, dumpIndex);
+      dumpIndex = 0;
+    }
+  }
 
-	if (localCounter < bufferSize)
-	   localBuffer [localCounter ++]        = temp;
-//
-//	OK, we have a sample!!
-//	first: adjust frequency. We need Hz accuracy
-	currentPhase	-= phaseOffset;
-	currentPhase	= (currentPhase + INPUT_RATE) % INPUT_RATE;
+  if (localCounter < bufferSize)
+  {
+    localBuffer[localCounter++] = temp;
+  }
+  //
+  //	OK, we have a sample!!
+  //	first: adjust frequency. We need Hz accuracy
+  currentPhase -= phaseOffset;
+  currentPhase = (currentPhase + INPUT_RATE) % INPUT_RATE;
 
-	temp		*= oscillatorTable [currentPhase];
-	sLevel		= 0.00001 * jan_abs (temp) + (1 - 0.00001) * sLevel;
-#define	N	4
-	if (++ sampleCount > INPUT_RATE / N) {
-	   show_Corrector	(corrector);
-	   sampleCount = 0;
-	   if (spectrumBuffer != nullptr) {
-              spectrumBuffer -> putDataIntoBuffer (localBuffer. data(),
-	                                                       localCounter);
-              emit show_Spectrum (bufferSize);
-	   }
-           localCounter = 0;
-	}
-	return temp;
+  temp *= oscillatorTable[currentPhase];
+  sLevel = 0.00001 * jan_abs(temp) + (1 - 0.00001) * sLevel;
+#define  N  4
+  if (++sampleCount > INPUT_RATE / N)
+  {
+    show_Corrector(corrector);
+    sampleCount = 0;
+    if (spectrumBuffer != nullptr)
+    {
+      spectrumBuffer->putDataIntoBuffer(localBuffer.data(), localCounter);
+      emit show_Spectrum(bufferSize);
+    }
+    localCounter = 0;
+  }
+  return temp;
 }
 
-void	sampleReader::getSamples (std::vector<cmplx>  &v,
-	                          int index,
-	                          int32_t n, int32_t phaseOffset) {
-int32_t		i;
-cmplx buffer [n];
-	corrector	= phaseOffset;
-	if (!running. load())
-	   throw 21;
-	if (n > bufferContent) {
-	   bufferContent = theRig -> Samples();
-	   while ((bufferContent < n) && running. load()) {
-	      usleep (10);
-	      bufferContent = theRig -> Samples();
-	   }
-	}
+void SampleReader::getSamples(std::vector<cmplx> & v, int index, int32_t n, int32_t phaseOffset)
+{
+  int32_t i;
+  cmplx buffer[n];
+  corrector = phaseOffset;
+  if (!running.load())
+  {
+    throw 21;
+  }
+  if (n > bufferContent)
+  {
+    bufferContent = theRig->Samples();
+    while ((bufferContent < n) && running.load())
+    {
+      usleep(10);
+      bufferContent = theRig->Samples();
+    }
+  }
 
-	if (!running. load())	
-	   throw 20;
-//
-//	so here, bufferContent >= n
-	n	= theRig -> getSamples (buffer, n);
-	bufferContent -= n;
-	if (dumpfilePointer. load () != nullptr) {
-	   for (i = 0; i < n; i ++) {
-	      dumpBuffer [2 * dumpIndex    ] = real (v [i]) * dumpScale;
-	      dumpBuffer [2 * dumpIndex + 1] = imag (v [i]) * dumpScale;
-	      if (++dumpIndex >= DUMPSIZE / 2) {
-	         sf_writef_short (dumpfilePointer. load(),
-	                          dumpBuffer, dumpIndex);
-	         dumpIndex = 0;
-	      }
-	   }
-	}
+  if (!running.load())
+  {
+    throw 20;
+  }
+  //
+  //	so here, bufferContent >= n
+  n = theRig->getSamples(buffer, n);
+  bufferContent -= n;
+  if (dumpfilePointer.load() != nullptr)
+  {
+    for (i = 0; i < n; i++)
+    {
+      dumpBuffer[2 * dumpIndex] = real(v[i]) * dumpScale;
+      dumpBuffer[2 * dumpIndex + 1] = imag(v[i]) * dumpScale;
+      if (++dumpIndex >= DUMPSIZE / 2)
+      {
+        sf_writef_short(dumpfilePointer.load(), dumpBuffer, dumpIndex);
+        dumpIndex = 0;
+      }
+    }
+  }
 
-//	OK, we have samples!!
-//	first: adjust frequency. We need Hz accuracy
-	for (i = 0; i < n; i ++) {
-	   currentPhase	-= phaseOffset;
-//
-//	Note that "phase" itself might be negative
-	   currentPhase	= (currentPhase + INPUT_RATE) % INPUT_RATE;
-	   if (localCounter < bufferSize)
-	      localBuffer [localCounter ++]     = v [i];
-	   v  [index + i]	= buffer [i] * oscillatorTable [currentPhase];
-	   sLevel	= 0.00001 * jan_abs (v [i]) + (1 - 0.00001) * sLevel;
-	}
+  //	OK, we have samples!!
+  //	first: adjust frequency. We need Hz accuracy
+  for (i = 0; i < n; i++)
+  {
+    currentPhase -= phaseOffset;
+    //
+    //	Note that "phase" itself might be negative
+    currentPhase = (currentPhase + INPUT_RATE) % INPUT_RATE;
+    if (localCounter < bufferSize)
+    {
+      localBuffer[localCounter++] = v[i];
+    }
+    v[index + i] = buffer[i] * oscillatorTable[currentPhase];
+    sLevel = 0.00001 * jan_abs(v[i]) + (1 - 0.00001) * sLevel;
+  }
 
-	sampleCount	+= n;
-	if (sampleCount > INPUT_RATE / N) {
-	   show_Corrector	(corrector);
-	   if (spectrumBuffer != nullptr) {
-	      spectrumBuffer -> putDataIntoBuffer (localBuffer. data(),
-	                                                       bufferSize);
-	      emit show_Spectrum (bufferSize);
-	   }
-	   localCounter = 0;
-	   sampleCount = 0;
-	}
+  sampleCount += n;
+  if (sampleCount > INPUT_RATE / N)
+  {
+    show_Corrector(corrector);
+    if (spectrumBuffer != nullptr)
+    {
+      spectrumBuffer->putDataIntoBuffer(localBuffer.data(), bufferSize);
+      emit show_Spectrum(bufferSize);
+    }
+    localCounter = 0;
+    sampleCount = 0;
+  }
 }
 
-void	sampleReader::startDumping (SNDFILE *f) {
-	dumpfilePointer. store (f);
+void SampleReader::startDumping(SNDFILE * f)
+{
+  dumpfilePointer.store(f);
 }
 
-void	sampleReader::stopDumping() {
-	dumpfilePointer. store (nullptr);
+void SampleReader::stopDumping()
+{
+  dumpfilePointer.store(nullptr);
 }
 

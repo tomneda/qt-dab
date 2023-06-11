@@ -25,10 +25,10 @@
 //	Shows the spectrum of the incoming data stream 
 //	If made invisible, it is a "do nothing"
 //
-#ifndef    SPECTRUM_VIEWER_INCLUDE
-#define    SPECTRUM_VIEWER_INCLUDE
+#ifndef    SPECTRUM_VIEWER_H
+#define    SPECTRUM_VIEWER_H
 
-#include        "dab-constants.h"
+#include  "dab-constants.h"
 #include  <QFrame>
 #include  <QObject>
 #include  "ui_scopewidget.h"
@@ -38,19 +38,20 @@
 #include  <qwt_plot_marker.h>
 #include  <qwt_plot_grid.h>
 #include  <qwt_plot_curve.h>
-#include        <qwt_color_map.h>
-#include        <qwt_plot_zoomer.h>
-#include        <qwt_plot_textlabel.h>
-#include        <qwt_plot_panner.h>
-#include        <qwt_plot_layout.h>
+#include  <qwt_color_map.h>
+#include  <qwt_plot_zoomer.h>
+#include  <qwt_plot_textlabel.h>
+#include  <qwt_plot_panner.h>
+#include  <qwt_plot_layout.h>
 #include  <qwt_picker_machine.h>
-#include        <qwt_scale_widget.h>
-#include        <QBrush>
-#include        <QTimer>
+#include  <qwt_scale_widget.h>
+#include  <QBrush>
+#include  <QTimer>
 
 #include  "spectrum-scope.h"
 #include  "waterfall-scope.h"
-#include  "null-scope.h"
+#include  "correlation-viewer.h"
+//#include  "null-scope.h"
 
 constexpr int32_t SP_DISPLAYSIZE = 512;
 constexpr int32_t SP_SPECTRUMSIZE = 2048;
@@ -59,18 +60,18 @@ constexpr int32_t SP_SPECTRUMOVRSMPFAC = (SP_SPECTRUMSIZE / SP_DISPLAYSIZE);
 #include  "fft-handler.h"
 
 class RadioInterface;
-
 class QSettings;
-
 class IQDisplay;
+class correlationViewer;
 
 class spectrumViewer : public QObject, Ui_scopeWidget
 {
 Q_OBJECT
 public:
-  spectrumViewer(RadioInterface *, QSettings *, RingBuffer<cmplx> *, RingBuffer<cmplx> *);
+  spectrumViewer(RadioInterface *, QSettings *, RingBuffer<cmplx> *, RingBuffer<cmplx> *, RingBuffer<float> *);
   ~spectrumViewer() override;
   void showSpectrum(int32_t, int32_t);
+  void showCorrelation(int32_t dots, int marker, const QVector<int> & v);
   void showFrequency(float);
   void showIQ(int32_t);
   void show_nullPeriod(float *, int);
@@ -82,12 +83,14 @@ public:
   void show();
   void hide();
   bool isHidden();
+
 private:
   QFrame myFrame;
   RadioInterface * myRadioInterface;
   QSettings * dabSettings;
   RingBuffer<cmplx> * spectrumBuffer;
   RingBuffer<cmplx> * iqBuffer;
+  RingBuffer<float> * mpCorrelationBuffer = nullptr;
   QwtPlotPicker * lm_picker{};
   QColor mDisplayColor;
   QColor mGridColor;
@@ -97,7 +100,7 @@ private:
 
   std::array<cmplx, SP_SPECTRUMSIZE> spectrum{ 0 };
   std::array<double, SP_SPECTRUMSIZE> displayBuffer{ 0 };
-  std::array<float,  SP_SPECTRUMSIZE> Window{ 0 };
+  std::array<float, SP_SPECTRUMSIZE> Window{ 0 };
   std::array<double, SP_SPECTRUMSIZE> X_axis{ 0 };
   std::array<double, SP_SPECTRUMSIZE> Y_values{ 0 };
   std::array<double, SP_SPECTRUMSIZE> Y2_values{ 0 };
@@ -115,7 +118,8 @@ private:
   IQDisplay * myIQDisplay;
   spectrumScope * mySpectrumScope;
   waterfallScope * myWaterfallScope;
-  nullScope * myNullScope;
+  correlationViewer * mpCorrelationViewer = nullptr;
+  //nullScope * myNullScope;
 private slots:
   void rightMouseClick(const QPointF &);
 };

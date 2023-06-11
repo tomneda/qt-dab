@@ -28,7 +28,7 @@
 #include  "color-selector.h"
 
 
-spectrumViewer::spectrumViewer(RadioInterface * mr, QSettings * dabSettings, RingBuffer<cmplx> * sbuffer, RingBuffer<cmplx> * ibuffer)
+spectrumViewer::spectrumViewer(RadioInterface * mr, QSettings * dabSettings, RingBuffer<cmplx> * sbuffer, RingBuffer<cmplx> * ibuffer, RingBuffer<float> * cbuffer)
   : Ui_scopeWidget(),
     myFrame(nullptr),
     fft(SP_SPECTRUMSIZE, false)
@@ -39,6 +39,7 @@ spectrumViewer::spectrumViewer(RadioInterface * mr, QSettings * dabSettings, Rin
   this->dabSettings = dabSettings;
   this->spectrumBuffer = sbuffer;
   this->iqBuffer = ibuffer;
+  this->mpCorrelationBuffer = cbuffer;
 
   dabSettings->beginGroup("spectrumViewer");
   int x = dabSettings->value("position-x", 100).toInt();
@@ -66,7 +67,8 @@ spectrumViewer::spectrumViewer(RadioInterface * mr, QSettings * dabSettings, Rin
   mySpectrumScope = new spectrumScope(dabScope, SP_DISPLAYSIZE, dabSettings);
   myWaterfallScope = new waterfallScope(dabWaterfall, SP_DISPLAYSIZE, 50);
   myIQDisplay = new IQDisplay(iqDisplay);
-  myNullScope = new nullScope(nullDisplay, 256, dabSettings);
+  mpCorrelationViewer = new correlationViewer(impulseGrid, indexDisplay, dabSettings, mpCorrelationBuffer);
+  //myNullScope = new nullScope(nullDisplay, 256, dabSettings);
   setBitDepth(12);
 }
 
@@ -83,10 +85,11 @@ spectrumViewer::~spectrumViewer()
 
   myFrame.hide();
 
+  delete mpCorrelationViewer;
   delete myIQDisplay;
   delete mySpectrumScope;
   delete myWaterfallScope;
-  delete myNullScope;
+  //delete myNullScope;
 }
 
 void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
@@ -284,7 +287,7 @@ void spectrumViewer::show_clockErr(int e)
 
 void spectrumViewer::show_nullPeriod(float * v, int amount)
 {
-  myNullScope->show_nullPeriod(v, amount);
+  //myNullScope->show_nullPeriod(v, amount);
 }
 
 void spectrumViewer::rightMouseClick(const QPointF & point)
@@ -347,4 +350,9 @@ void spectrumViewer::rightMouseClick(const QPointF & point)
 void spectrumViewer::showFrequency(float f)
 {
   frequencyDisplay->display(f);
+}
+
+void spectrumViewer::showCorrelation(int32_t dots, int marker, const QVector<int> & v)
+{
+  mpCorrelationViewer->showCorrelation(dots, marker, v);
 }

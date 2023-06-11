@@ -23,7 +23,6 @@
 #include  "msc-handler.h"
 #include  "radio.h"
 #include  "process-params.h"
-#include  "timesyncer.h"
 
 /**
   *	\brief DabProcessor
@@ -118,26 +117,28 @@ void DabProcessor::run()
   int32_t startIndex;
   TimeSyncer myTimeSyncer(&mSampleReader);
   int attempts;
-  std::vector<int16_t> ibits;
   int frameCount = 0;
   int sampleCount = 0;
   int totalSamples = 0;
   double cLevel = 0;
   int cCount = 0;
-  bool null_shower;
-  EState state = EState::NOT_SYNCED;
 
-  QVector<cmplx> tester(mDabPar.T_u / 2);
-  ibits.resize(2 * mDabPar.K);
   mFineOffset = 0;
   mCoarseOffset = 0;
   mCorrectionNeeded = true;
   attempts = 0;
   mSampleReader.setRunning(true);  // useful after a restart
-  //
-  //	to get some idea of the signal strength
+
+  enum class EState
+  {
+    NOT_SYNCED, TIME_SYNC_ESTABLISHED, CHECK_END_OF_NULL, SYNC_ON_PHASE, QUIT
+  };
+
+  EState state = EState::NOT_SYNCED;
+
   try
   {
+    // To get some idea of the signal strength
     for (int32_t i = 0; i < mDabPar.T_F / 5; i++)
     {
       mSampleReader.getSample(0);
@@ -147,27 +148,34 @@ void DabProcessor::run()
     {
       switch (state)
       {
-      //-------------------------------------------------------------
       case EState::NOT_SYNCED:
-        state = _run_state_not_synced(myTimeSyncer, attempts, frameCount, sampleCount, totalSamples);
+      {
+        const bool ok = _run_state_not_synced(myTimeSyncer, attempts, frameCount, sampleCount, totalSamples);
+        state = (ok ? EState::TIME_SYNC_ESTABLISHED : EState::NOT_SYNCED);
         break;
+      }
 
-      //-------------------------------------------------------------
       case EState::TIME_SYNC_ESTABLISHED:
-        state = _run_state_sync_established(startIndex, sampleCount);
+      {
+        const bool ok = _run_state_sync_established(startIndex, sampleCount);
+        state = (ok ? EState::SYNC_ON_PHASE : EState::NOT_SYNCED);
         break;
+      }
 
-      //-------------------------------------------------------------
       case EState::CHECK_END_OF_NULL:
-        state = _run_state_check_end_of_null(null_shower, tester, startIndex, frameCount, sampleCount, totalSamples);
+      {
+        const bool ok = _run_state_check_end_of_null(startIndex, frameCount, sampleCount, totalSamples);
+        state = (ok ? EState::SYNC_ON_PHASE : EState::NOT_SYNCED);
         break;
+      }
 
-      //-------------------------------------------------------------
       case EState::SYNC_ON_PHASE:
-        state = _run_state_sync_on_phase(startIndex, ibits, cLevel, cCount, sampleCount);
+      {
+        _run_state_sync_on_phase(startIndex, cLevel, cCount, sampleCount);
+        state = EState::CHECK_END_OF_NULL;
         break;
+      }
 
-      //-------------------------------------------------------------
       case EState::QUIT:
         // not handled
         break;
@@ -178,11 +186,11 @@ void DabProcessor::run()
   {
     fprintf(stderr, "DabProcessor is stopping\n");
   }
-  //	inputDevice	-> stopReader ();
 }
 
-DabProcessor::EState DabProcessor::_run_state_sync_on_phase(int32_t startIndex, vector<int16_t> & ibits, double cLevel, int cCount, int & sampleCount)
+void DabProcessor::_run_state_sync_on_phase(int32_t startIndex, double cLevel, int cCount, int & sampleCount)
 {
+  std::vector<int16_t> ibits(2 * mDabPar.K);
   //SyncOnPhase:
   mGoodFrames++;
   cLevel = 0;
@@ -259,6 +267,7 @@ DabProcessor::EState DabProcessor::_run_state_sync_on_phase(int32_t startIndex, 
       cLevel += abs(mOfdmBuffer[i]) + abs(mOfdmBuffer[i - mDabPar.T_u]);
     }
     cCount += 2 * mDabPar.T_g;
+
 
     if ((ofdmSymbolCount <= 3) || mEti_on)
     {
@@ -373,16 +382,14 @@ DabProcessor::EState DabProcessor::_run_state_sync_on_phase(int32_t startIndex, 
 
   //ReadyForNewFrame:
   ///	and off we go, up to the next frame
-  return EState::CHECK_END_OF_NULL;
-  //goto Check_endofNULL;
+  //return EState::CHECK_END_OF_NULL;
 }
 
-DabProcessor::EState DabProcessor::_run_state_check_end_of_null(bool null_shower, QVector<cmplx> & tester, int32_t & startIndex, int & frameCount, int & sampleCount, int & totalSamples)
+bool DabProcessor::_run_state_check_end_of_null(int32_t & startIndex, int & frameCount, int & sampleCount, int & totalSamples)
 {
-  //Check_endofNULL:
   mTotalFrames++;
   frameCount++;
-  null_shower = false;
+  bool null_shower = false;
   totalSamples += sampleCount;
   if (frameCount > 10)
   {
@@ -391,6 +398,8 @@ DabProcessor::EState DabProcessor::_run_state_check_end_of_null(bool null_shower
     frameCount = 0;
     null_shower = true;
   }
+
+  QVector<cmplx> tester(mDabPar.T_u / 2);
 
   if (null_shower)
   {
@@ -426,17 +435,18 @@ DabProcessor::EState DabProcessor::_run_state_check_end_of_null(bool null_shower
       setSyncLost();
     }
     mBadFrames++;
-    return EState::NOT_SYNCED;
-    //goto notSynced;
+    return false;
+    //return EState::NOT_SYNCED;
   }
   else
   {
     sampleCount = startIndex;
-    return EState::SYNC_ON_PHASE;
+    return true;
+    //return EState::SYNC_ON_PHASE;
   }
 }
 
-DabProcessor::EState DabProcessor::_run_state_sync_established(int32_t & startIndex, int & sampleCount)
+bool DabProcessor::_run_state_sync_established(int32_t & startIndex, int & sampleCount)
 {
   // get first OFDM symbol after time sync marker
   mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
@@ -456,18 +466,18 @@ DabProcessor::EState DabProcessor::_run_state_sync_established(int32_t & startIn
       setSyncLost();
     }
     mBadFrames++;
-    return EState::NOT_SYNCED;
-    //goto notSynced;
+    return false;
+    //return EState::NOT_SYNCED;
   }
   else
   {
     sampleCount = startIndex;
-    return EState::SYNC_ON_PHASE;
-    //goto SyncOnPhase;
+    return true;
+    //return EState::SYNC_ON_PHASE;
   }
 }
 
-DabProcessor::EState DabProcessor::_run_state_not_synced(TimeSyncer & myTimeSyncer, int attempts, int & frameCount, int & sampleCount, int & totalSamples)
+bool DabProcessor::_run_state_not_synced(TimeSyncer & myTimeSyncer, int attempts, int & frameCount, int & sampleCount, int & totalSamples)
 {
   //notSynced:
   mTotalFrames++;
@@ -481,7 +491,8 @@ DabProcessor::EState DabProcessor::_run_state_not_synced(TimeSyncer & myTimeSync
   switch (myTimeSyncer.read_samples_until_end_of_level_drop(mDabPar.T_n, mDabPar.T_F))
   {
   case TimeSyncer::EState::TIMESYNC_ESTABLISHED:
-    return EState::TIME_SYNC_ESTABLISHED;
+    return true;
+    //return EState::TIME_SYNC_ESTABLISHED;
   case TimeSyncer::EState::NO_DIP_FOUND:
     if (++attempts >= 8)
     {
@@ -492,7 +503,8 @@ DabProcessor::EState DabProcessor::_run_state_not_synced(TimeSyncer & myTimeSync
   case TimeSyncer::EState::NO_END_OF_DIP_FOUND:
     break;
   }
-  return EState::NOT_SYNCED;
+  return false;
+  //return EState::NOT_SYNCED;
 }
 
 void DabProcessor::set_scanMode(bool b)

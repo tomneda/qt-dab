@@ -42,6 +42,7 @@
 #include  "ringbuffer.h"
 #include  "tii-detector.h"
 #include  "eti-generator.h"
+#include "timesyncer.h"
 
 class RadioInterface;
 class DabParams;
@@ -125,8 +126,21 @@ private:
 
   bool mCorrectionNeeded{ true };
   std::vector<cmplx> mOfdmBuffer;
+  enum class EState
+  {
+    NOT_SYNCED,
+    TIME_SYNC_ESTABLISHED,
+    CHECK_END_OF_NULL,
+    SYNC_ON_PHASE,
+    QUIT
+  };
 
-  void run() override;
+  void run() override; // the new QThread
+
+  EState _run_state_not_synced(TimeSyncer & myTimeSyncer, int attempts, int & frameCount, int & sampleCount, int & totalSamples);
+  EState _run_state_sync_established(int32_t & startIndex, int & sampleCount);
+  EState _run_state_check_end_of_null(bool null_shower, QVector<cmplx> & tester, int32_t & startIndex, int & frameCount, int & sampleCount, int & totalSamples);
+  EState _run_state_sync_on_phase(int32_t startIndex, std::vector<int16_t> & ibits, double cLevel, int cCount, int & sampleCount);
 
 signals:
   void setSynced(bool);

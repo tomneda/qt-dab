@@ -20,11 +20,9 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include  "dab-processor.h"
-#include  "fic-handler.h"
 #include  "msc-handler.h"
 #include  "radio.h"
 #include  "process-params.h"
-//#include  "dab-params.h"
 #include  "timesyncer.h"
 
 /**
@@ -127,14 +125,6 @@ void DabProcessor::run()
   double cLevel = 0;
   int cCount = 0;
   bool null_shower;
-  enum class EState
-  {
-    NOT_SYNCED,
-    TIME_SYNC_ESTABLISHED,
-    CHECK_END_OF_NULL,
-    SYNC_ON_PHASE,
-    QUIT
-  };
   EState state = EState::NOT_SYNCED;
 
   QVector<cmplx> tester(mDabPar.T_u / 2);
@@ -159,327 +149,23 @@ void DabProcessor::run()
       {
       //-------------------------------------------------------------
       case EState::NOT_SYNCED:
-      {
-        //notSynced:
-        mTotalFrames++;
-        totalSamples = 0;
-        frameCount = 0;
-        sampleCount = 0;
-
-        setSynced(false);
-        mTiiDetector.reset();
-
-        switch (myTimeSyncer.read_samples_until_end_of_level_drop(mDabPar.T_n, mDabPar.T_F))
-        {
-        case TimeSyncer::EState::TIMESYNC_ESTABLISHED:
-          state = EState::TIME_SYNC_ESTABLISHED;
-          break;      // yes, we are ready
-        case TimeSyncer::EState::NO_DIP_FOUND:
-          if (++attempts >= 8)
-          {
-            emit No_Signal_Found();
-            attempts = 0;
-          }
-          // keep state EState::NOT_SYNCED;
-          //goto notSynced;
-          break;
-        default:      // does not happen
-        case TimeSyncer::EState::NO_END_OF_DIP_FOUND:
-          // keep state EState::NOT_SYNCED;
-          //goto notSynced;
-          break;
-        }
-      }
-      break;
+        state = _run_state_not_synced(myTimeSyncer, attempts, frameCount, sampleCount, totalSamples);
+        break;
 
       //-------------------------------------------------------------
       case EState::TIME_SYNC_ESTABLISHED:
-      {
-        // get first OFDM symbol after time sync marker
-        mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
-
-        /**
-          *	Looking for the first sample of the T_u part of the sync block.
-          *	Note that we probably already had 30 to 40 samples of the T_g
-          *	part
-          */
-
-        startIndex = mPhaseReference.find_index(mOfdmBuffer, mcThreshold);
-
-        if (startIndex < 0)
-        { // no sync, try again
-          if (!mCorrectionNeeded)
-          {
-            setSyncLost();
-          }
-          mBadFrames++;
-          state = EState::NOT_SYNCED;
-          break;
-          //goto notSynced;
-        }
-        sampleCount = startIndex;
-        state = EState::SYNC_ON_PHASE;
+        state = _run_state_sync_established(startIndex, sampleCount);
         break;
-        //goto SyncOnPhase;
-      }
-      break;
 
       //-------------------------------------------------------------
       case EState::CHECK_END_OF_NULL:
-      {
-        //Check_endofNULL:
-        mTotalFrames++;
-        frameCount++;
-        null_shower = false;
-        totalSamples += sampleCount;
-        if (frameCount > 10)
-        {
-          show_clockErr(totalSamples - frameCount * mDabPar.T_F);
-          totalSamples = 0;
-          frameCount = 0;
-          null_shower = true;
-        }
+        state = _run_state_check_end_of_null(null_shower, tester, startIndex, frameCount, sampleCount, totalSamples);
+        break;
 
-        if (null_shower)
-        {
-          for (int i = 0; i < mDabPar.T_u / 4; i++)
-          {
-            tester[i] = mOfdmBuffer[mDabPar.T_n - mDabPar.T_u / 4 + i];
-          }
-        }
-
-        mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
-
-        if (null_shower)
-        {
-          for (int i = 0; i < mDabPar.T_u / 4; i++)
-          {
-            tester[1 * mDabPar.T_u / 4 + i] = mOfdmBuffer[i];
-          }
-          mpNullBuffer->putDataIntoBuffer(tester.data(), mDabPar.T_u / 2);
-          show_null(mDabPar.T_u / 2);
-        }
-
-        /**
-          *	We now have to find the exact first sample of the non-null period.
-          *	We use a correlation that will find the first sample after the
-          *	cyclic prefix.
-          */
-        startIndex = mPhaseReference.find_index(mOfdmBuffer, 3 * mcThreshold);
-
-        if (startIndex < 0)
-        { // no sync, try again
-          if (!mCorrectionNeeded)
-          {
-            setSyncLost();
-          }
-          mBadFrames++;
-          state = EState::NOT_SYNCED;
-          //goto notSynced;
-          break;
-        }
-
-        sampleCount = startIndex;
-        state = EState::SYNC_ON_PHASE;
-      }
-      break;
-
+      //-------------------------------------------------------------
       case EState::SYNC_ON_PHASE:
-      {
-        //SyncOnPhase:
-        mGoodFrames++;
-        cLevel = 0;
-        cCount = 0;
-        /**
-          *	Once here, we are synchronized, we need to copy the data we
-          *	used for synchronization for block 0
-          */
-        const int32_t ofdmBufferIndex = mDabPar.T_u - startIndex;
-        assert(ofdmBufferIndex >= 0);
-        memmove(mOfdmBuffer.data(), &(mOfdmBuffer[startIndex]), ofdmBufferIndex * sizeof(cmplx));
-
-        //Block_0:
-        /**
-          *	Block 0 is special in that it is used for fine time synchronization,
-          *	for coarse frequency synchronization
-          *	and its content is used as a reference for decoding the
-          *	first datablock.
-          *	We read the missing samples in the ofdm buffer
-          */
-        setSynced(true);
-        mSampleReader.getSamples(mOfdmBuffer, ofdmBufferIndex, mDabPar.T_u - ofdmBufferIndex, mCoarseOffset + mFineOffset);
-
-        sampleCount += mDabPar.T_u;
-        mOfdmDecoder.processBlock_0(mOfdmBuffer);
-
-        if (!mScanMode)
-        {
-          mMscHandler.processBlock_0(mOfdmBuffer.data());
-        }
-
-        // Here we look only at the block_0 when we need a coarse frequency synchronization.
-        mCorrectionNeeded = !mFicHandler.syncReached();
-
-        if (mCorrectionNeeded)
-        {
-          const int32_t correction = mPhaseReference.estimate_carrier_offset(mOfdmBuffer);
-
-          if (correction != PhaseReference::IDX_NOT_FOUND)
-          {
-            mCoarseOffset += (int32_t)(0.4 * correction * mDabPar.CarrDiff);
-
-            if (abs(mCoarseOffset) > kHz(35))
-            {
-              mCoarseOffset = 0;
-            }
-          }
-        }
-        /**
-          *	after block 0, we will just read in the other (params -> L - 1) blocks
-          */
-        //Data_blocks:
-        /**
-          *	The first ones are the FIC blocks these are handled within
-          *	the thread executing this "task", the other blocks
-          *	are passed on to be handled in the mscHandler, running
-          *	in a different thread.
-          *	We immediately start with building up an average of
-          *	the phase difference between the samples in the cyclic prefix
-          *	and the	corresponding samples in the datapart.
-          */
-        cCount = 0;
-        cLevel = 0;
-        cmplx freqCorr = cmplx(0, 0);
-
-        for (int ofdmSymbolCount = 1; ofdmSymbolCount < mDabPar.L; ofdmSymbolCount++)
-        {
-          mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_s, mCoarseOffset + mFineOffset);
-          sampleCount += mDabPar.T_s;
-
-          for (int32_t i = mDabPar.T_u; i < mDabPar.T_s; i++)
-          {
-            freqCorr += mOfdmBuffer[i] * conj(mOfdmBuffer[i - mDabPar.T_u]);
-            cLevel += abs(mOfdmBuffer[i]) + abs(mOfdmBuffer[i - mDabPar.T_u]);
-          }
-          cCount += 2 * mDabPar.T_g;
-
-          if ((ofdmSymbolCount <= 3) || mEti_on)
-          {
-            mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbolCount, ibits);
-          }
-
-          if (ofdmSymbolCount <= 3)
-          {
-            mFicHandler.process_ficBlock(ibits, ofdmSymbolCount);
-          }
-
-          if (mEti_on)
-          {
-            mEtiGenerator.processBlock(ibits, ofdmSymbolCount);
-          }
-
-          if (!mScanMode)
-          {
-            mMscHandler.process_Msc(&(mOfdmBuffer[mDabPar.T_g]), ofdmSymbolCount);
-          }
-        }
-
-        /**
-          *	OK,  here we are at the end of the frame
-          *	Assume everything went well and skip T_null samples
-          */
-        mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_n, mCoarseOffset + mFineOffset);
-        sampleCount += mDabPar.T_n;
-        float sum = 0;
-
-        for (int32_t i = 0; i < mDabPar.T_n; i++)
-        {
-          sum += abs(mOfdmBuffer[i]);
-        }
-        sum /= (float)mDabPar.T_n;
-
-        if (this->mpSnrBuffer != nullptr)
-        {
-          auto snrV = (float)(20 * log10((cLevel / cCount + 0.005) / (sum + 0.005)));
-          mpSnrBuffer->putDataIntoBuffer(&snrV, 1);
-        }
-
-        if (++mSnrCounter >= 5)
-        {
-          constexpr float ALPHA_SNR = 0.1f;
-          mSnrCounter = 0;
-          mSnrdB = (1.0f - ALPHA_SNR) * mSnrdB + ALPHA_SNR * 20.0f * log10f((mSampleReader.get_sLevel() + 0.005f) / (sum + 0.005f));
-          show_snr((int)mSnrdB);
-        }
-        /*
-         *	The TII data is encoded in the null period of the
-         *	odd frames
-         */
-
-        auto wasSecond = [](int32_t iCF, uint8_t iDabMode) -> bool
-        {
-          switch (iDabMode)
-          {
-          default:
-          case 1: return (iCF & 07) >= 4;
-          case 2:
-          case 3: return (iCF & 02);
-          case 4: return (iCF & 03) >= 2;
-          }
-        };
-
-        if (mcDabMode == 1)
-        {
-          if (wasSecond(mFicHandler.get_CIFcount(), mcDabMode))
-          {
-            mTiiDetector.addBuffer(mOfdmBuffer);
-            if (++mTiiCounter >= mcTiiDelay)
-            {
-              mpTiiBuffer->putDataIntoBuffer(mOfdmBuffer.data(), mDabPar.T_u);
-              show_tii_spectrum();
-              uint16_t res = mTiiDetector.processNULL();
-              if (res != 0)
-              {
-                uint8_t mainId = res >> 8;
-                uint8_t subId = res & 0xFF;
-                show_tii(mainId, subId);
-              }
-              mTiiCounter = 0;
-              mTiiDetector.reset();
-            }
-          }
-        }
-
-
-        /**
-          *	The first sample to be found for the next frame should be T_g
-          *	samples ahead. Before going for the next frame, we
-          *	we just check the fineCorrector
-          */
-        //NewOffset:
-        //     we integrate the newly found frequency error with the
-        //     existing frequency error.
-        //
-
-        mFineOffset += (int32_t)(0.05 * arg(freqCorr) / (2 * M_PI) * mDabPar.CarrDiff);
-
-        if (mFineOffset > mDabPar.CarrDiff / 2)
-        {
-          mCoarseOffset += mDabPar.CarrDiff;
-          mFineOffset -= mDabPar.CarrDiff;
-        }
-        else if (mFineOffset < -mDabPar.CarrDiff / 2)
-        {
-          mCoarseOffset -= mDabPar.CarrDiff;
-          mFineOffset += mDabPar.CarrDiff;
-        }
-
-        //ReadyForNewFrame:
-        ///	and off we go, up to the next frame
-        state = EState::CHECK_END_OF_NULL;
-        //goto Check_endofNULL;
-      }
-      break;
+        state = _run_state_sync_on_phase(startIndex, ibits, cLevel, cCount, sampleCount);
+        break;
 
       //-------------------------------------------------------------
       case EState::QUIT:
@@ -493,6 +179,320 @@ void DabProcessor::run()
     fprintf(stderr, "DabProcessor is stopping\n");
   }
   //	inputDevice	-> stopReader ();
+}
+
+DabProcessor::EState DabProcessor::_run_state_sync_on_phase(int32_t startIndex, vector<int16_t> & ibits, double cLevel, int cCount, int & sampleCount)
+{
+  //SyncOnPhase:
+  mGoodFrames++;
+  cLevel = 0;
+  cCount = 0;
+  /**
+    *	Once here, we are synchronized, we need to copy the data we
+    *	used for synchronization for block 0
+    */
+  const int32_t ofdmBufferIndex = mDabPar.T_u - startIndex;
+  assert(ofdmBufferIndex >= 0);
+  memmove(mOfdmBuffer.data(), &(mOfdmBuffer[startIndex]), ofdmBufferIndex * sizeof(cmplx));
+
+  //Block_0:
+  /**
+    *	Block 0 is special in that it is used for fine time synchronization,
+    *	for coarse frequency synchronization
+    *	and its content is used as a reference for decoding the
+    *	first datablock.
+    *	We read the missing samples in the ofdm buffer
+    */
+  setSynced(true);
+  mSampleReader.getSamples(mOfdmBuffer, ofdmBufferIndex, mDabPar.T_u - ofdmBufferIndex, mCoarseOffset + mFineOffset);
+
+  sampleCount += mDabPar.T_u;
+  mOfdmDecoder.processBlock_0(mOfdmBuffer);
+
+  if (!mScanMode)
+  {
+    mMscHandler.processBlock_0(mOfdmBuffer.data());
+  }
+
+  // Here we look only at the block_0 when we need a coarse frequency synchronization.
+  mCorrectionNeeded = !mFicHandler.syncReached();
+
+  if (mCorrectionNeeded)
+  {
+    const int32_t correction = mPhaseReference.estimate_carrier_offset(mOfdmBuffer);
+
+    if (correction != PhaseReference::IDX_NOT_FOUND)
+    {
+      mCoarseOffset += (int32_t)(0.4 * correction * mDabPar.CarrDiff);
+
+      if (abs(mCoarseOffset) > kHz(35))
+      {
+        mCoarseOffset = 0;
+      }
+    }
+  }
+  /**
+    *	after block 0, we will just read in the other (params -> L - 1) blocks
+    */
+  //Data_blocks:
+  /**
+    *	The first ones are the FIC blocks these are handled within
+    *	the thread executing this "task", the other blocks
+    *	are passed on to be handled in the mscHandler, running
+    *	in a different thread.
+    *	We immediately start with building up an average of
+    *	the phase difference between the samples in the cyclic prefix
+    *	and the	corresponding samples in the datapart.
+    */
+  cCount = 0;
+  cLevel = 0;
+  cmplx freqCorr = cmplx(0, 0);
+
+  for (int ofdmSymbolCount = 1; ofdmSymbolCount < mDabPar.L; ofdmSymbolCount++)
+  {
+    mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_s, mCoarseOffset + mFineOffset);
+    sampleCount += mDabPar.T_s;
+
+    for (int32_t i = mDabPar.T_u; i < mDabPar.T_s; i++)
+    {
+      freqCorr += mOfdmBuffer[i] * conj(mOfdmBuffer[i - mDabPar.T_u]);
+      cLevel += abs(mOfdmBuffer[i]) + abs(mOfdmBuffer[i - mDabPar.T_u]);
+    }
+    cCount += 2 * mDabPar.T_g;
+
+    if ((ofdmSymbolCount <= 3) || mEti_on)
+    {
+      mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbolCount, ibits);
+    }
+
+    if (ofdmSymbolCount <= 3)
+    {
+      mFicHandler.process_ficBlock(ibits, ofdmSymbolCount);
+    }
+
+    if (mEti_on)
+    {
+      mEtiGenerator.processBlock(ibits, ofdmSymbolCount);
+    }
+
+    if (!mScanMode)
+    {
+      mMscHandler.process_Msc(&(mOfdmBuffer[mDabPar.T_g]), ofdmSymbolCount);
+    }
+  }
+
+  /**
+    *	OK,  here we are at the end of the frame
+    *	Assume everything went well and skip T_null samples
+    */
+  mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_n, mCoarseOffset + mFineOffset);
+  sampleCount += mDabPar.T_n;
+  float sum = 0;
+
+  for (int32_t i = 0; i < mDabPar.T_n; i++)
+  {
+    sum += abs(mOfdmBuffer[i]);
+  }
+  sum /= (float)mDabPar.T_n;
+
+  if (mpSnrBuffer != nullptr)
+  {
+    auto snrV = (float)(20 * log10((cLevel / cCount + 0.005) / (sum + 0.005)));
+    mpSnrBuffer->putDataIntoBuffer(&snrV, 1);
+  }
+
+  if (++mSnrCounter >= 5)
+  {
+    constexpr float ALPHA_SNR = 0.1f;
+    mSnrCounter = 0;
+    mSnrdB = (1.0f - ALPHA_SNR) * mSnrdB + ALPHA_SNR * 20.0f * log10f((mSampleReader.get_sLevel() + 0.005f) / (sum + 0.005f));
+    show_snr((int)mSnrdB);
+  }
+  /*
+   *	The TII data is encoded in the null period of the
+   *	odd frames
+   */
+
+  auto wasSecond = [](int32_t iCF, uint8_t iDabMode) -> bool
+  {
+    switch (iDabMode)
+    {
+    default:
+    case 1: return (iCF & 07) >= 4;
+    case 2:
+    case 3: return (iCF & 02);
+    case 4: return (iCF & 03) >= 2;
+    }
+  };
+
+  if (mcDabMode == 1)
+  {
+    if (wasSecond(mFicHandler.get_CIFcount(), mcDabMode))
+    {
+      mTiiDetector.addBuffer(mOfdmBuffer);
+      if (++mTiiCounter >= mcTiiDelay)
+      {
+        mpTiiBuffer->putDataIntoBuffer(mOfdmBuffer.data(), mDabPar.T_u);
+        show_tii_spectrum();
+        uint16_t res = mTiiDetector.processNULL();
+        if (res != 0)
+        {
+          uint8_t mainId = res >> 8;
+          uint8_t subId = res & 0xFF;
+          show_tii(mainId, subId);
+        }
+        mTiiCounter = 0;
+        mTiiDetector.reset();
+      }
+    }
+  }
+
+
+  /**
+    *	The first sample to be found for the next frame should be T_g
+    *	samples ahead. Before going for the next frame, we
+    *	we just check the fineCorrector
+    */
+  //NewOffset:
+  //     we integrate the newly found frequency error with the
+  //     existing frequency error.
+  //
+
+  mFineOffset += (int32_t)(0.05 * arg(freqCorr) / (2 * M_PI) * mDabPar.CarrDiff);
+
+  if (mFineOffset > mDabPar.CarrDiff / 2)
+  {
+    mCoarseOffset += mDabPar.CarrDiff;
+    mFineOffset -= mDabPar.CarrDiff;
+  }
+  else if (mFineOffset < -mDabPar.CarrDiff / 2)
+  {
+    mCoarseOffset -= mDabPar.CarrDiff;
+    mFineOffset += mDabPar.CarrDiff;
+  }
+
+  //ReadyForNewFrame:
+  ///	and off we go, up to the next frame
+  return EState::CHECK_END_OF_NULL;
+  //goto Check_endofNULL;
+}
+
+DabProcessor::EState DabProcessor::_run_state_check_end_of_null(bool null_shower, QVector<cmplx> & tester, int32_t & startIndex, int & frameCount, int & sampleCount, int & totalSamples)
+{
+  //Check_endofNULL:
+  mTotalFrames++;
+  frameCount++;
+  null_shower = false;
+  totalSamples += sampleCount;
+  if (frameCount > 10)
+  {
+    show_clockErr(totalSamples - frameCount * mDabPar.T_F);
+    totalSamples = 0;
+    frameCount = 0;
+    null_shower = true;
+  }
+
+  if (null_shower)
+  {
+    for (int i = 0; i < mDabPar.T_u / 4; i++)
+    {
+      tester[i] = mOfdmBuffer[mDabPar.T_n - mDabPar.T_u / 4 + i];
+    }
+  }
+
+  mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
+
+  if (null_shower)
+  {
+    for (int i = 0; i < mDabPar.T_u / 4; i++)
+    {
+      tester[1 * mDabPar.T_u / 4 + i] = mOfdmBuffer[i];
+    }
+    mpNullBuffer->putDataIntoBuffer(tester.data(), mDabPar.T_u / 2);
+    show_null(mDabPar.T_u / 2);
+  }
+
+  /**
+    *	We now have to find the exact first sample of the non-null period.
+    *	We use a correlation that will find the first sample after the
+    *	cyclic prefix.
+    */
+  startIndex = mPhaseReference.find_index(mOfdmBuffer, 3 * mcThreshold);
+
+  if (startIndex < 0)
+  { // no sync, try again
+    if (!mCorrectionNeeded)
+    {
+      setSyncLost();
+    }
+    mBadFrames++;
+    return EState::NOT_SYNCED;
+    //goto notSynced;
+  }
+  else
+  {
+    sampleCount = startIndex;
+    return EState::SYNC_ON_PHASE;
+  }
+}
+
+DabProcessor::EState DabProcessor::_run_state_sync_established(int32_t & startIndex, int & sampleCount)
+{
+  // get first OFDM symbol after time sync marker
+  mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_u, mCoarseOffset + mFineOffset);
+
+  /**
+    *	Looking for the first sample of the T_u part of the sync block.
+    *	Note that we probably already had 30 to 40 samples of the T_g
+    *	part
+    */
+
+  startIndex = mPhaseReference.find_index(mOfdmBuffer, mcThreshold);
+
+  if (startIndex < 0)
+  { // no sync, try again
+    if (!mCorrectionNeeded)
+    {
+      setSyncLost();
+    }
+    mBadFrames++;
+    return EState::NOT_SYNCED;
+    //goto notSynced;
+  }
+  else
+  {
+    sampleCount = startIndex;
+    return EState::SYNC_ON_PHASE;
+    //goto SyncOnPhase;
+  }
+}
+
+DabProcessor::EState DabProcessor::_run_state_not_synced(TimeSyncer & myTimeSyncer, int attempts, int & frameCount, int & sampleCount, int & totalSamples)
+{
+  //notSynced:
+  mTotalFrames++;
+  totalSamples = 0;
+  frameCount = 0;
+  sampleCount = 0;
+
+  setSynced(false);
+  mTiiDetector.reset();
+
+  switch (myTimeSyncer.read_samples_until_end_of_level_drop(mDabPar.T_n, mDabPar.T_F))
+  {
+  case TimeSyncer::EState::TIMESYNC_ESTABLISHED:
+    return EState::TIME_SYNC_ESTABLISHED;
+  case TimeSyncer::EState::NO_DIP_FOUND:
+    if (++attempts >= 8)
+    {
+      emit No_Signal_Found();
+      attempts = 0;
+    }
+    break;
+  case TimeSyncer::EState::NO_END_OF_DIP_FOUND:
+    break;
+  }
+  return EState::NOT_SYNCED;
 }
 
 void DabProcessor::set_scanMode(bool b)

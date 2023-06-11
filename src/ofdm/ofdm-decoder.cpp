@@ -91,9 +91,17 @@ void ofdmDecoder::processBlock_0(std::vector<cmplx> buffer)
  *	only to spare a test. The mapping code is the same
  */
 
-void ofdmDecoder::decode(const std::vector<cmplx> &buffer, int32_t blkno, std::vector<int16_t> &oBits)
+void ofdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float iPhaseCorr, std::vector<int16_t> & oBits)
 {
   memcpy(fft_buffer.data(), &((buffer.data())[T_g]), T_u * sizeof(cmplx));
+
+  constexpr float MAX_PHASE_ANGLE = 20.0f / 360.0f * 2.0f * M_PI;
+  if (abs(iPhaseCorr) > MAX_PHASE_ANGLE)
+  {
+    iPhaseCorr = 0;
+  }
+  //const cmplx phaseRotator = cmplx(cosf(iPhaseCorr), -sinf(iPhaseCorr));
+  const cmplx phaseRotator = std::exp(cmplx(0.0f, -iPhaseCorr));
 
   // fftlabel:
   /**
@@ -129,6 +137,7 @@ void ofdmDecoder::decode(const std::vector<cmplx> &buffer, int32_t blkno, std::v
      */
     
     cmplx r1 = fft_buffer[index] * conj(phaseReference[index]);
+    r1 *= phaseRotator;
     dataVector[i] = r1;
     float ab1 = abs(r1);
     

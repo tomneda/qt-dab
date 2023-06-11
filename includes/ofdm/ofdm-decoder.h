@@ -41,7 +41,7 @@ public:
   ~ofdmDecoder() = default;
   
   void processBlock_0(std::vector<cmplx>);
-  void decode(const std::vector<cmplx> &, int32_t n, std::vector<int16_t> &);
+  void decode(const std::vector<cmplx> &, int32_t n, float iPhaseCorr, std::vector<int16_t> &);
   void stop();
   void reset();
 

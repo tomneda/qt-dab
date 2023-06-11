@@ -114,6 +114,7 @@ private:
   bool mScanMode{ false };
   int16_t mTiiCounter = 0;
   bool mEti_on = false;
+  float   mPhaseOffset = 0;
   int32_t mFineOffset = 0;
   int32_t mCoarseOffset = 0;
   int32_t mSnrCounter = 0;

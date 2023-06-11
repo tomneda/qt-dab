@@ -259,7 +259,7 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
 
     if ((ofdmSymbolCount <= 3) || mEti_on)
     {
-      mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbolCount, ibits);
+      mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbolCount, mPhaseOffset, ibits);
     }
 
     if (ofdmSymbolCount <= 3)
@@ -355,8 +355,8 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
   //     we integrate the newly found frequency error with the
   //     existing frequency error.
   //
-
-  mFineOffset += (int32_t)(0.05 * arg(freqCorr) / (2 * M_PI) * mDabPar.CarrDiff);
+  mPhaseOffset = arg(freqCorr);
+  mFineOffset += (int32_t)(0.10 * mPhaseOffset / (2 * M_PI) * mDabPar.CarrDiff); // formerly 0.05
 
   if (mFineOffset > mDabPar.CarrDiff / 2)
   {
@@ -371,9 +371,9 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
 
   mClockOffsetTotalSamples += ioSampleCount;
 
-  if (++mClockOffsetFrameCount > 10)
+  if (++mClockOffsetFrameCount > 100)
   {
-    show_clockErr(mClockOffsetTotalSamples - mClockOffsetFrameCount * mDabPar.T_F);
+    show_clockErr(mClockOffsetTotalSamples - mClockOffsetFrameCount * mDabPar.T_F); // samples per 100 frames
     mClockOffsetTotalSamples = 0;
     mClockOffsetFrameCount = 0;
   }

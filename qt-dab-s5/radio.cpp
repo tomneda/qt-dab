@@ -800,7 +800,7 @@ bool	RadioInterface::doStart	() {
 	}
 	else
 	   channelSelector -> setCurrentIndex (0);
-	my_dabProcessor	= new dabProcessor  (this, inputDevice, &globals);
+	my_dabProcessor	= new DabProcessor  (this, inputDevice, &globals);
 	channel. cleanChannel ();
 
 //	Some hidden buttons can be made visible now
@@ -1489,15 +1489,15 @@ void	RadioInterface::updateTimeDisplay() {
 	      theTechWindow -> showMissed (xxx);
 	}
 	if (error_report && (numberofSeconds % 10) == 0) {
-	   int	totalFrames;
-	   int	goodFrames;
-	   int	badFrames;
-	   my_dabProcessor	-> get_frameQuality (&totalFrames,
-	                                             &goodFrames,
-	                                             &badFrames);
-	   fprintf (stderr, "total %d, good %d bad %d ficRatio %f\n",
-	                     totalFrames, goodFrames, badFrames,
-	                                            total_ficError * 100.0 / total_fics);
+//	   int	totalFrames;
+//	   int	goodFrames;
+//	   int	badFrames;
+//	   my_dabProcessor	-> get_frameQuality (&totalFrames,
+//	                                             &goodFrames,
+//	                                             &badFrames);
+//	   fprintf (stderr, "total %d, good %d bad %d ficRatio %f\n",
+//	                     totalFrames, goodFrames, badFrames,
+//	                                            total_ficError * 100.0 / total_fics);
 	   total_ficError	= 0;
 	   total_fics		= 0;
 #ifndef TCP_STREAMER 

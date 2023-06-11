@@ -222,7 +222,7 @@ private:
 #ifdef	HAVE_PLUTO_RXTX
 	dabStreamer		*streamerOut;
 #endif
-	dabProcessor		*my_dabProcessor;
+	DabProcessor		*my_dabProcessor;
 	audioBase		*soundOut;
 #ifdef	DATA_STREAMER
 	tcpServer		*dataStreamer;

@@ -36,7 +36,7 @@ public:
     int16_t L;        //      76 blocks per frame
     int16_t K;        //    1536 number carriers
     int16_t T_n;      //    2656 null length
-    int32_t T_F;      //  196608 samples per frame
+    int32_t T_F;      //  196608 samples per frame (T_n + L * T_s)
     int16_t T_s;      //    2552 block length
     int16_t T_u;      //    2048 useful part, FFT length
     int16_t T_g;      //     504 guard length (T_s - T_u)

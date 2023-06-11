@@ -1577,13 +1577,13 @@ void	RadioInterface::updateTimeDisplay() {
         }
 
 	if (error_report && (numberofSeconds % 10) == 0) {
-	   int	totalFrames;
-	   int	goodFrames;
-	   int	badFrames;
-     my_dabProcessor->get_frame_quality(totalFrames, goodFrames, badFrames);
-	   fprintf (stderr, "total %d, good %d bad %d ficRatio %f\n",
-	                     totalFrames, goodFrames, badFrames,
-	                                            total_ficError * 100.0 / total_fics);
+//	   int	totalFrames;
+//	   int	goodFrames;
+//	   int	badFrames;
+//     my_dabProcessor->get_frame_quality(totalFrames, goodFrames, badFrames);
+//	   fprintf (stderr, "total %d, good %d bad %d ficRatio %f\n",
+//	                     totalFrames, goodFrames, badFrames,
+//	                                            total_ficError * 100.0 / total_fics);
 	   total_ficError	= 0;
 	   total_fics		= 0;
 #ifndef TCP_STREAMER 

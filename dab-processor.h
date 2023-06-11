@@ -63,7 +63,6 @@ public:
   void stop_etiGenerator();
   void reset_etiGenerator();
   void set_scanMode(bool);
-  void get_frame_quality(int32_t & oTotalFrames, int32_t & oGoodFrames, int32_t & oBadFrames);
 
   //	inheriting from our delegates
   //	for the FicHandler:
@@ -97,9 +96,7 @@ public:
   void set_tiiDetectorMode(bool);
 
 private:
-  deviceHandler * const mpInputDevice;
   RingBuffer<cmplx> * const mpTiiBuffer;
-  RingBuffer<cmplx> * const mpNullBuffer;
   RingBuffer<float> * const mpSnrBuffer;
   RadioInterface * const mpRadioInterface;
   SampleReader mSampleReader;
@@ -109,30 +106,30 @@ private:
   TII_Detector mTiiDetector;
   ofdmDecoder mOfdmDecoder;
   etiGenerator mEtiGenerator;
+  TimeSyncer mTimeSyncer;
   const uint8_t mcDabMode;
   const float mcThreshold;
   const int16_t mcTiiDelay;
   const DabParams::SDabPar mDabPar;
   bool mScanMode{ false };
-  int32_t mTotalFrames = 0;
-  int32_t mGoodFrames = 0;
-  int32_t mBadFrames = 0;
   int16_t mTiiCounter = 0;
   bool mEti_on = false;
   int32_t mFineOffset = 0;
   int32_t mCoarseOffset = 0;
-  int mSnrCounter = 0;
+  int32_t mSnrCounter = 0;
   float mSnrdB = 0;
+  int32_t mTimeSyncAttemptCount = 0;
+  int32_t mClockOffsetTotalSamples = 0;
+  int32_t mClockOffsetFrameCount = 0;
 
   bool mCorrectionNeeded{ true };
   std::vector<cmplx> mOfdmBuffer;
 
   void run() override; // the new QThread
 
-  bool _run_state_not_synced(TimeSyncer & myTimeSyncer, int attempts, int & frameCount, int & sampleCount, int & totalSamples);
-  bool _run_state_sync_established(int32_t & startIndex, int & sampleCount);
-  bool _run_state_check_end_of_null(int32_t & startIndex, int & frameCount, int & sampleCount, int & totalSamples);
-  void _run_state_sync_on_phase(int32_t startIndex, double cLevel, int cCount, int & sampleCount);
+  bool _state_wait_for_time_sync_marker();
+  bool _state_eval_sync_symbol(int32_t & oStartIndex, int & oSampleCount, float iThreshold);
+  void _state_process_rest_of_frame(int32_t iStartIndex, int32_t & ioSampleCount);
 
 signals:
   void setSynced(bool);

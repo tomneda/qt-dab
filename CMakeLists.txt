@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.13)
+project(Qt-DAB)
 set(objectName qt-dab-5.3)
-set(CMAKE_CXX_FLAGS "${CMAKE_XCC_FLAGS} -Wall -std=c++14 -flto")
+set(CMAKE_CXX_FLAGS "${CMAKE_XCC_FLAGS} -Wall -std=c++17 -flto")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
 
 set(CMAKE_AUTORCC ON)
@@ -51,80 +52,34 @@ set(CMAKE_BUILD_TYPE ${CMAKE_BUILD_TYPE} CACHE STRING "")
 list(INSERT CMAKE_MODULE_PATH 0 ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 ######################################################################
-#
-#####################################################################
-#
-#	default value
-set(USE_PORTAUDIO true)
+######################################################################
+# select only one of these audio outputs
+#set(USE_PORTAUDIO  ON)
 
-if (DEFINED AIRSPY)
-    set(AIRSPY true)
-endif ()
+option(USE_PORTAUDIO  ON)
+option(QT_AUDIO      OFF)
+option(TCP_STREAMER  OFF)
 
-if (DEFINED SDRPLAY_V2)
-    set(SDRPLAY_V2 true)
-endif ()
+# select one or more devices (set to ON)
+option(AIRSPY        OFF)
+option(SDRPLAY_V2    OFF)
+option(SDRPLAY       OFF)
+option(RTLSDR_LINUX  OFF)
+option(RTLSDR_WIN    OFF)
+option(HACKRF        OFF)
+option(LIMESDR       OFF)
+option(RTL_TCP       OFF)
+option(PLUTO         OFF)
 
-if (DEFINED SDRPLAY)
-    set(SDRPLAY true)
-endif ()
-
-if (DEFINED RTLSDR_LINUX)
-    set(RTLSDR_LINUX true)
-endif ()
-
-if (DEFINED RTLSDR_WIN)
-    set(RTLSDR_WIN true)
-endif ()
-
-if (DEFINED HACKRF)
-    set(HACKRF true)
-endif ()
-
-if (DEFINED LIMESDR)
-    set(LIMESDR true)
-endif ()
-
-if (DEFINED RTL_TCP)
-    set(RTL_TCP true)
-endif ()
-
-if (DEFINED PLUTO)
-    set(PLUTO true)
-endif ()
-
-if (DEFINED DATA_STREAMER)
-    set(DATA_STREAMER true)
-endif ()
-
-if (DEFINED VITERBI_SSE)
-    set(VITERBI_SSE true)
-endif ()
-
-if (DEFINED VITERBI_NEON)
-    set(VITERBI_NEON true)
-endif ()
-
-if (DEFINED FDK_AAC)
-    set(FDK_AAC true)
-endif ()
-#	If you want a tcp stream of the audio rather than
-#	audio being sent to the soundcard, set
-if (DEFINED TCP_STREAMER)
-    set(TCP_STREAMER true)
-    set(USE_PORTAUDIO false)
-endif ()
-
-#	If you want the Qt system to handle the audio (only default out)
-#	then set
-if (DEFINED QT_AUDIO)
-    set(QT_AUDIO true)
-    set(USE_PORTAUDIO false)
-endif ()
+option(DATA_STREAMER OFF)
+option(VITERBI_SSE   OFF)
+option(VITERBI_NEON  OFF)
+option(FDK_AAC       OFF)
+######################################################################
+######################################################################
 
 #add_definitions (-D__THREADED_BACKEND)	# uncomment for use for an RPI
 #add_definitions (-D__MSC_THREAD__)	# uncomment for use for an RPI
-
 #
 ########################################################################
 
@@ -211,7 +166,6 @@ include_directories(
         ./includes/scopes-qwt6
         ./viewers
         ./viewers/spectrum-viewer
-        #../viewers/correlation-viewer
         ./viewers/tii-viewer
         ./viewers/snr-viewer
         ./qt-devices
@@ -317,8 +271,6 @@ set(${objectName}_HDRS
         ./viewers/spectrum-viewer/spectrum-scope.h
         ./viewers/spectrum-viewer/waterfall-scope.h
         ./viewers/spectrum-viewer/correlation-viewer.h
-        #./viewers/spectrum-viewer/null-scope.h
-        #./viewers/correlation-viewer/correlation-viewer.h
         ./viewers/tii-viewer/tii-viewer.h
         ./viewers/snr-viewer/snr-viewer.h
         ./qt-devices/device-handler.h
@@ -422,8 +374,6 @@ set(${objectName}_SRCS
         ./viewers/spectrum-viewer/spectrum-scope.cpp
         ./viewers/spectrum-viewer/waterfall-scope.cpp
         ./viewers/spectrum-viewer/correlation-viewer.cpp
-        #../viewers/spectrum-viewer/null-scope.cpp
-        #../viewers/correlation-viewer/correlation-viewer.cpp
         ./viewers/tii-viewer/tii-viewer.cpp
         ./viewers/snr-viewer/snr-viewer.cpp
         ./qt-devices/device-handler.cpp
@@ -489,8 +439,6 @@ set(${objectName}_MOCS
         ./viewers/spectrum-viewer/spectrum-scope.h
         ./viewers/spectrum-viewer/waterfall-scope.h
         ./viewers/spectrum-viewer/correlation-viewer.h
-        #./viewers/spectrum-viewer/null-scope.h
-        #./viewers/correlation-viewer/correlation-viewer.h
         ./viewers/tii-viewer/tii-viewer.h
         ./viewers/snr-viewer/snr-viewer.h
         ./qt-devices/rawfiles-new/rawfiles.h
@@ -507,7 +455,6 @@ set(${objectName}_UIS
         ./forms-v5/technical_data.ui
         ./forms-v5/config-helper.ui
         ./viewers/spectrum-viewer/scopewidget.ui
-        #./viewers/correlation-viewer/correlation-widget.ui
         ./viewers/tii-viewer/tii-widget.ui
         ./viewers/snr-viewer/snr-widget.ui
         ./qt-devices/xml-filereader/xmlfiles.ui

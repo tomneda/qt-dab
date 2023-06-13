@@ -767,8 +767,8 @@ QString RadioInterface::presetText()
 
 QString RadioInterface::footText()
 {
-  version = QString(CURRENT_VERSION);
-  QString versionText = "Qt-DAB-version: " + QString(CURRENT_VERSION) + "\n";
+  version = QString(PRJ_VERS);
+  QString versionText = QString(PRJ_NAME) + " V" +  version + "\n";
   versionText += "Built on " + QString(__TIMESTAMP__) + QString(", Commit ") + QString(GITHASH) + "\n";
   versionText += "Copyright Jan van Katwijk, mailto:J.vanKatwijk@gmail.com\n";
   versionText += "Rights of Qt, portaudio, libfaad, libsamplerate and libsndfile gratefully acknowledged\n";

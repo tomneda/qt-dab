@@ -63,11 +63,6 @@ using cmplx = std::complex<float>;
 #define  kHz(x)    (x * 1000)
 #define  MHz(x)    (kHz (x) * 1000)
 
-#define  CURRENT_VERSION  "5.3"
-
-#define    DAB    0100
-#define    DAB_PLUS  0101
-
 #define    AUDIO_SERVICE  0101
 #define    PACKET_SERVICE  0102
 #define    UNKNOWN_SERVICE  0100

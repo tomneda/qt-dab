@@ -1,6 +1,9 @@
-cmake_minimum_required(VERSION 3.13)
-project(Qt-DAB)
-set(objectName qt-dab-5.3)
+cmake_minimum_required(VERSION 3.21)
+#cmake_policy(SET CMP0048 NEW) # use version number in command project()
+
+project(Qt-DAB VERSION 5.3.50.99)
+
+set(objectName "qt-dab")
 set(CMAKE_CXX_FLAGS "${CMAKE_XCC_FLAGS} -Wall -std=c++17 -flto")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
 
@@ -8,7 +11,15 @@ set(CMAKE_AUTORCC ON)
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
     set(CMAKE_INSTALL_PREFIX "/usr/local/bin" CACHE PATH "default install path" FORCE)
 endif ()
+
 #set (CMAKE_INSTALL_PREFIX /usr/local/bin)
+message(STATUS "${PROJECT_NAME} V${PROJECT_VERSION}")
+
+add_definitions(-DAPP_NAME="${objectName}")
+add_definitions(-DPRJ_NAME="${PROJECT_NAME}")
+add_definitions(-DPRJ_VERS="${PROJECT_VERSION}")
+
+
 
 #	modify if you want
 #	Note that since there are always problems with the rtlsdr interface

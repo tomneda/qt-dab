@@ -147,23 +147,23 @@ include_directories(
         ./pauzeslide
         ./support
         ./fft
-        ./includes
-        ./includes/ofdm
-        ./includes/protection
-        ./includes/backend
-        ./includes/backend/audio
-        ./includes/backend/data
-        ./includes/backend/data/journaline
-        ./includes/backend/data/mot
-        ./includes/backend/data/epg-2
-        ./includes/backend/data/epg
-        ./includes/support
-        ./src/support/tii-library
-        ./includes/support/buttons
-        ./includes/support/viterbi-jan
-        ./includes/support/viterbi-spiral
-        ./includes/output
-        ./includes/scopes-qwt6
+        ./code
+        ./code/ofdm
+        ./code/protection
+        ./code/backend
+        ./code/backend/audio
+        ./code/backend/data
+        ./code/backend/data/journaline
+        ./code/backend/data/mot
+        ./code/backend/data/epg-2
+        ./code/backend/data/epg
+        ./code/support
+        ./code/support/tii-library
+        ./code/support/buttons
+        ./code/support/viterbi-jan
+        ./code/support/viterbi-spiral
+        ./code/output
+        ./code/scopes-qwt6
         ./viewers
         ./viewers/spectrum-viewer
         ./viewers/tii-viewer
@@ -183,90 +183,90 @@ set(${objectName}_HDRS
         ./fft/fft-handler.h
         ./fft/fft-complex.h
         ./eti-handler/eti-generator.h
-        ./includes/dab-constants.h
-        ./includes/mot-content-types.h
-        ./includes/ofdm/sample-reader.h
-        ./includes/ofdm/phasereference.h
-        ./includes/ofdm/ofdm-decoder.h
-        ./includes/ofdm/phasetable.h
-        ./includes/ofdm/freq-interleaver.h
-        ./includes/ofdm/fib-decoder.h
-        ./includes/ofdm/dab-config.h
-        ./includes/ofdm/fib-table.h
-        ./includes/ofdm/fic-handler.h
-        ./includes/ofdm/tii-detector.h
-        ./includes/ofdm/timesyncer.h
-        ./includes/protection/protTables.h
-        ./includes/protection/protection.h
-        ./includes/protection/uep-protection.h
-        ./includes/protection/eep-protection.h
-        ./includes/backend/firecode-checker.h
-        ./includes/backend/frame-processor.h
-        ./includes/backend/charsets.h
-        ./includes/backend/galois.h
+        ./code/dab-constants.h
+        ./code/mot-content-types.h
+        ./code/ofdm/sample-reader.h
+        ./code/ofdm/phasereference.h
+        ./code/ofdm/ofdm-decoder.h
+        ./code/ofdm/phasetable.h
+        ./code/ofdm/freq-interleaver.h
+        ./code/ofdm/fib-decoder.h
+        ./code/ofdm/dab-config.h
+        ./code/ofdm/fib-table.h
+        ./code/ofdm/fic-handler.h
+        ./code/ofdm/tii-detector.h
+        ./code/ofdm/timesyncer.h
+        ./code/protection/protTables.h
+        ./code/protection/protection.h
+        ./code/protection/uep-protection.h
+        ./code/protection/eep-protection.h
+        ./code/backend/firecode-checker.h
+        ./code/backend/frame-processor.h
+        ./code/backend/charsets.h
+        ./code/backend/galois.h
         ./incluces/backend/reed-solomon.h
-        ./includes/backend/msc-handler.h
-        ./includes/backend/backend.h
-        ./includes/backend/backend-deconvolver.h
-        ./includes/backend/backend-driver.h
-        ./includes/backend/audio/mp4processor.h
-        ./includes/backend/audio/bitWriter.h
-        ./includes/backend/audio/mp2processor.h
-        ./includes/backend/data/ip-datahandler.h
-        ./includes/backend/data/tdc-datahandler.h
-        ./includes/backend/data/journaline-datahandler.h
-        ./includes/backend/data/journaline/dabdatagroupdecoder.h
-        ./includes/backend/data/journaline/crc_8_16.h
-        ./includes/backend/data/journaline/log.h
-        ./includes/backend/data/journaline/newssvcdec_impl.h
-        ./includes/backend/data/journaline/Splitter.h
-        ./includes/backend/data/journaline/dabdgdec_impl.h
-        ./includes/backend/data/journaline/newsobject.h
-        ./includes/backend/data/journaline/NML.h
-        ./includes/backend/data/epg/epgdec.h
-        ./includes/backend/data/epg-2/epg-decoder.h
-        ./includes/backend/data/virtual-datahandler.h
-        ./includes/backend/data/pad-handler.h
-        ./includes/backend/data/mot/mot-handler.h
-        ./includes/backend/data/mot/mot-object.h
-        ./includes/backend/data/mot/mot-dir.h
-        ./includes/backend/data/data-processor.h
-        ./includes/output/fir-filters.h
-        ./includes/output/audio-base.h
-        ./includes/output/newconverter.h
-        ./includes/support/ringbuffer.h
-        ./includes/support/Xtan2.h
-        ./includes/support/dab-params.h
-        ./includes/support/band-handler.h
-        ./includes/support/dab-tables.h
-        ./includes/support/viterbi-jan/viterbi-handler.h
-        ./includes/support/viterbi-spiral/viterbi-spiral.h
-        ./includes/support/preset-handler.h
-        ./includes/support/presetcombobox.h
-        ./includes/support/history-handler.h
-        ./includes/support/color-selector.h
-        ./includes/support/scheduler.h
-        ./includes/support/schedule-selector.h
-        ./includes/support/element-selector.h
-        ./includes/support/time-table.h
-        ./includes/support/findfilenames.h
-        ./includes/support/content-table.h
-        ./includes/support/dl-cache.h
-        ./includes/support/ITU_Region_1.h
-        ./includes/support/coordinates.h
-        ./includes/support/mapport.h
-        ./includes/support/http-handler.h
-        ./includes/support/converted_map.h
-        ./src/support/tii-library/tii-codes.h
-        ./includes/support/buttons/smallcombobox.h
-        ./includes/support/buttons/newpushbutton.h
-        ./includes/support/buttons/normalpushbutton.h
-        ./includes/support/buttons/smallpushbutton.h
-        ./includes/support/buttons/verysmallpushbutton.h
-        ./includes/support/buttons/smallqlistview.h
-        ./includes/support/buttons/smallspinbox.h
-        ./includes/scopes-qwt6/iqdisplay.h
-        ./includes/scopes-qwt6/audio-display.h
+        ./code/backend/msc-handler.h
+        ./code/backend/backend.h
+        ./code/backend/backend-deconvolver.h
+        ./code/backend/backend-driver.h
+        ./code/backend/audio/mp4processor.h
+        ./code/backend/audio/bitWriter.h
+        ./code/backend/audio/mp2processor.h
+        ./code/backend/data/ip-datahandler.h
+        ./code/backend/data/tdc-datahandler.h
+        ./code/backend/data/journaline-datahandler.h
+        ./code/backend/data/journaline/dabdatagroupdecoder.h
+        ./code/backend/data/journaline/crc_8_16.h
+        ./code/backend/data/journaline/log.h
+        ./code/backend/data/journaline/newssvcdec_impl.h
+        ./code/backend/data/journaline/Splitter.h
+        ./code/backend/data/journaline/dabdgdec_impl.h
+        ./code/backend/data/journaline/newsobject.h
+        ./code/backend/data/journaline/NML.h
+        ./code/backend/data/epg/epgdec.h
+        ./code/backend/data/epg-2/epg-decoder.h
+        ./code/backend/data/virtual-datahandler.h
+        ./code/backend/data/pad-handler.h
+        ./code/backend/data/mot/mot-handler.h
+        ./code/backend/data/mot/mot-object.h
+        ./code/backend/data/mot/mot-dir.h
+        ./code/backend/data/data-processor.h
+        ./code/output/fir-filters.h
+        ./code/output/audio-base.h
+        ./code/output/newconverter.h
+        ./code/support/ringbuffer.h
+        ./code/support/Xtan2.h
+        ./code/support/dab-params.h
+        ./code/support/band-handler.h
+        ./code/support/dab-tables.h
+        ./code/support/viterbi-jan/viterbi-handler.h
+        ./code/support/viterbi-spiral/viterbi-spiral.h
+        ./code/support/preset-handler.h
+        ./code/support/presetcombobox.h
+        ./code/support/history-handler.h
+        ./code/support/color-selector.h
+        ./code/support/scheduler.h
+        ./code/support/schedule-selector.h
+        ./code/support/element-selector.h
+        ./code/support/time-table.h
+        ./code/support/findfilenames.h
+        ./code/support/content-table.h
+        ./code/support/dl-cache.h
+        ./code/support/ITU_Region_1.h
+        ./code/support/coordinates.h
+        ./code/support/mapport.h
+        ./code/support/http-handler.h
+        ./code/support/converted_map.h
+        ./code/support/tii-library/tii-codes.h
+        ./code/support/buttons/smallcombobox.h
+        ./code/support/buttons/newpushbutton.h
+        ./code/support/buttons/normalpushbutton.h
+        ./code/support/buttons/smallpushbutton.h
+        ./code/support/buttons/verysmallpushbutton.h
+        ./code/support/buttons/smallqlistview.h
+        ./code/support/buttons/smallspinbox.h
+        ./code/scopes-qwt6/iqdisplay.h
+        ./code/scopes-qwt6/audio-display.h
         ./viewers/spectrum-viewer/spectrum-viewer.h
         ./viewers/spectrum-viewer/spectrum-scope.h
         ./viewers/spectrum-viewer/waterfall-scope.h
@@ -295,81 +295,81 @@ set(${objectName}_SRCS
         ./fft/fft-handler.cpp
         ./fft/fft-complex.cpp
         ./eti-handler/eti-generator.cpp
-        ./src/ofdm/sample-reader.cpp
-        ./src/ofdm/ofdm-decoder.cpp
-        ./src/ofdm/phasereference.cpp
-        ./src/ofdm/phasetable.cpp
-        ./src/ofdm/freq-interleaver.cpp
-        ./src/ofdm/fib-decoder.cpp
-        ./src/ofdm/fic-handler.cpp
-        ./src/ofdm/tii-detector.cpp
-        ./src/ofdm/channel.cpp
-        ./src/ofdm/timesyncer.cpp
-        ./src/protection/protTables.cpp
-        ./src/protection/protection.cpp
-        ./src/protection/eep-protection.cpp
-        ./src/protection/uep-protection.cpp
-        ./src/backend/firecode-checker.cpp
-        ./src/backend/charsets.cpp
-        ./src/backend/galois.cpp
-        ./src/backend/reed-solomon.cpp
-        ./src/backend/msc-handler.cpp
-        ./src/backend/backend.cpp
-        ./src/backend/backend-deconvolver.cpp
-        ./src/backend/backend-driver.cpp
-        ./src/backend/audio/mp4processor.cpp
-        ./src/backend/audio/bitWriter.cpp
-        ./src/backend/audio/mp2processor.cpp
-        ./src/backend/data/ip-datahandler.cpp
-        ./src/backend/data/journaline-datahandler.cpp
-        ./src/backend/data/journaline/crc_8_16.c
-        ./src/backend/data/journaline/log.c
-        ./src/backend/data/journaline/newssvcdec_impl.cpp
-        ./src/backend/data/journaline/Splitter.cpp
-        ./src/backend/data/journaline/dabdgdec_impl.c
-        ./src/backend/data/journaline/newsobject.cpp
-        ./src/backend/data/journaline/NML.cpp
-        ./src/backend/data/epg-2/epg-decoder.cpp
-        ./src/backend/data/epg/epgdec.cpp
-        ./src/backend/data/tdc-datahandler.cpp
-        ./src/backend/data/pad-handler.cpp
-        ./src/backend/data/mot/mot-handler.cpp
-        ./src/backend/data/mot/mot-object.cpp
-        ./src/backend/data/mot/mot-dir.cpp
-        ./src/backend/data/data-processor.cpp
-        ./src/output/audio-base.cpp
-        ./src/output/newconverter.cpp
-        ./src/output/fir-filters.cpp
-        ./src/support/Xtan2.cpp
-        ./src/support/dab-params.cpp
-        ./src/support/band-handler.cpp
-        ./src/support/dab-tables.cpp
-        ./src/support/preset-handler.cpp
-        ./src/support/presetcombobox.cpp
-        ./src/support/buttons/smallcombobox.cpp
-        ./src/support/buttons/newpushbutton.cpp
-        ./src/support/buttons/normalpushbutton.cpp
-        ./src/support/buttons/smallpushbutton.cpp
-        ./src/support/buttons/verysmallpushbutton.cpp
-        ./src/support/buttons/smallqlistview.cpp
-        ./src/support/buttons/smallspinbox.cpp
-        ./src/support/history-handler.cpp
-        ./src/support/viterbi-jan/viterbi-handler.cpp
-        ./src/support/viterbi-spiral/viterbi-spiral.cpp
-        ./src/support/color-selector.cpp
-        ./src/support/scheduler.cpp
-        ./src/support/schedule-selector.cpp
-        ./src/support/element-selector.cpp
-        ./src/support/time-table.cpp
-        ./src/support/findfilenames.cpp
-        ./src/support/content-table.cpp
-        ./src/support/ITU_Region_1.cpp
-        ./src/support/coordinates.cpp
-        ./src/support/mapport.cpp
-        ./src/support/http-handler.cpp
-        ./src/support/tii-library/tii-codes.cpp
-        ./src/scopes-qwt6/iqdisplay.cpp
-        ./src/scopes-qwt6/audio-display.cpp
+        ./code/ofdm/sample-reader.cpp
+        ./code/ofdm/ofdm-decoder.cpp
+        ./code/ofdm/phasereference.cpp
+        ./code/ofdm/phasetable.cpp
+        ./code/ofdm/freq-interleaver.cpp
+        ./code/ofdm/fib-decoder.cpp
+        ./code/ofdm/fic-handler.cpp
+        ./code/ofdm/tii-detector.cpp
+        ./code/ofdm/channel.cpp
+        ./code/ofdm/timesyncer.cpp
+        ./code/protection/protTables.cpp
+        ./code/protection/protection.cpp
+        ./code/protection/eep-protection.cpp
+        ./code/protection/uep-protection.cpp
+        ./code/backend/firecode-checker.cpp
+        ./code/backend/charsets.cpp
+        ./code/backend/galois.cpp
+        ./code/backend/reed-solomon.cpp
+        ./code/backend/msc-handler.cpp
+        ./code/backend/backend.cpp
+        ./code/backend/backend-deconvolver.cpp
+        ./code/backend/backend-driver.cpp
+        ./code/backend/audio/mp4processor.cpp
+        ./code/backend/audio/bitWriter.cpp
+        ./code/backend/audio/mp2processor.cpp
+        ./code/backend/data/ip-datahandler.cpp
+        ./code/backend/data/journaline-datahandler.cpp
+        ./code/backend/data/journaline/crc_8_16.c
+        ./code/backend/data/journaline/log.c
+        ./code/backend/data/journaline/newssvcdec_impl.cpp
+        ./code/backend/data/journaline/Splitter.cpp
+        ./code/backend/data/journaline/dabdgdec_impl.c
+        ./code/backend/data/journaline/newsobject.cpp
+        ./code/backend/data/journaline/NML.cpp
+        ./code/backend/data/epg-2/epg-decoder.cpp
+        ./code/backend/data/epg/epgdec.cpp
+        ./code/backend/data/tdc-datahandler.cpp
+        ./code/backend/data/pad-handler.cpp
+        ./code/backend/data/mot/mot-handler.cpp
+        ./code/backend/data/mot/mot-object.cpp
+        ./code/backend/data/mot/mot-dir.cpp
+        ./code/backend/data/data-processor.cpp
+        ./code/output/audio-base.cpp
+        ./code/output/newconverter.cpp
+        ./code/output/fir-filters.cpp
+        ./code/support/Xtan2.cpp
+        ./code/support/dab-params.cpp
+        ./code/support/band-handler.cpp
+        ./code/support/dab-tables.cpp
+        ./code/support/preset-handler.cpp
+        ./code/support/presetcombobox.cpp
+        ./code/support/buttons/smallcombobox.cpp
+        ./code/support/buttons/newpushbutton.cpp
+        ./code/support/buttons/normalpushbutton.cpp
+        ./code/support/buttons/smallpushbutton.cpp
+        ./code/support/buttons/verysmallpushbutton.cpp
+        ./code/support/buttons/smallqlistview.cpp
+        ./code/support/buttons/smallspinbox.cpp
+        ./code/support/history-handler.cpp
+        ./code/support/viterbi-jan/viterbi-handler.cpp
+        ./code/support/viterbi-spiral/viterbi-spiral.cpp
+        ./code/support/color-selector.cpp
+        ./code/support/scheduler.cpp
+        ./code/support/schedule-selector.cpp
+        ./code/support/element-selector.cpp
+        ./code/support/time-table.cpp
+        ./code/support/findfilenames.cpp
+        ./code/support/content-table.cpp
+        ./code/support/ITU_Region_1.cpp
+        ./code/support/coordinates.cpp
+        ./code/support/mapport.cpp
+        ./code/support/http-handler.cpp
+        ./code/support/tii-library/tii-codes.cpp
+        ./code/scopes-qwt6/iqdisplay.cpp
+        ./code/scopes-qwt6/audio-display.cpp
         ./viewers/spectrum-viewer/spectrum-viewer.cpp
         ./viewers/spectrum-viewer/spectrum-scope.cpp
         ./viewers/spectrum-viewer/waterfall-scope.cpp
@@ -391,50 +391,50 @@ set(${objectName}_MOCS
         ./radio.h
         ./support/techdata.h
         ./dab-processor.h
-        ./includes/output/audio-base.h
-        ./includes/ofdm/sample-reader.h
-        ./includes/ofdm/ofdm-decoder.h
-        ./includes/ofdm/phasereference.h
-        ./includes/ofdm/fib-decoder.h
-        ./includes/ofdm/fic-handler.h
-        ./includes/ofdm/tii-detector.h
-        ./includes/ofdm/channel.h
-        ./includes/backend/msc-handler.h
-        ./includes/backend/backend.h
-        ./includes/backend/audio/mp2processor.h
-        ./includes/backend/audio/mp4processor.h
-        ./includes/backend/data/virtual-datahandler.h
-        ./includes/backend/data/pad-handler.h
-        ./includes/backend/data/mot/mot-handler.h
-        ./includes/backend/data/mot/mot-object.h
-        ./includes/backend/data/mot/mot-dir.h
-        ./includes/backend/data/ip-datahandler.h
-        ./includes/backend/data/tdc-datahandler.h
-        ./includes/backend/data/journaline-datahandler.h
-        ./includes/backend/data/epg-2/epg-decoder.h
-        ./includes/backend/data/data-processor.h
-        ./includes/support/band-handler.h
-        ./includes/support/preset-handler.h
-        ./includes/support/presetcombobox.h
-        ./includes/support/buttons/smallcombobox.h
-        ./includes/support/buttons/newpushbutton.h
-        ./includes/support/buttons/normalpushbutton.h
-        ./includes/support/buttons/smallpushbutton.h
-        ./includes/support/buttons/verysmallpushbutton.h
-        ./includes/support/buttons/smallqlistview.h
-        ./includes/support/buttons/smallspinbox.h
-        ./includes/support/history-handler.h
-        ./includes/support/color-selector.h
-        ./includes/support/scheduler.h
-        ./includes/support/schedule-selector.h
-        ./includes/support/element-selector.h
-        ./includes/support/time-table.h
-        ./includes/support/content-table.h
-        ./includes/support/coordinates.h
-        ./includes/support/mapport.h
-        ./includes/support/http-handler.h
-        ./includes/scopes-qwt6/iqdisplay.h
-        ./includes/scopes-qwt6/audio-display.h
+        ./code/output/audio-base.h
+        ./code/ofdm/sample-reader.h
+        ./code/ofdm/ofdm-decoder.h
+        ./code/ofdm/phasereference.h
+        ./code/ofdm/fib-decoder.h
+        ./code/ofdm/fic-handler.h
+        ./code/ofdm/tii-detector.h
+        ./code/ofdm/channel.h
+        ./code/backend/msc-handler.h
+        ./code/backend/backend.h
+        ./code/backend/audio/mp2processor.h
+        ./code/backend/audio/mp4processor.h
+        ./code/backend/data/virtual-datahandler.h
+        ./code/backend/data/pad-handler.h
+        ./code/backend/data/mot/mot-handler.h
+        ./code/backend/data/mot/mot-object.h
+        ./code/backend/data/mot/mot-dir.h
+        ./code/backend/data/ip-datahandler.h
+        ./code/backend/data/tdc-datahandler.h
+        ./code/backend/data/journaline-datahandler.h
+        ./code/backend/data/epg-2/epg-decoder.h
+        ./code/backend/data/data-processor.h
+        ./code/support/band-handler.h
+        ./code/support/preset-handler.h
+        ./code/support/presetcombobox.h
+        ./code/support/buttons/smallcombobox.h
+        ./code/support/buttons/newpushbutton.h
+        ./code/support/buttons/normalpushbutton.h
+        ./code/support/buttons/smallpushbutton.h
+        ./code/support/buttons/verysmallpushbutton.h
+        ./code/support/buttons/smallqlistview.h
+        ./code/support/buttons/smallspinbox.h
+        ./code/support/history-handler.h
+        ./code/support/color-selector.h
+        ./code/support/scheduler.h
+        ./code/support/schedule-selector.h
+        ./code/support/element-selector.h
+        ./code/support/time-table.h
+        ./code/support/content-table.h
+        ./code/support/coordinates.h
+        ./code/support/mapport.h
+        ./code/support/http-handler.h
+        ./code/scopes-qwt6/iqdisplay.h
+        ./code/scopes-qwt6/audio-display.h
         ./viewers/spectrum-viewer/spectrum-viewer.h
         ./viewers/spectrum-viewer/spectrum-scope.h
         ./viewers/spectrum-viewer/waterfall-scope.h
@@ -471,15 +471,15 @@ if (FDK_AAC)
     include_directories(./specials/fdk-aac)
     set($(objectName)_HDRS
             ${${objectName}_HDRS}
-            ./includes/backend/audio/fdk-aac.h
+            ./code/backend/audio/fdk-aac.h
             )
     set(${objectName}_SRCS
             ${${objectName}_SRCS}
-            ./src/backend/audio/fdk-aac.cpp
+            ./code/backend/audio/fdk-aac.cpp
             )
     set(${objectName}_MOCS
             ${${objectName}_MOCS}
-            ./includes/backend/audio/fdk-aac.h
+            ./code/backend/audio/fdk-aac.h
             )
     list(APPEND extraLibs ${FDK_AAC_LIBRARIES})
     add_definitions(-D__WITH_FDK_AAC__)
@@ -490,15 +490,15 @@ elseif (NOT FDK_AAC)
     endif ()
     set(${objectName}_HDRS
             ${${objectName}_HDRS}
-            ./includes/backend/audio/faad-decoder.h
+            ./code/backend/audio/faad-decoder.h
             )
     set(${objectName}_SRCS
             ${${objectName}_SRCS}
-            ./src/backend/audio/faad-decoder.cpp
+            ./code/backend/audio/faad-decoder.cpp
             )
     set(${objectName}_MOCS
             ${${objectName}_MOCS}
-            ./includes/backend/audio/faad-decoder.h
+            ./code/backend/audio/faad-decoder.h
             )
     add_definitions(-D__WITH_FAAD__)
 endif (FDK_AAC)
@@ -509,32 +509,32 @@ if (VITERBI_NEON)
     set(VITERBI_SSE false)
     set(${objectName}_HDRS
             ${${objectName}_HDRS}
-            ./src/support/viterbi-spiral/spiral-neon.h
+            ./code/support/viterbi-spiral/spiral-neon.h
             )
     set(${objectName}_SRCS
             ${${objectName}_SRCS}
-            ./src/support/viterbi-spiral/spiral-neon.c
+            ./code/support/viterbi-spiral/spiral-neon.c
             )
 
     add_definitions(-DNEON_AVAILABLE)
 elseif (VITERBI_SSE)
     set($(objectName)_HDRS
             ${${objectName}_HDRS}
-            ./src/support/viterbi-spiral/spiral-sse.h
+            ./code/support/viterbi-spiral/spiral-sse.h
             )
     set(${objectName}_SRCS
             ${${objectName}_SRCS}
-            ./src/support/viterbi-spiral/spiral-sse.c
+            ./code/support/viterbi-spiral/spiral-sse.c
             )
     add_definitions(-DSSE_AVAILABLE)
 else (VITERBI_SSE)
     set($(objectName)_HDRS
             ${${objectName}_HDRS}
-            ./src/support/viterbi-spiral/spiral-no-sse.h
+            ./code/support/viterbi-spiral/spiral-no-sse.h
             )
     set(${objectName}_SRCS
             ${${objectName}_SRCS}
-            ./src/support/viterbi-spiral/spiral-no-sse.c
+            ./code/support/viterbi-spiral/spiral-no-sse.c
             )
 endif (VITERBI_NEON)
 
@@ -816,16 +816,16 @@ if (TCP_STREAMER)
     find_package(Qt5Network REQUIRED)
     set(${objectName}_MOCS
             ${${objectName}_MOCS}
-            ./includes/output/tcp-streamer.h
+            ./code/output/tcp-streamer.h
             )
     set(${objectName}_HDRS
             ${${objectName}_HDRS}
-            ./includes/output/tcp-streamer.h
+            ./code/output/tcp-streamer.h
             )
 
     set(${objectName}_SRCS
             ${${objectName}_SRCS}
-            ./src/output/tcp-streamer.cpp
+            ./code/output/tcp-streamer.cpp
             )
 endif (TCP_STREAMER)
 
@@ -838,18 +838,18 @@ if (QT_AUDIO)
 
     set(${objectName}_MOCS
             ${${objectName}_MOCS}
-            ./includes/output/Qt-audio.h
-            ./includes/output/Qt-audiodevice.h
+            ./code/output/Qt-audio.h
+            ./code/output/Qt-audiodevice.h
             )
     set(${objectName}_HDRS
             ${${objectName}_HDRS}
-            ./includes/output/Qt-audio.h
-            ./includes/output/Qt-audiodevice.h
+            ./code/output/Qt-audio.h
+            ./code/output/Qt-audiodevice.h
             )
     set(${objectName}_SRCS
             ${${objectName}_SRCS}
-            ./src/output/Qt-audio.cpp
-            ./src/output/Qt-audiodevice.cpp
+            ./code/output/Qt-audio.cpp
+            ./code/output/Qt-audiodevice.cpp
             )
 endif (QT_AUDIO)
 
@@ -909,17 +909,17 @@ if (USE_PORTAUDIO)
     list(APPEND extraLibs ${PORTAUDIO_LIBRARIES})
     set(${objectName}_HDRS
             ${${objectName}_HDRS}
-            ./includes/output/audiosink.h
+            ./code/output/audiosink.h
             )
 
     set(${objectName}_MOCS
             ${${objectName}_MOCS}
-            ./includes/output/audiosink.h
+            ./code/output/audiosink.h
             )
 
     set(${objectName}_SRCS
             ${${objectName}_SRCS}
-            ./src/output/audiosink.cpp
+            ./code/output/audiosink.cpp
             )
 endif (USE_PORTAUDIO)
 

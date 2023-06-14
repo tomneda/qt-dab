@@ -381,7 +381,6 @@ public slots:
   void newFrame(int);
 
   void show_clockError(int);
-  void show_null(int);
   void set_epgData(int, int, const QString &, const QString &);
   void epgTimer_timeOut();
   void switchVisibility(QWidget *);

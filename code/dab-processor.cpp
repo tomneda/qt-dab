@@ -56,7 +56,6 @@ DabProcessor::DabProcessor(RadioInterface * const mr, deviceHandler * const inpu
   connect(this, SIGNAL (show_tii_spectrum()), mpRadioInterface, SLOT (show_tii_spectrum()));
   connect(this, SIGNAL (show_snr(int)), mr, SLOT (show_snr(int)));
   connect(this, SIGNAL (show_clockErr(int)), mr, SLOT (show_clockError(int)));
-  connect(this, SIGNAL (show_null(int)), mr, SLOT (show_null(int)));
 
   mOfdmBuffer.resize(2 * mDabPar.T_s);
   mTiiDetector.reset();

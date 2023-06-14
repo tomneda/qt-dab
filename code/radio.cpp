@@ -380,14 +380,11 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
   float local_lat = dabSettings->value("latitude", 0).toFloat();
   float local_lon = dabSettings->value("longitude", 0).toFloat();
   channel.localPos = cmplx(local_lat, local_lon);
+
   connect(configWidget.loadTableButton, SIGNAL (clicked()), this, SLOT (loadTable()));
-
   connect(configWidget.onTop, SIGNAL (stateChanged(int)), this, SLOT (handle_onTop(int)));
-
   connect(configWidget.epgSelector, SIGNAL (stateChanged(int)), this, SLOT (handle_epgSelector(int)));
-
   connect(configWidget.transmSelector, SIGNAL (stateChanged(int)), this, SLOT (handle_transmSelector(int)));
-
   connect(configWidget.saveSlides, SIGNAL (stateChanged(int)), this, SLOT (handle_saveSlides(int)));
 
   logFile = nullptr;
@@ -502,9 +499,7 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
   epgPath += "Qt-DAB-files/";
   epgPath = dabSettings->value("epgPath", epgPath).toString();
   epgPath = checkDir(epgPath);
-  connect(&epgProcessor, SIGNAL (set_epgData(int, int,
-                                   const QString &, const QString &)), this, SLOT (set_epgData(int, int,
-                                                                                     const QString &, const QString &)));
+  connect(&epgProcessor, SIGNAL (set_epgData(int, int, const QString &, const QString &)), this, SLOT (set_epgData(int, int, const QString &, const QString &)));
   //	timer for autostart epg service
   epgTimer.setSingleShot(true);
   connect(&epgTimer, SIGNAL (timeout()), this, SLOT (epgTimer_timeOut()));
@@ -2217,25 +2212,6 @@ void RadioInterface::setStereo(bool b)
 
   stereoLabel->setText(b ? "stereo" : "mono");
   stereoSetting = b;
-}
-
-//
-//	Alyternative function. If configured we show the
-//	null period of the DAB framees
-void RadioInterface::show_null(int amount)
-{
-//  cmplx B[amount];
-//  QVector<float> V(amount);
-//  nullBuffer.getDataFromBuffer(B, amount);
-//  if (my_spectrumViewer.isHidden())
-//  {
-//    return;
-//  }
-//  for (int i = 0; i < amount; i++)
-//  {
-//    V[i] = abs(B[i]);
-//  }
-//  my_spectrumViewer.show_nullPeriod(V.data(), amount);
 }
 
 static QString tiiNumber(int n)

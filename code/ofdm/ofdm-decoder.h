@@ -19,8 +19,8 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef __OFDM_DECODER__
-#define __OFDM_DECODER__
+#ifndef OFDM_DECODER_H
+#define OFDM_DECODER_H
 
 #include "dab-constants.h"
 #include "dab-params.h"
@@ -33,40 +33,34 @@
 
 class RadioInterface;
 
-class ofdmDecoder : public QObject {
+class OfdmDecoder : public QObject
+{
   Q_OBJECT
 public:
-  ofdmDecoder(RadioInterface *, uint8_t, int16_t,
-              RingBuffer<cmplx> *iqBuffer = nullptr);
-  ~ofdmDecoder() = default;
-  
+  OfdmDecoder(RadioInterface *, uint8_t, int16_t, RingBuffer<cmplx> * iqBuffer = nullptr);
+  ~OfdmDecoder() = default;
+
   void processBlock_0(std::vector<cmplx>);
   void decode(const std::vector<cmplx> &, int32_t n, float iPhaseCorr, std::vector<int16_t> &);
   void stop();
   void reset();
 
 private:
-  RadioInterface *myRadioInterface;
-  DabParams params;
-  interLeaver myMapper;
-  fftHandler fft;
-  RingBuffer<cmplx> *iqBuffer;
-  
-  int32_t T_s;
-  int32_t T_u;
-  int32_t T_g;
-  int32_t nrBlocks;
-  int32_t carriers;
-  int32_t cnt = 0;
-  std::vector<cmplx> phaseReference;
-  std::vector<cmplx> fft_buffer;
-  std::vector<cmplx> dataVector;
- 
+  RadioInterface * const mpRadioInterface;
+  const DabParams::SDabPar mDabPar;
+  interLeaver mFreqInterleaver;
+  fftHandler mFftHandler;
+  RingBuffer<cmplx> * const mpIqBuffer;
+
+  int32_t mStatisticCnt = 0;
+  std::vector<cmplx> mPhaseReference;
+  std::vector<cmplx> mFftBuffer;
+  std::vector<cmplx> mDataVector;
+
   float compute_mod_quality(const std::vector<cmplx> & v);
   float compute_time_offset(const std::vector<cmplx> &, const std::vector<cmplx> &);
   float compute_clock_offset(const cmplx *, const cmplx *);
   float compute_frequency_offset(const std::vector<cmplx> &, const std::vector<cmplx> &);
-  int16_t getMiddle();
 
 signals:
   void showIQ(int);

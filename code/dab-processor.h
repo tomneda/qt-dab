@@ -104,7 +104,7 @@ private:
   mscHandler mMscHandler;
   PhaseReference mPhaseReference;
   TII_Detector mTiiDetector;
-  ofdmDecoder mOfdmDecoder;
+  OfdmDecoder mOfdmDecoder;
   etiGenerator mEtiGenerator;
   TimeSyncer mTimeSyncer;
   const uint8_t mcDabMode;

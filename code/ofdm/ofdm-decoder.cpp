@@ -33,55 +33,42 @@
 #include "radio.h"
 #include <vector>
 /**
- *	\brief ofdmDecoder
- *	The class ofdmDecoder is
+ *	\brief OfdmDecoder
+ *	The class OfdmDecoder is
  *	taking the data from the ofdmProcessor class in, and
  *	will extract the Tu samples, do an FFT and extract the
  *	carriers and map them on (soft) bits
  */
-ofdmDecoder::ofdmDecoder(RadioInterface *mr, uint8_t dabMode, int16_t bitDepth,
-                         RingBuffer<cmplx> *iqBuffer)
-  : params(dabMode)
-  , myMapper(dabMode)
-  , fft(params.get_T_u(), false)
+OfdmDecoder::OfdmDecoder(RadioInterface * mr, uint8_t dabMode, int16_t bitDepth, RingBuffer<cmplx> * iqBuffer)
+  : mpRadioInterface(mr),
+    mDabPar(DabParams(dabMode).get_dab_par()),
+    mFreqInterleaver(dabMode),
+    mFftHandler(mDabPar.T_u, false),
+    mpIqBuffer(iqBuffer)
 {
-  this->myRadioInterface = mr;
-  this->iqBuffer = iqBuffer;
+  connect(this, SIGNAL(showIQ(int)), mpRadioInterface, SLOT(showIQ(int)));
+  connect(this, SIGNAL(showQuality(float, float, float)), mpRadioInterface, SLOT(showQuality(float, float, float)));
 
-  connect(this, SIGNAL(showIQ(int)), myRadioInterface, SLOT(showIQ(int)));
-  connect(this, SIGNAL(showQuality(float,float,float)), myRadioInterface, SLOT(showQuality(float,float,float)));
-  
-  this->T_s      = params.get_T_s();
-  this->T_u      = params.get_T_u();
-  this->nrBlocks = params.get_L();
-  this->carriers = params.get_K();
-  
-  this->T_g = T_s - T_u;
-
-  phaseReference.resize(T_u);
-  fft_buffer.resize(T_u);
-  dataVector.resize(carriers);
+  mPhaseReference.resize(mDabPar.T_u);
+  mFftBuffer.resize(mDabPar.T_u);
+  mDataVector.resize(mDabPar.K);
 }
 
-void ofdmDecoder::stop()
-{
-}
+void OfdmDecoder::stop() {}
 
-void ofdmDecoder::reset()
-{
-}
+void OfdmDecoder::reset() {}
 
 /**
  */
-void ofdmDecoder::processBlock_0(std::vector<cmplx> buffer)
+void OfdmDecoder::processBlock_0(std::vector<cmplx> buffer)
 {
-  fft.fft(buffer);
+  mFftHandler.fft(buffer);
   /**
    *	we are now in the frequency domain, and we keep the carriers
    *	as coming from the FFT as phase reference.
    */
-  
-  memcpy(phaseReference.data(), buffer.data(), T_u * sizeof(cmplx));
+
+  memcpy(mPhaseReference.data(), buffer.data(), mDabPar.T_u * sizeof(cmplx));
 }
 
 /**
@@ -91,15 +78,13 @@ void ofdmDecoder::processBlock_0(std::vector<cmplx> buffer)
  *	only to spare a test. The mapping code is the same
  */
 
-void ofdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float iPhaseCorr, std::vector<int16_t> & oBits)
+void OfdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float iPhaseCorr,
+                         std::vector<int16_t> & oBits)
 {
-  memcpy(fft_buffer.data(), &((buffer.data())[T_g]), T_u * sizeof(cmplx));
+  memcpy(mFftBuffer.data(), &((buffer.data())[mDabPar.T_g]), mDabPar.T_u * sizeof(cmplx));
 
   constexpr float MAX_PHASE_ANGLE = 20.0f / 360.0f * 2.0f * M_PI;
-  if (abs(iPhaseCorr) > MAX_PHASE_ANGLE)
-  {
-    iPhaseCorr = 0;
-  }
+  if (abs(iPhaseCorr) > MAX_PHASE_ANGLE) { iPhaseCorr = 0; }
   //const cmplx phaseRotator = cmplx(cosf(iPhaseCorr), -sinf(iPhaseCorr));
   const cmplx phaseRotator = std::exp(cmplx(0.0f, -iPhaseCorr));
 
@@ -107,9 +92,9 @@ void ofdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float
   /**
    *	first step: do the FFT
    */
-  
-  fft.fft(fft_buffer);
-  
+
+  mFftHandler.fft(mFftBuffer);
+
   /**
    *	a little optimization: we do not interchange the
    *	positive/negative frequencies to their right positions.
@@ -120,76 +105,74 @@ void ofdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float
    *	Note that from here on, we are only interested in the
    *	"carriers", the useful carriers of the FFT output
    */
-  for (int i = 0; i < carriers; i++)
+  for (int i = 0; i < mDabPar.K; i++)
   {
-    int16_t index = myMapper.mapIn(i);
-    
-    if (index < 0)
-    {
-      index += T_u;
-    }
-    
+    int16_t index = mFreqInterleaver.mapIn(i);
+
+    if (index < 0) { index += mDabPar.T_u; }
+
     /**
      *	decoding is computing the phase difference between
      *	carriers with the same index in subsequent blocks.
      *	The carrier of a block is the reference for the carrier
      *	on the same position in the next block
      */
-    
-    cmplx r1 = fft_buffer[index] * conj(phaseReference[index]);
+
+    //mFftBuffer[index] *= phaseRotator;
+
+    cmplx r1 = mFftBuffer[index] * conj(mPhaseReference[index]);
     r1 *= phaseRotator;
-    dataVector[i] = r1;
+    mDataVector[i] = r1;
     float ab1 = abs(r1);
-    
+
     // split the real and the imaginary part and scale it
     // we make the bits into softbits in the range -127 .. 127 (+/- 255?)
-    oBits[i]            = -(real(r1) * 255) / ab1;
-    oBits[carriers + i] = -(imag(r1) * 255) / ab1;
+    oBits[i] = -(real(r1) * 255) / ab1;
+    oBits[mDabPar.K + i] = -(imag(r1) * 255) / ab1;
   }
 
   //	From time to time we show the constellation of symbol 2.
 
   if (blkno == 2)
   {
-    if (++cnt > 7)
+    if (++mStatisticCnt > 7)
     {
-      iqBuffer->putDataIntoBuffer(dataVector.data(), carriers);
-      showIQ(carriers);
-      
-      float quality    = compute_mod_quality(dataVector);
-      float timeOffset = compute_time_offset(fft_buffer, phaseReference);
-      float freqOffset = compute_frequency_offset(fft_buffer, phaseReference);
+      mpIqBuffer->putDataIntoBuffer(mDataVector.data(), mDabPar.K);
+      showIQ(mDabPar.K);
+
+      float quality = compute_mod_quality(mDataVector);
+      float timeOffset = compute_time_offset(mFftBuffer, mPhaseReference);
+      float freqOffset = compute_frequency_offset(mFftBuffer, mPhaseReference);
       showQuality(quality, timeOffset, freqOffset);
-      
-      cnt = 0;
+
+      mStatisticCnt = 0;
     }
   }
 
-  memcpy(phaseReference.data(), fft_buffer.data(), T_u * sizeof(cmplx));
+  memcpy(mPhaseReference.data(), mFftBuffer.data(), mDabPar.T_u * sizeof(cmplx));
 }
 
-float ofdmDecoder::compute_mod_quality(const std::vector<cmplx> & v)
+float OfdmDecoder::compute_mod_quality(const std::vector<cmplx> & v)
 {
-  //	since we do not equalize, we have a kind of "fake"
-  //	reference point.
-  //
-  //	The key parameter here is the phase offset, so we compute the
-  //	std deviation of the phases rather than the computation
-  //	from the Modulation Error Ratio as specified in Tr 101 290
-  
-  constexpr cmplx rotator = cmplx(1.0f, -1.0f); // this is the reference phase shift to get the phase zero degree
+  /*
+   * Since we do not equalize, we have a kind of "fake" reference point.
+   * The key parameter here is the phase offset, so we compute the std. deviation of the phases rather than the
+   * computation from the Modulation Error Ratio as specified in Tr 101 290
+  */
+
+  constexpr cmplx rotator = cmplx(1.0f, -1.0f);// this is the reference phase shift to get the phase zero degree
   float squareVal = 0;
 
-  for (int i = 0; i < carriers; i++)
+  for (int i = 0; i < mDabPar.K; i++)
   {
-    float x1 = arg(cmplx(abs(real(v[i])), abs(imag(v[i]))) * rotator); // map to top right section and shift phase to zero (nominal)
+    float x1 = arg(cmplx(abs(real(v[i])), abs(imag(v[i]))) *
+                   rotator);// map to top right section and shift phase to zero (nominal)
     squareVal += x1 * x1;
   }
 
-  return sqrt(squareVal / carriers) / M_PI * 180.0f; // in degree
+  return sqrt(squareVal / mDabPar.K) / M_PI * 180.0f;// in degree
 }
 
-//
 //	While DAB symbols do not carry pilots, it is known that
 //	arg (carrier [i, j] * conj (carrier [i + 1, j])
 //	should be K * M_PI / 4,  (k in {1, 3, 5, 7}) so basically
@@ -198,56 +181,56 @@ float ofdmDecoder::compute_mod_quality(const std::vector<cmplx> & v)
 //	so, with that in mind we experiment with formula 5.39
 //	and 5.40 from "OFDM Baseband Receiver Design for Wireless
 //	Communications (Chiueh and Tsai)"
-float ofdmDecoder::compute_time_offset(const std::vector<cmplx> & r, const std::vector<cmplx> & v)
+float OfdmDecoder::compute_time_offset(const std::vector<cmplx> & r, const std::vector<cmplx> & v)
 {
   cmplx leftTerm;
   cmplx rightTerm;
   cmplx sum = cmplx(0, 0);
 
-  for (int i = -carriers / 2; i < carriers / 2; i += 6)
+  for (int i = -mDabPar.K / 2; i < mDabPar.K / 2; i += 6)
   {
-    int index_1 = i < 0 ? i + T_u : i;
-    int index_2 = (i + 1) < 0 ? (i + 1) + T_u : (i + 1);
-    
+    int index_1 = i < 0 ? i + mDabPar.T_u : i;
+    int index_2 = (i + 1) < 0 ? (i + 1) + mDabPar.T_u : (i + 1);
+
     cmplx s = r[index_1] * conj(v[index_2]);
-    
+
     s = cmplx(abs(real(s)), abs(imag(s)));
     leftTerm = s * conj(cmplx(abs(s) / sqrt(2), abs(s) / sqrt(2)));
-    
+
     s = r[index_2] * conj(v[index_2]);
     s = cmplx(abs(real(s)), abs(imag(s)));
     rightTerm = s * conj(cmplx(abs(s) / sqrt(2), abs(s) / sqrt(2)));
-    
+
     sum += conj(leftTerm) * rightTerm;
   }
 
   return arg(sum);
 }
 
-float ofdmDecoder::compute_frequency_offset(const std::vector<cmplx> & r, const std::vector<cmplx> & c)
+float OfdmDecoder::compute_frequency_offset(const std::vector<cmplx> & r, const std::vector<cmplx> & c)
 {
   cmplx theta = cmplx(0, 0);
 
-  for (int i = -carriers / 2; i < carriers / 2; i += 6)
+  for (int i = -mDabPar.K / 2; i < mDabPar.K / 2; i += 6)
   {
-    int index = i < 0 ? i + T_u : i;
+    int index = i < 0 ? i + mDabPar.T_u : i;
     cmplx val = r[index] * conj(c[index]);
-    val    = cmplx(abs(real(val)), abs(imag(val)));
+    val = cmplx(abs(real(val)), abs(imag(val)));
     theta += val * cmplx(1, -1);
   }
 
-  return arg(theta) / (2 * M_PI) * 2048000 / T_u;
+  return arg(theta) / (2 * M_PI) * 2048000 / mDabPar.T_u;
 }
 
-float ofdmDecoder::compute_clock_offset(const cmplx * r, const cmplx * v)
+float OfdmDecoder::compute_clock_offset(const cmplx * r, const cmplx * v)
 {
   float offsa = 0;
   int offsb = 0;
 
-  for (int i = -carriers / 2; i < carriers / 2; i += 6)
+  for (int i = -mDabPar.K / 2; i < mDabPar.K / 2; i += 6)
   {
-    int index   = i < 0 ? (i + T_u) : i;
-    int index_2 = i + carriers / 2;
+    int index = i < 0 ? (i + mDabPar.T_u) : i;
+    int index_2 = i + mDabPar.K / 2;
     cmplx a1 = cmplx(abs(real(r[index])), abs(imag(r[index])));
     cmplx a2 = cmplx(abs(real(v[index])), abs(imag(v[index])));
     float s = abs(arg(a1 * conj(a2)));
@@ -255,7 +238,5 @@ float ofdmDecoder::compute_clock_offset(const cmplx * r, const cmplx * v)
     offsb += index_2 * index_2;
   }
 
-  float sampleClockOffset = offsa / (2 * M_PI * (float)T_s / T_u * offsb);
-
-  return sampleClockOffset;
+  return offsa / (2 * M_PI * (float)mDabPar.T_s / mDabPar.T_u * offsb);
 }

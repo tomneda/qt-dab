@@ -29,7 +29,7 @@
   *	The DabProcessor class is the driver of the processing
   *	of the samplestream.
   *	It is the main interface to the qt-dab program,
-  *	local are classes ofdmDecoder, FicHandler and mschandler.
+  *	local are classes OfdmDecoder, FicHandler and mschandler.
   */
 
 DabProcessor::DabProcessor(RadioInterface * const mr, deviceHandler * const inputDevice, processParams * const p)
@@ -107,7 +107,7 @@ void DabProcessor::stop()
    *	The main thread, reading samples,
    *	time synchronization and frequency synchronization
    *	Identifying blocks in the DAB frame
-   *	and sending them to the ofdmDecoder who will transfer the results
+   *	and sending them to the OfdmDecoder who will transfer the results
    *	Finally, estimating the small freqency error
    */
 void DabProcessor::run()

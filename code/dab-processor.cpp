@@ -41,7 +41,7 @@ DabProcessor::DabProcessor(RadioInterface * const mr, deviceHandler * const inpu
     mMscHandler(mr, p->dabMode, p->frameBuffer),
     mPhaseReference(mr, p),
     mTiiDetector(p->dabMode, p->tii_depth),
-    mOfdmDecoder(mr, p->dabMode, inputDevice->bitDepth(), p->iqBuffer),
+    mOfdmDecoder(mr, p->dabMode, p->iqBuffer),
     mEtiGenerator(p->dabMode, &mFicHandler),
     mTimeSyncer(&mSampleReader),
     mcDabMode(p->dabMode),

@@ -35,10 +35,10 @@ class RadioInterface;
 
 class OfdmDecoder : public QObject
 {
-  Q_OBJECT
+Q_OBJECT
 public:
-  OfdmDecoder(RadioInterface *, uint8_t, int16_t, RingBuffer<cmplx> * iqBuffer = nullptr);
-  ~OfdmDecoder() = default;
+  OfdmDecoder(RadioInterface *, uint8_t, RingBuffer<cmplx> * iqBuffer);
+  ~OfdmDecoder() override = default;
 
   void processBlock_0(std::vector<cmplx>);
   void decode(const std::vector<cmplx> &, int32_t n, float iPhaseCorr, std::vector<int16_t> &);
@@ -57,10 +57,10 @@ private:
   std::vector<cmplx> mFftBuffer;
   std::vector<cmplx> mDataVector;
 
-  float compute_mod_quality(const std::vector<cmplx> & v);
-  float compute_time_offset(const std::vector<cmplx> &, const std::vector<cmplx> &);
-  float compute_clock_offset(const cmplx *, const cmplx *);
-  float compute_frequency_offset(const std::vector<cmplx> &, const std::vector<cmplx> &);
+  float compute_mod_quality(const std::vector<cmplx> & v) const;
+  float compute_time_offset(const std::vector<cmplx> & r, const std::vector<cmplx> & v) const;
+  float compute_clock_offset(const cmplx * r, const cmplx * v) const;
+  float compute_frequency_offset(const std::vector<cmplx> & r, const std::vector<cmplx> & c) const;
 
 signals:
   void showIQ(int);

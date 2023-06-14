@@ -173,7 +173,7 @@ cmplx fft_buffer [params. get_T_u ()];;
 	fft. fft (fft_buffer);
 	if (blkno >= 4) {
 	   for (int i = 0; i < params.get_K(); i ++) {
-	      int16_t      index   = myMapper. mapIn (i);
+	      int16_t      index   = myMapper.map_k_to_fft_bin(i);
 	      if (index < 0)
 	         index += params. get_T_u();
 	      cmplx  r1 = fft_buffer [index] *

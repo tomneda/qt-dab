@@ -76,7 +76,7 @@ private:
 	DabParams	params;
 	std::vector<cmplx>     phaseReference;
 
-        interLeaver     myMapper;
+  FreqInterleaver     myMapper;
 	QMutex		locker;
 	bool		audioService;
 	fftHandler	fft;

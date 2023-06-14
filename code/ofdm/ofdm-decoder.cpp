@@ -109,7 +109,7 @@ void OfdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float
    */
   for (int16_t i = 0; i < mDabPar.K; i++)
   {
-    int16_t index = mFreqInterleaver.mapIn(i);
+    int16_t index = mFreqInterleaver.map_k_to_fft_bin(i);
 
     if (index < 0)
     {

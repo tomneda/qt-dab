@@ -48,7 +48,7 @@ public:
 private:
   RadioInterface * const mpRadioInterface;
   const DabParams::SDabPar mDabPar;
-  interLeaver mFreqInterleaver;
+  FreqInterleaver mFreqInterleaver;
   fftHandler mFftHandler;
   RingBuffer<cmplx> * const mpIqBuffer;
 

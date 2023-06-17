@@ -90,7 +90,6 @@ option(FDK_AAC       OFF)
 ######################################################################
 
 #add_definitions (-D__THREADED_BACKEND)	# uncomment for use for an RPI
-#add_definitions (-D__MSC_THREAD__)	# uncomment for use for an RPI
 #
 ########################################################################
 
@@ -402,20 +401,13 @@ set(${objectName}_MOCS
         ./code/ofdm/phasereference.h
         ./code/ofdm/fib-decoder.h
         ./code/ofdm/fic-handler.h
-        ./code/ofdm/tii-detector.h
-        ./code/ofdm/channel.h
-        ./code/backend/msc-handler.h
-        ./code/backend/backend.h
         ./code/backend/audio/mp2processor.h
         ./code/backend/audio/mp4processor.h
         ./code/backend/data/virtual-datahandler.h
         ./code/backend/data/pad-handler.h
-        ./code/backend/data/mot/mot-handler.h
         ./code/backend/data/mot/mot-object.h
-        ./code/backend/data/mot/mot-dir.h
         ./code/backend/data/ip-datahandler.h
         ./code/backend/data/tdc-datahandler.h
-        ./code/backend/data/journaline-datahandler.h
         ./code/backend/data/epg-2/epg-decoder.h
         ./code/backend/data/data-processor.h
         ./code/support/band-handler.h
@@ -584,12 +576,7 @@ if (SDRPLAY)
     set(${objectName}_MOCS
             ${${objectName}_MOCS}
             ./code/qt-devices/sdrplay-handler-v3/sdrplay-handler-v3.h
-            ./code/qt-devices/sdrplay-handler-v3/sdrplay-commands.h
             ./code/qt-devices/sdrplay-handler-v3/Rsp-device.h
-            ./code/qt-devices/sdrplay-handler-v3/Rsp1A-handler.h
-            ./code/qt-devices/sdrplay-handler-v3/RspII-handler.h
-            ./code/qt-devices/sdrplay-handler-v3/RspDuo-handler.h
-            ./code/qt-devices/sdrplay-handler-v3/RspDx-handler.h
             )
 
     include_directories(

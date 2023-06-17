@@ -310,7 +310,6 @@ set(${objectName}_SRCS
         ./code/ofdm/fib-decoder.cpp
         ./code/ofdm/fic-handler.cpp
         ./code/ofdm/tii-detector.cpp
-        ./code/ofdm/channel.cpp
         ./code/ofdm/timesyncer.cpp
         ./code/protection/protTables.cpp
         ./code/protection/protection.cpp

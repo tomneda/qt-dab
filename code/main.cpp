@@ -32,7 +32,6 @@
 #include <unistd.h>
 #define DEFAULT_INI ".qt-dab.ini"
 #define PRESETS ".qt-dab-presets.xml"
-#define SCHEDULE ".qt-dab-schedule"
 #ifndef GITHASH
   #define GITHASH "      "
 #endif
@@ -86,7 +85,6 @@ int main(int argc, char ** argv)
   QString freqExtension = "";
   bool error_report = false;
   int fmFrequency = 110000;
-  QString scheduleFile = fullPathfor(SCHEDULE);
 
   QTranslator theTranslator;
   QCoreApplication::setOrganizationName("Lazy Chair Computing");
@@ -133,8 +131,7 @@ int main(int argc, char ** argv)
   setTranslator(&theTranslator, locale);
   a.setWindowIcon(QIcon("./qt-dab-5.ico"));
 
-  MyRadioInterface = new RadioInterface(dabSettings, presets, freqExtension, scheduleFile, error_report, dataPort,
-                                        clockPort, fmFrequency);
+  MyRadioInterface = new RadioInterface(dabSettings, presets, freqExtension, error_report, dataPort, clockPort, fmFrequency, nullptr);
   MyRadioInterface->show();
 
   qRegisterMetaType<QVector<int>>("QVector<int>");

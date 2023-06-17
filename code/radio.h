@@ -59,13 +59,8 @@
 
 #include  "spectrum-viewer.h"
 #include  "tii-viewer.h"
-//#include  "correlation-viewer.h"
 #include  "snr-viewer.h"
-
 #include  "findfilenames.h"
-
-#include  "scheduler.h"
-
 #include  "http-handler.h"
 
 class QSettings;
@@ -171,7 +166,7 @@ class RadioInterface : public QWidget, private Ui_dabradio
 {
 Q_OBJECT
 public:
-  RadioInterface(QSettings *, const QString &, const QString &, const QString &, bool, int32_t dataPort, int32_t clockPort, int, QWidget * parent = nullptr);
+  RadioInterface(QSettings *, const QString &, const QString &, bool, int32_t dataPort, int32_t clockPort, int, QWidget * parent);
   ~RadioInterface();
 
 protected:
@@ -198,7 +193,6 @@ private:
   dlCache the_dlCache;
   tiiHandler tiiProcessor;
   findfileNames filenameFinder;
-  Scheduler theScheduler;
   RingBuffer<int16_t> theTechData;
   httpHandler * mapHandler;
   processParams globals;
@@ -295,23 +289,18 @@ private:
   void stopScanning(bool);
   void startAudiodumping();
   void stopAudiodumping();
-  void scheduled_audioDumping();
-  void scheduled_dlTextDumping();
-  void scheduled_ficDumping();
   FILE * ficDumpPointer;
 
   void startSourcedumping();
   void stopSourcedumping();
   void startFramedumping();
   void stopFramedumping();
-  void scheduled_frameDumping(const QString &);
   void startChannel(const QString &);
   void stopChannel();
   void stopService(dabService &);
   void startService(dabService &);
   void colorService(QModelIndex ind, QColor c, int pt, bool italic = false);
   void localSelect(const QString & s);
-  void scheduleSelect(const QString & s);
   void localSelect(const QString &, const QString &);
   void showServices();
 
@@ -430,11 +419,9 @@ private slots:
   void setPresetService();
   void handle_muteButton();
   void muteButton_timeOut();
-  void scheduler_timeOut(const QString &);
   void handle_dlTextButton();
 
   void handle_configButton();
-  void handle_scheduleButton();
   void handle_httpButton();
   void handle_onTop(int);
   void handle_autoBrowser(int);
@@ -459,7 +446,6 @@ private slots:
   void color_prevServiceButton();
   void color_nextServiceButton();
   void color_dlTextButton();
-  void color_scheduleButton();
   void color_configButton();
   void color_httpButton();
   void color_set_coordinatesButton();

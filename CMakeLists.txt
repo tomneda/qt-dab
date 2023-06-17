@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 #cmake_policy(SET CMP0048 NEW) # use version number in command project()
 
-project(Qt-DAB VERSION 5.3.50.99)
+project(Qt-DAB VERSION 5.3.50)
 
 set(objectName "qt-dab")
 set(CMAKE_CXX_FLAGS "${CMAKE_XCC_FLAGS} -Wall -std=c++17 -flto")
@@ -256,8 +256,6 @@ set(${objectName}_HDRS
         ./code/support/presetcombobox.h
         ./code/support/history-handler.h
         ./code/support/color-selector.h
-        ./code/support/scheduler.h
-        ./code/support/schedule-selector.h
         ./code/support/element-selector.h
         ./code/support/time-table.h
         ./code/support/findfilenames.h
@@ -368,8 +366,6 @@ set(${objectName}_SRCS
         ./code/support/viterbi-jan/viterbi-handler.cpp
         ./code/support/viterbi-spiral/viterbi-spiral.cpp
         ./code/support/color-selector.cpp
-        ./code/support/scheduler.cpp
-        ./code/support/schedule-selector.cpp
         ./code/support/element-selector.cpp
         ./code/support/time-table.cpp
         ./code/support/findfilenames.cpp
@@ -436,8 +432,6 @@ set(${objectName}_MOCS
         ./code/support/buttons/smallspinbox.h
         ./code/support/history-handler.h
         ./code/support/color-selector.h
-        ./code/support/scheduler.h
-        ./code/support/schedule-selector.h
         ./code/support/element-selector.h
         ./code/support/time-table.h
         ./code/support/content-table.h

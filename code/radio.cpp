@@ -43,7 +43,6 @@
 #include  "wavfiles.h"
 #include  "xml-filereader.h"
 #include  "color-selector.h"
-#include  "schedule-selector.h"
 #include  "element-selector.h"
 #include  "dab-tables.h"
 #include  "ITU_Region_1.h"
@@ -221,7 +220,7 @@ static uint8_t convert(QString s)
   return 1;
 }
 
-RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const QString & freqExtension, const QString & schedule, bool error_report, int32_t dataPort, int32_t clockPort, int fmFrequency, QWidget * parent)
+RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const QString & freqExtension, bool error_report, int32_t dataPort, int32_t clockPort, int fmFrequency, QWidget * parent)
   : QWidget(parent),
     spectrumBuffer(2 * 32768),
     iqBuffer(2 * 1536),
@@ -242,7 +241,6 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
     the_dlCache(10),
     tiiProcessor(),
     filenameFinder(Si),
-    theScheduler(this, schedule),
     theTechData(16 * 32768)
 {
   int16_t latency;
@@ -555,7 +553,6 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
   connect(configWidget.dlTextButton, SIGNAL (rightClicked()), this, SLOT (color_dlTextButton()));
   connect(configButton, SIGNAL (rightClicked()), this, SLOT (color_configButton()));
   connect(httpButton, SIGNAL (rightClicked()), this, SLOT (color_httpButton()));
-  connect(configWidget.scheduleButton, SIGNAL (rightClicked()), this, SLOT (color_scheduleButton()));
   connect(configWidget.set_coordinatesButton, SIGNAL (rightClicked()), this, SLOT (color_set_coordinatesButton()));
   connect(configWidget.loadTableButton, SIGNAL (rightClicked()), this, SLOT (color_loadTableButton()));
   connect(prevChannelButton, SIGNAL (rightClicked()), this, SLOT (color_prevChannelButton()));
@@ -1488,7 +1485,6 @@ void RadioInterface::TerminateProcess()
   stopAudiodumping();
   //	theTable. hide		();
   theBand.hide();
-  theScheduler.hide();
   configDisplay.hide();
   LOG("terminating ", "");
   usleep(1000);    // pending signals
@@ -2649,29 +2645,6 @@ void RadioInterface::startAudiodumping()
   soundOut->startDumping(audioDumper);
 }
 
-void RadioInterface::scheduled_audioDumping()
-{
-  if (audioDumper != nullptr)
-  {
-    soundOut->stopDumping();
-    sf_close(audioDumper);
-    audioDumper = nullptr;
-    LOG("scheduled audio dump stops ", serviceLabel->text());
-    theTechWindow->audiodumpButton_text("audio dump", 10);
-    return;
-  }
-
-  audioDumper = filenameFinder.findAudioDump_fileName(serviceLabel->text(), false);
-  if (audioDumper == nullptr)
-  {
-    return;
-  }
-
-  LOG("scheduled audio dump starts ", serviceLabel->text());
-  theTechWindow->audiodumpButton_text("writing", 12);
-  soundOut->startDumping(audioDumper);
-}
-
 void RadioInterface::handle_framedumpButton()
 {
   if (!running.load() || scanning.load())
@@ -2711,28 +2684,6 @@ void RadioInterface::startFramedumping()
   theTechWindow->framedumpButton_text("recording", 12);
 }
 
-void RadioInterface::scheduled_frameDumping(const QString & s)
-{
-  if (channel.currentService.frameDumper != nullptr)
-  {
-    fclose(channel.currentService.frameDumper);
-    theTechWindow->framedumpButton_text("frame dump", 10);
-    channel.currentService.frameDumper = nullptr;
-    return;
-  }
-
-  channel.currentService.frameDumper = filenameFinder.findFrameDump_fileName(s, false);
-  if (channel.currentService.frameDumper == nullptr)
-  {
-    return;
-  }
-  theTechWindow->framedumpButton_text("recording", 12);
-}
-
-//----------------------------------------------------------------------
-//	End of section on dumping
-//----------------------------------------------------------------------
-//
 //	called from the mp4 handler, using a signal
 void RadioInterface::newFrame(int amount)
 {
@@ -2875,7 +2826,6 @@ void RadioInterface::connectGUI()
   connect(theTechWindow, SIGNAL (handle_audioDumping()), this, SLOT (handle_audiodumpButton()));
   connect(theTechWindow, SIGNAL (handle_frameDumping()), this, SLOT (handle_framedumpButton()));
   connect(muteButton, SIGNAL (clicked()), this, SLOT (handle_muteButton()));
-  connect(configWidget.scheduleButton, SIGNAL (clicked()), this, SLOT (handle_scheduleButton()));
 
   connect(ensembleDisplay, SIGNAL (clicked(QModelIndex)), this, SLOT (selectService(QModelIndex)));
 
@@ -2911,7 +2861,6 @@ void RadioInterface::disconnectGUI()
   disconnect(theTechWindow, SIGNAL (handle_audioDumping()), this, SLOT (handle_audiodumpButton()));
   disconnect(theTechWindow, SIGNAL (handle_frameDumping()), this, SLOT (handle_framedumpButton()));
   disconnect(muteButton, SIGNAL (clicked()), this, SLOT (handle_muteButton()));
-  disconnect(configWidget.scheduleButton, SIGNAL (clicked()), this, SLOT (handle_scheduleButton()));
 
   disconnect(ensembleDisplay, SIGNAL (clicked(QModelIndex)), this, SLOT (selectService(QModelIndex)));
 
@@ -3148,12 +3097,7 @@ void RadioInterface::handle_contentSelector(const QString & s)
 //	From a predefined schedule list, the service names most
 //	likely are less than 16 characters
 //
-void RadioInterface::scheduleSelect(const QString & s)
-{
-  localSelect(s);
-}
 
-//
 void RadioInterface::localSelect(const QString & s)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 2)
@@ -4243,7 +4187,6 @@ void RadioInterface::set_Colors()
   configWidget.dlTextButton->setStyleSheet(temp.arg(dlTextButton_color, dlTextButton_font));
 
   configWidget.dumpButton->setStyleSheet(temp.arg(dumpButton_color, dumpButton_font));
-  configWidget.scheduleButton->setStyleSheet(temp.arg(scheduleButton_color, scheduleButton_font));
 
   configWidget.set_coordinatesButton->setStyleSheet(temp.arg(set_coordinatesButton_color, set_coordinatesButton_font));
 
@@ -4367,11 +4310,6 @@ void RadioInterface::color_httpButton()
   set_buttonColors(httpButton, HTTP_BUTTON);
 }
 
-void RadioInterface::color_scheduleButton()
-{
-  set_buttonColors(configWidget.scheduleButton, SCHEDULE_BUTTON);
-}
-
 void RadioInterface::color_set_coordinatesButton()
 {
   set_buttonColors(configWidget.set_coordinatesButton, SET_COORDINATES_BUTTON);
@@ -4458,121 +4396,6 @@ void RadioInterface::handle_orderServiceIds()
 void RadioInterface::handle_ordersubChannelIds()
 {
   dabSettings->setValue("serviceOrder", SUBCH_BASED);
-}
-
-///////////////////////////////////////////////////////////////////////////
-//	Handling schedule
-
-void RadioInterface::handle_scheduleButton()
-{
-  QStringList candidates;
-  scheduleSelector theSelector;
-  QString scheduleService;
-
-  theSelector.addtoList("nothing");
-  theSelector.addtoList("exit");
-  theSelector.addtoList("framedump");
-  theSelector.addtoList("audiodump");
-  theSelector.addtoList("dlText");
-  theSelector.addtoList("ficDump");
-  candidates += "nothing";
-  candidates += "exit";
-  candidates += "framedump";
-  candidates += "audiodump";
-  candidates += "dlText";
-  candidates += "ficDump";
-  for (uint16_t i = 0; i < serviceList.size(); i++)
-  {
-    QString service = channelSelector->currentText() + ":" + serviceList.at(i).name;
-    theSelector.addtoList(service);
-    candidates += service;
-  }
-  for (int i = 1; i < presetSelector->count(); i++)
-  {
-    if (!candidates.contains(presetSelector->itemText(i)))
-    {
-      theSelector.addtoList(presetSelector->itemText(i));
-      candidates += presetSelector->itemText(i);
-    }
-  }
-
-  int selected = theSelector.QDialog::exec();
-  scheduleService = candidates.at(selected);
-  {
-    elementSelector theElementSelector(scheduleService);
-    int targetTime = theElementSelector.QDialog::exec();
-    int delayDays = (targetTime & 0XF0000) >> 16;
-    targetTime = targetTime & 0xFFFF;
-    theScheduler.addRow(scheduleService, delayDays, targetTime / 60, targetTime % 60);
-  }
-  theScheduler.show();
-}
-
-void RadioInterface::scheduler_timeOut(const QString & s)
-{
-  if (!running.load())
-  {
-    return;
-  }
-
-  if (s == "nothing")
-  {
-    return;
-  }
-
-  if (s == "exit")
-  {
-    configWidget.closeDirect->setChecked(true);
-    QWidget::close();
-    return;
-  }
-
-  if (s == "framedump")
-  {
-    scheduled_frameDumping(channel.currentService.serviceName);
-    return;
-  }
-
-  if (s == "audiodump")
-  {
-    scheduled_audioDumping();
-    return;
-  }
-
-  if (s == "dlText")
-  {
-    scheduled_dlTextDumping();
-    return;
-  }
-
-  if (s == "ficDump")
-  {
-    scheduled_ficDumping();
-    return;
-  }
-
-  presetTimer.stop();
-  if (scanning.load())
-  {
-    stopScanning(false);
-  }
-  scheduleSelect(s);
-}
-
-void RadioInterface::scheduled_ficDumping()
-{
-  if (ficDumpPointer == nullptr)
-  {
-    ficDumpPointer = filenameFinder.find_ficDump_file(channel.channelName);
-    if (ficDumpPointer == nullptr)
-    {
-      return;
-    }
-    my_dabProcessor->start_ficDump(ficDumpPointer);
-    return;
-  }
-  my_dabProcessor->stop_ficDump();
-  ficDumpPointer = nullptr;
 }
 
 //-------------------------------------------------------------------------
@@ -4751,24 +4574,6 @@ void RadioInterface::handle_dlTextButton()
   configWidget.dlTextButton->setText("writing");
 }
 
-void RadioInterface::scheduled_dlTextDumping()
-{
-  if (dlTextFile != nullptr)
-  {
-    fclose(dlTextFile);
-    dlTextFile = nullptr;
-    configWidget.dlTextButton->setText("dlText");
-    return;
-  }
-
-  QString fileName = filenameFinder.finddlText_fileName(false);
-  dlTextFile = fopen(fileName.toUtf8().data(), "w+");
-  if (dlTextFile == nullptr)
-  {
-    return;
-  }
-  configWidget.dlTextButton->setText("writing");
-}
 
 void RadioInterface::handle_configButton()
 {

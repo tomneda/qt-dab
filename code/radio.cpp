@@ -300,6 +300,8 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
 
   //	The settings are done, now creation of the GUI parts
   setupUi(this);
+  //setWindowTitle(QString(PRJ_NAME) + QString(" (V" PRJ_VERS ")"));
+  setWindowTitle(PRJ_NAME);
   int x = dabSettings->value("mainWidget-x", 100).toInt();
   int y = dabSettings->value("mainWidget-y", 100).toInt();
   int wi = dabSettings->value("main-widget-w", 300).toInt();

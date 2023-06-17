@@ -140,7 +140,6 @@ signals:
   void show_tii_spectrum();
   void show_Spectrum(int);
   void show_snr(int);
-  void show_snr(float, float, float, float, float);
   void show_clockErr(int);
 };
 

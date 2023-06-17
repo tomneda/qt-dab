@@ -1,25 +1,24 @@
 #ifndef  SPECTRUM_SCOPE_H
 #define  SPECTRUM_SCOPE_H
 
-#include        "dab-constants.h"
+#include  "dab-constants.h"
 #include  <QObject>
 #include  <qwt.h>
 #include  <qwt_plot.h>
 #include  <qwt_plot_marker.h>
 #include  <qwt_plot_grid.h>
 #include  <qwt_plot_curve.h>
-#include        <qwt_color_map.h>
-#include        <qwt_plot_zoomer.h>
-#include        <qwt_plot_textlabel.h>
-#include        <qwt_plot_panner.h>
-#include        <qwt_plot_layout.h>
+#include  <qwt_color_map.h>
+#include  <qwt_plot_zoomer.h>
+#include  <qwt_plot_textlabel.h>
+#include  <qwt_plot_panner.h>
+#include  <qwt_plot_layout.h>
 #include  <qwt_picker_machine.h>
-#include        <qwt_scale_widget.h>
-#include        <QBrush>
-#include        <QTimer>
+#include  <qwt_scale_widget.h>
+#include  <QBrush>
+#include  <QTimer>
 
 class RadioInterface;
-
 class QSettings;
 
 class spectrumScope : public QObject
@@ -28,11 +27,11 @@ Q_OBJECT
 public:
   spectrumScope(QwtPlot *, int, QSettings *);
   ~spectrumScope();
+
   void showSpectrum(const double *, double *, int, int);
   void setBitDepth(int);
 
 private:
-
   QwtPlotCurve spectrumCurve;
   QSettings * dabSettings;
   QwtPlotPicker * lm_picker;
@@ -49,6 +48,7 @@ private:
   QwtPlotGrid * grid;
   QwtPlotGrid * grid_2;
   int32_t indexforMarker;
+
   void ViewSpectrum(double *, double *, double, int);
   float get_db(float);
 

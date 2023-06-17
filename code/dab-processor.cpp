@@ -49,13 +49,13 @@ DabProcessor::DabProcessor(RadioInterface * const mr, deviceHandler * const inpu
     mcTiiDelay(p->tii_delay),
     mDabPar(DabParams(p->dabMode).get_dab_par())
 {
-  connect(this, SIGNAL (setSynced(bool)), mpRadioInterface, SLOT (setSynced(bool)));
-  connect(this, SIGNAL (setSyncLost(void)), mpRadioInterface, SLOT (setSyncLost(void)));
-  connect(this, SIGNAL (show_Spectrum(int)), mpRadioInterface, SLOT (showSpectrum(int)));
-  connect(this, SIGNAL (show_tii(int, int)), mpRadioInterface, SLOT (show_tii(int, int)));
-  connect(this, SIGNAL (show_tii_spectrum()), mpRadioInterface, SLOT (show_tii_spectrum()));
-  connect(this, SIGNAL (show_snr(int)), mr, SLOT (show_snr(int)));
-  connect(this, SIGNAL (show_clockErr(int)), mr, SLOT (show_clockError(int)));
+  connect(this, &DabProcessor::setSynced, mpRadioInterface, &RadioInterface::setSynced);
+  connect(this, &DabProcessor::setSyncLost, mpRadioInterface, &RadioInterface::setSyncLost);
+  connect(this, &DabProcessor::show_Spectrum, mpRadioInterface, &RadioInterface::showSpectrum);
+  connect(this, &DabProcessor::show_tii, mpRadioInterface, &RadioInterface::show_tii);
+  connect(this, &DabProcessor::show_tii_spectrum, mpRadioInterface, &RadioInterface::show_tii_spectrum);
+  connect(this, &DabProcessor::show_snr, mpRadioInterface, &RadioInterface::show_snr);
+  connect(this, &DabProcessor::show_clockErr, mpRadioInterface, &RadioInterface::show_clockError);
 
   mOfdmBuffer.resize(2 * mDabPar.T_s);
   mTiiDetector.reset();

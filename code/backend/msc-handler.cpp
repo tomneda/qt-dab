@@ -42,10 +42,6 @@ mscHandler::mscHandler(RadioInterface * mr, uint8_t dabMode, RingBuffer<uint8_t>
   params(dabMode),
   myMapper(dabMode),
   fft(params.get_T_u(), false)
-#ifdef  __MSC_THREAD__
-  ,
-  bufferSpace(params.get_L())
-#endif
 {
   myRadioInterface = mr;
   this->frameBuffer = frameBuffer;
@@ -57,27 +53,10 @@ mscHandler::mscHandler(RadioInterface * mr, uint8_t dabMode, RingBuffer<uint8_t>
   phaseReference.resize(params.get_T_u());
 
   numberofblocksperCIF = cifTable[(dabMode - 1) & 03];
-#ifdef  __MSC_THREAD__
-  command.resize(nrBlocks);
-  for (int i = 0; i < nrBlocks; i++)
-  {
-    command[i].resize(params.get_T_u());
-  }
-  amount = 0;
-  running.store(false);
-  start();
-#endif
 }
 
 mscHandler::~mscHandler()
 {
-#ifdef  __MSC_THREAD__
-  running.store(false);
-  while (isRunning())
-  {
-    usleep(100);
-  }
-#endif
   locker.lock();
   for (auto const & b: theBackends)
   {
@@ -93,86 +72,8 @@ mscHandler::~mscHandler()
 //	will handle the data from the buffer
 void mscHandler::processBlock_0(cmplx * b)
 {
-#ifdef  __MSC_THREAD__
-  bufferSpace.acquire(1);
-  memcpy(command[0].data(), b, params.get_T_u() * sizeof(cmplx));
-  helper.lock();
-  amount++;
-  commandHandler.wakeOne();
-  helper.unlock();
-#else
   (void)b;
-#endif
 }
-
-#ifdef  __MSC_THREAD__
-
-void mscHandler::process_Msc(cmplx * b, int blkno)
-{
-  bufferSpace.acquire(1);
-  memcpy(command[blkno].data(), b, params.get_T_u() * sizeof(cmplx));
-  helper.lock();
-  amount++;
-  commandHandler.wakeOne();
-  helper.unlock();
-}
-
-void mscHandler::run()
-{
-  int currentBlock = 0;
-
-  cmplx fft_buffer[params.get_T_u()];
-
-  if (running.load())
-  {
-    fprintf(stderr, "already running\n");
-    return;
-  }
-
-  running.store(true);
-  while (running.load())
-  {
-    helper.lock();
-    commandHandler.wait(&helper, 100);
-    helper.unlock();
-    while ((amount > 0) && running.load())
-    {
-      memcpy(fft_buffer, command[currentBlock].data(), params.get_T_u() * sizeof(cmplx));
-      //
-      //	block 3 and up are needed as basis for demodulation the "mext" block
-      //	"our" msc blocks start with blkno 4
-      fft.fft(fft_buffer);
-      if (currentBlock >= 4)
-      {
-        for (int i = 0; i < params.get_K(); i++)
-        {
-          int16_t index = myMapper.map_k_to_fft_bin(i);
-          if (index < 0)
-          {
-            index += params.get_T_u();
-          }
-
-          cmplx r1 = fft_buffer[index] * conj(phaseReference[index]);
-          float ab1 = jan_abs(r1);
-          //      Recall:  the viterbi decoder wants 127 max pos, - 127 max neg
-          //      we make the bits into softbits in the range -127 .. 127
-          ibits[i] = -(real(r1) * 255) / ab1;
-          ibits[params.get_K() + i] = -(imag(r1) * 255) / ab1;
-        }
-
-        process_mscBlock(ibits, currentBlock);
-      }
-      memcpy(phaseReference.data(), fft_buffer, params.get_T_u() * sizeof(cmplx));
-      bufferSpace.release(1);
-      helper.lock();
-      currentBlock = (currentBlock + 1) % (nrBlocks);
-      amount -= 1;
-      helper.unlock();
-    }
-  }
-}
-
-#else
 
 void mscHandler::process_Msc(cmplx * b, int blkno)
 {
@@ -209,8 +110,6 @@ void mscHandler::process_Msc(cmplx * b, int blkno)
   memcpy(phaseReference.data(), fft_buffer, params.get_T_u() * sizeof(cmplx));
 }
 
-#endif
-
 //
 //	Note, the set_Channel function is called from within a
 //	different thread than the process_mscBlock method is,
@@ -220,15 +119,6 @@ void mscHandler::process_Msc(cmplx * b, int blkno)
 void mscHandler::reset_Buffers()
 {
   reset_Channel();
-#ifdef  __MSC_THREAD__
-  running.store(false);
-  while (isRunning())
-  {
-    wait(100);
-  }
-  bufferSpace.release(params.get_L() - bufferSpace.available());
-  start();
-#endif
 }
 
 void mscHandler::reset_Channel()

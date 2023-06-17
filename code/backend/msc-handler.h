@@ -24,13 +24,6 @@
 
 #ifndef  __MSC_HANDLER__
 #define  __MSC_HANDLER__
-
-#ifdef __MSC_THREAD__
-#include	<QThread>
-#include	<QWaitCondition>
-#include	<QSemaphore>
-#endif
-
 #include  <QMutex>
 #include  <atomic>
 #include  <cstdio>
@@ -46,16 +39,10 @@
 #include  "fft-handler.h"
 
 class RadioInterface;
-
 class Backend;
-
-#ifdef  __MSC_THREAD__
-class mscHandler: public QThread  {
-#else
 
 class mscHandler
 {
-#endif
 public:
   mscHandler(RadioInterface *, uint8_t, RingBuffer<uint8_t> *);
   ~mscHandler();
@@ -92,15 +79,6 @@ private:
   void processMsc(int32_t n);
   QMutex helper;
   int nrBlocks;
-#ifdef  __MSC_THREAD__
-  void            processBlock_0	();
-  std::vector<std::vector<cmplx> > command;
-  int16_t         amount;
-void            run();
-  QSemaphore      bufferSpace;
-  QWaitCondition  commandHandler;
-  std::atomic<bool>       running;
-#endif
 };
 
 #endif

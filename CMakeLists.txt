@@ -256,7 +256,6 @@ set(${objectName}_HDRS
         ./code/support/presetcombobox.h
         ./code/support/history-handler.h
         ./code/support/color-selector.h
-        ./code/support/element-selector.h
         ./code/support/time-table.h
         ./code/support/findfilenames.h
         ./code/support/content-table.h
@@ -366,7 +365,6 @@ set(${objectName}_SRCS
         ./code/support/viterbi-jan/viterbi-handler.cpp
         ./code/support/viterbi-spiral/viterbi-spiral.cpp
         ./code/support/color-selector.cpp
-        ./code/support/element-selector.cpp
         ./code/support/time-table.cpp
         ./code/support/findfilenames.cpp
         ./code/support/content-table.cpp
@@ -432,7 +430,6 @@ set(${objectName}_MOCS
         ./code/support/buttons/smallspinbox.h
         ./code/support/history-handler.h
         ./code/support/color-selector.h
-        ./code/support/element-selector.h
         ./code/support/time-table.h
         ./code/support/content-table.h
         ./code/support/coordinates.h

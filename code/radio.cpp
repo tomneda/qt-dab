@@ -43,7 +43,6 @@
 #include  "wavfiles.h"
 #include  "xml-filereader.h"
 #include  "color-selector.h"
-#include  "element-selector.h"
 #include  "dab-tables.h"
 #include  "ITU_Region_1.h"
 #include  "coordinates.h"
@@ -329,11 +328,6 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
     configWidget.transmSelector->setChecked(true);
   }
 
-  if (dabSettings->value("epgFlag", 0).toInt() == 1)
-  {
-    configWidget.epgSelector->setChecked(true);
-  }
-
   if (dabSettings->value("saveSlides", 0).toInt() == 1)
   {
     configWidget.saveSlides->setChecked(true);
@@ -381,7 +375,6 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
 
   connect(configWidget.loadTableButton, SIGNAL (clicked()), this, SLOT (loadTable()));
   connect(configWidget.onTop, SIGNAL (stateChanged(int)), this, SLOT (handle_onTop(int)));
-  connect(configWidget.epgSelector, SIGNAL (stateChanged(int)), this, SLOT (handle_epgSelector(int)));
   connect(configWidget.transmSelector, SIGNAL (stateChanged(int)), this, SLOT (handle_transmSelector(int)));
   connect(configWidget.saveSlides, SIGNAL (stateChanged(int)), this, SLOT (handle_saveSlides(int)));
 
@@ -4778,12 +4771,6 @@ void RadioInterface::handle_portSelector()
 {
   mapPortHandler theHandler(dabSettings);
   (void)theHandler.QDialog::exec();
-}
-
-void RadioInterface::handle_epgSelector(int x)
-{
-  (void)x;
-  dabSettings->setValue("epgFlag", configWidget.epgSelector->isChecked() ? 1 : 0);
 }
 
 void RadioInterface::handle_transmSelector(int x)

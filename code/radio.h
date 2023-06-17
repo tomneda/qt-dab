@@ -465,7 +465,6 @@ private slots:
   void handle_LoggerButton(int);
   void handle_set_coordinatesButton();
   void handle_portSelector();
-  void handle_epgSelector(int);
   void handle_transmSelector(int);
   void handle_eti_activeSelector(int);
   void handle_saveSlides(int);

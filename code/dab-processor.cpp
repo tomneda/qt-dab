@@ -207,10 +207,10 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
   ioSampleCount += mDabPar.T_u;
   mOfdmDecoder.processBlock_0(mOfdmBuffer);
 
-  if (!mScanMode)
-  {
-    mMscHandler.processBlock_0(mOfdmBuffer.data());
-  }
+//  if (!mScanMode)
+//  {
+//    mMscHandler.processBlock_0(mOfdmBuffer.data());
+//  }
 
   // Here we look only at the block_0 when we need a coarse frequency synchronization.
   mCorrectionNeeded = !mFicHandler.syncReached();
@@ -244,7 +244,7 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
   int cCount = 0;
   cmplx freqCorr = cmplx(0, 0);
 
-  for (int ofdmSymbolCount = 1; ofdmSymbolCount < mDabPar.L; ofdmSymbolCount++)
+  for (int16_t ofdmSymbolCount = 1; ofdmSymbolCount < mDabPar.L; ofdmSymbolCount++)
   {
     mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_s, mCoarseOffset + mFineOffset);
     ioSampleCount += mDabPar.T_s;
@@ -256,7 +256,7 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
     }
     cCount += 2 * mDabPar.T_g; // 2 times because 2 values are added in cLevel
 
-    if ((ofdmSymbolCount <= 3) || mEti_on)
+    //if ((ofdmSymbolCount <= 3) || mEti_on)
     {
       mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbolCount, mPhaseOffset, ibits);
     }
@@ -271,9 +271,10 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
       mEtiGenerator.processBlock(ibits, ofdmSymbolCount);
     }
 
-    if (!mScanMode)
+    if (ofdmSymbolCount > 3 && !mScanMode)
     {
-      mMscHandler.process_Msc(&(mOfdmBuffer[mDabPar.T_g]), ofdmSymbolCount);
+      mMscHandler.process_mscBlock(ibits, ofdmSymbolCount);
+      //mMscHandler.process_Msc(&(mOfdmBuffer[mDabPar.T_g]), ofdmSymbolCount);
     }
   }
 
@@ -596,7 +597,7 @@ uint32_t DabProcessor::julianDate()
   return mFicHandler.julianDate();
 }
 
-[[maybe_unused]] bool DabProcessor::start_etiGenerator(const QString & s)
+bool DabProcessor::start_etiGenerator(const QString & s)
 {
   if (mEtiGenerator.start_etiGenerator(s))
   {

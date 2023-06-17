@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1118</width>
-    <height>917</height>
+    <width>1127</width>
+    <height>939</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -92,14 +92,14 @@
        </item>
        <item>
         <layout class="QFormLayout" name="formLayout_2">
-         <item row="1" column="0">
+         <item row="2" column="0">
           <widget class="QLabel" name="label_6">
            <property name="text">
             <string>Freq Correction</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="2" column="1">
           <widget class="QLCDNumber" name="correctorDisplay">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Frequency correction, The software computed an estimate of the frequency offset by lokking at phasedifferences in the samples in the time domain. Based on the difference found a correction factor is applied to the input stream.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -118,14 +118,14 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="3" column="0">
           <widget class="QLabel" name="label_5">
            <property name="text">
             <string>SNR</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="3" column="1">
           <widget class="QLCDNumber" name="snrDisplay">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;SNR, i.e. Signal Noise ratio, compoted from the difference in signal strength between the datablocks and the nullperiod.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -144,14 +144,14 @@
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="4" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
             <string>Freq Offset</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="1">
+         <item row="4" column="1">
           <widget class="QLCDNumber" name="frequencyOffsetDisplay">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Frequeny offset, the computed frequency error, after applying the estimated frequency correction.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -170,14 +170,14 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Time Offset</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="6" column="1">
           <widget class="QLCDNumber" name="timeOffsetDisplay">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sample clock offset. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -196,14 +196,14 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="7" column="0">
           <widget class="QLabel" name="label_3">
            <property name="text">
             <string>Clock Offset</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="7" column="1">
           <widget class="QLCDNumber" name="clockError">
            <property name="toolTip">
             <string>clock offset. The value indicates the number of samples too many or too few for 10 DAB frames (which is about 1 second).</string>
@@ -222,14 +222,14 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
+         <item row="8" column="0">
           <widget class="QLabel" name="label_4">
            <property name="text">
             <string>Std. Deviation</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="1">
+         <item row="8" column="1">
           <widget class="QLCDNumber" name="quality_display">
            <property name="toolTip">
             <string>Quality indicator: the &quot;quality&quot; of the decoded signal is measured as Modulation Error Rate, using  the formula from section 6.9.2 of TR 101 290 Measurement guidelines for DVB.
@@ -272,20 +272,66 @@ An &quot;ideal&quot; (i.e. synthetic) signal reaches a value of over 20. Poor si
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
+         <item row="10" column="0">
           <widget class="QLabel" name="label_8">
            <property name="text">
             <string/>
            </property>
           </widget>
          </item>
-         <item row="7" column="0" colspan="2">
+         <item row="9" column="0" colspan="2">
           <widget class="QCheckBox" name="cbLogIqScope">
            <property name="text">
             <string>IQ scope in log. scale</string>
            </property>
            <property name="checked">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Phase Correction</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLCDNumber" name="phaseCorrection">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="smallDecimalPoint">
+            <bool>true</bool>
+           </property>
+           <property name="digitCount">
+            <number>7</number>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>OFDM Sym No</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLCDNumber" name="ofdmSymbNo">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="smallDecimalPoint">
+            <bool>true</bool>
+           </property>
+           <property name="digitCount">
+            <number>7</number>
+           </property>
+           <property name="segmentStyle">
+            <enum>QLCDNumber::Flat</enum>
            </property>
           </widget>
          </item>

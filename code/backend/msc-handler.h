@@ -21,85 +21,85 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #
-#ifndef	__MSC_HANDLER__
-#define	__MSC_HANDLER__
+
+#ifndef  __MSC_HANDLER__
+#define  __MSC_HANDLER__
 
 #ifdef __MSC_THREAD__
 #include	<QThread>
 #include	<QWaitCondition>
 #include	<QSemaphore>
 #endif
-#include	<QMutex>
-#include	<atomic>
-#include	<cstdio>
-#include	<cstdint>
-#include	<cstdio>
-#include	<vector>
-#include	"dab-constants.h"
-#include	"dab-params.h"
+
+#include  <QMutex>
+#include  <atomic>
+#include  <cstdio>
+#include  <cstdint>
+#include  <cstdio>
+#include  <vector>
+#include  "dab-constants.h"
+#include  "dab-params.h"
 #include        "ringbuffer.h"
 #include        "phasetable.h"
 #include        "freq-interleaver.h"
 
-#include	"fft-handler.h"
-class	RadioInterface;
-class	Backend;
+#include  "fft-handler.h"
 
-#ifdef	__MSC_THREAD__
+class RadioInterface;
+
+class Backend;
+
+#ifdef  __MSC_THREAD__
 class mscHandler: public QThread  {
 #else
-class	mscHandler {
+
+class mscHandler
+{
 #endif
 public:
-			mscHandler		(RadioInterface *,
-	                                         uint8_t,
-	                                         RingBuffer<uint8_t> *);
-			~mscHandler();
-	void		processBlock_0		(cmplx *);
-	void		process_Msc		(cmplx *, int);
-	bool		set_Channel		(descriptorType *,
-	                                         RingBuffer<int16_t> *,
-	                                         RingBuffer<uint8_t> *,
-	                                         FILE *, int);
-//
-//	
-	void		reset_Channel		();
-	void		stop_service		(descriptorType *, int);
-	void		stop_service		(int, int);
-	void		reset_Buffers		();
+  mscHandler(RadioInterface *, uint8_t, RingBuffer<uint8_t> *);
+  ~mscHandler();
+  void processBlock_0(cmplx *);
+  void process_mscBlock(std::vector<int16_t> &, int16_t);
+  void process_Msc(cmplx *, int);
+  bool set_Channel(descriptorType *, RingBuffer<int16_t> *, RingBuffer<uint8_t> *, FILE *, int);
+  //
+  //
+  void reset_Channel();
+  void stop_service(descriptorType *, int);
+  void stop_service(int, int);
+  void reset_Buffers();
 private:
-	void		process_mscBlock	(std::vector<int16_t> &,
-	                                                  int16_t);
-	RadioInterface	*myRadioInterface;
-	RingBuffer<uint8_t>	*dataBuffer;
-	RingBuffer<uint8_t>	*frameBuffer;
-	DabParams	params;
-	std::vector<cmplx>     phaseReference;
+  RadioInterface * myRadioInterface;
+  RingBuffer<uint8_t> * dataBuffer;
+  RingBuffer<uint8_t> * frameBuffer;
+  DabParams params;
+  std::vector<cmplx> phaseReference;
 
-  FreqInterleaver     myMapper;
-	QMutex		locker;
-	bool		audioService;
-	fftHandler	fft;
-	std::vector<Backend *>theBackends;
-	std::vector<int16_t> cifVector;
-	int16_t		cifCount;
-	int16_t		blkCount;
-	int16_t		BitsperBlock;
-	std::vector<int16_t> ibits;
+  FreqInterleaver myMapper;
+  QMutex locker;
+  bool audioService;
+  fftHandler fft;
+  std::vector<Backend *> theBackends;
+  std::vector<int16_t> cifVector;
+  int16_t cifCount;
+  int16_t blkCount;
+  int16_t BitsperBlock;
+  std::vector<int16_t> ibits;
 
-	int16_t		numberofblocksperCIF;
-	int16_t		blockCount;
-        void            processMsc	(int32_t n);
-        QMutex          helper;
-	int		nrBlocks;
-#ifdef	__MSC_THREAD__
-        void            processBlock_0	();
-        std::vector<std::vector<cmplx> > command;
-        int16_t         amount;
-	void            run();
-        QSemaphore      bufferSpace;
-        QWaitCondition  commandHandler;
-        std::atomic<bool>       running;
+  int16_t numberofblocksperCIF;
+  int16_t blockCount;
+  void processMsc(int32_t n);
+  QMutex helper;
+  int nrBlocks;
+#ifdef  __MSC_THREAD__
+  void            processBlock_0	();
+  std::vector<std::vector<cmplx> > command;
+  int16_t         amount;
+void            run();
+  QSemaphore      bufferSpace;
+  QWaitCondition  commandHandler;
+  std::atomic<bool>       running;
 #endif
 };
 

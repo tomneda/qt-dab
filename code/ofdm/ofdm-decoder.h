@@ -40,8 +40,17 @@ public:
   OfdmDecoder(RadioInterface *, uint8_t, RingBuffer<cmplx> * iqBuffer);
   ~OfdmDecoder() override = default;
 
+  struct SQualityData
+  {
+    int32_t CurOfdmSymbolNo;
+    float StdDeviation;
+    float TimeOffset;
+    float FreqOffset;
+    float PhaseCorr;
+  };
+
   void processBlock_0(std::vector<cmplx>);
-  void decode(const std::vector<cmplx> &, int32_t n, float iPhaseCorr, std::vector<int16_t> &);
+  void decode(const std::vector<cmplx> & buffer, uint16_t iCurSymbolNo, float iPhaseCorr, std::vector<int16_t> & oBits);
   void stop();
   void reset();
 
@@ -52,7 +61,8 @@ private:
   fftHandler mFftHandler;
   RingBuffer<cmplx> * const mpIqBuffer;
 
-  int32_t mStatisticCnt = 0;
+  int32_t mShowCntStatistics = 0;
+  int32_t mShowCntIqScope = 0;
   std::vector<cmplx> mPhaseReference;
   std::vector<cmplx> mFftBuffer;
   std::vector<cmplx> mDataVector;
@@ -64,7 +74,7 @@ private:
 
 signals:
   void showIQ(int);
-  void showQuality(float, float, float);
+  void showQuality(const SQualityData *);
 };
 
 #endif

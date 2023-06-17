@@ -369,7 +369,7 @@ public slots:
   void showCorrelation(int amount, int marker, const QVector<int> & v);
   void showSpectrum(int);
   void showIQ(int);
-  void showQuality(float, float, float);
+  void showQuality(const OfdmDecoder::SQualityData *);
 
   void show_rsCorrections(int, int);
   void show_tii(int, int);

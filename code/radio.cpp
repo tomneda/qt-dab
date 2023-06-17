@@ -2396,7 +2396,7 @@ void RadioInterface::showIQ(int amount)
   my_spectrumViewer.showIQ(amount);
 }
 
-void RadioInterface::showQuality(float q, float sco, float freqOffset)
+void RadioInterface::showQuality(const OfdmDecoder::SQualityData * pQD)
 {
   if (!running.load())
   {
@@ -2405,7 +2405,7 @@ void RadioInterface::showQuality(float q, float sco, float freqOffset)
 
   if (!my_spectrumViewer.isHidden())
   {
-    my_spectrumViewer.showQuality(q, sco, freqOffset);
+    my_spectrumViewer.showQuality(pQD->CurOfdmSymbolNo, pQD->StdDeviation, pQD->TimeOffset, pQD->FreqOffset, pQD->PhaseCorr);
   }
 }
 

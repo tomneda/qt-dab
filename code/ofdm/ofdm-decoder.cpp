@@ -25,7 +25,6 @@
  *	its invocation results in 2 * Tu bits
  */
 #include "ofdm-decoder.h"
-#include "freq-interleaver.h"
 #include "phasetable.h"
 #include "radio.h"
 #include <vector>
@@ -78,15 +77,13 @@ void OfdmDecoder::processBlock_0(std::vector<cmplx> buffer)
  *	only to spare a test. The mapping code is the same
  */
 
-void OfdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float iPhaseCorr, std::vector<int16_t> & oBits)
+void OfdmDecoder::decode(const std::vector<cmplx> & buffer, uint16_t iCurSymbolNo, float iPhaseCorr, std::vector<int16_t> & oBits)
 {
   memcpy(mFftBuffer.data(), &(buffer[mDabPar.T_g]), mDabPar.T_u * sizeof(cmplx));
 
-  constexpr float MAX_PHASE_ANGLE = 20.0f / 360.0f * 2.0f * M_PI;
-  if (abs(iPhaseCorr) > MAX_PHASE_ANGLE)
-  {
-    iPhaseCorr = 0;
-  }
+  constexpr float MAX_PHASE_ANGLE = 10.0f / 360.0f * 2.0f * M_PI;
+  limit(iPhaseCorr, -MAX_PHASE_ANGLE, MAX_PHASE_ANGLE);
+
   // const cmplx phaseRotator = cmplx(cosf(iPhaseCorr), -sinf(iPhaseCorr));
   const cmplx phaseRotator = std::exp(cmplx(0.0f, -iPhaseCorr));
 
@@ -96,6 +93,9 @@ void OfdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float
    */
 
   mFftHandler.fft(mFftBuffer);
+
+  //const cmplx phaseShift = std::exp(cmplx(0.0f, 45.0f / 360.0f * 2.0f * M_PI));
+
 
   /**
    *	a little optimization: we do not interchange the
@@ -118,13 +118,12 @@ void OfdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float
 
     /**
      *	decoding is computing the phase difference between
-     *	carriers with the same index in subsequent blocks.
+     *	carriers w ith the same index in subsequent blocks.
      *	The carrier of a block is the reference for the carrier
      *	on the same position in the next block
      */
-
     cmplx r1 = mFftBuffer[index] * conj(mPhaseReference[index]);
-    r1 *= phaseRotator;
+    r1 *= phaseRotator; // fine correction of phase which can't be done in the time domain
     mDataVector[i] = r1;
     const float ab1 = abs(r1);
 
@@ -136,20 +135,23 @@ void OfdmDecoder::decode(const std::vector<cmplx> & buffer, int32_t blkno, float
 
   //	From time to time we show the constellation of symbol 2.
 
-  if (blkno == 2)
+  if (++mShowCntIqScope > mDabPar.L)
   {
-    if (++mStatisticCnt > 7)
-    {
-      mpIqBuffer->putDataIntoBuffer(mDataVector.data(), mDabPar.K);
-      showIQ(mDabPar.K);
+    mpIqBuffer->putDataIntoBuffer(mDataVector.data(), mDabPar.K);
+    emit showIQ(mDabPar.K);
+    mShowCntIqScope = 0;
+  }
 
-      float quality = compute_mod_quality(mDataVector);
-      float timeOffset = compute_time_offset(mFftBuffer, mPhaseReference);
-      float freqOffset = compute_frequency_offset(mFftBuffer, mPhaseReference);
-      showQuality(quality, timeOffset, freqOffset);
-
-      mStatisticCnt = 0;
-    }
+  if (++mShowCntStatistics > 10 * mDabPar.L)
+  {
+    SQualityData qd;
+    qd.CurOfdmSymbolNo = iCurSymbolNo;
+    qd.StdDeviation = compute_mod_quality(mDataVector);
+    qd.TimeOffset = compute_time_offset(mFftBuffer, mPhaseReference);
+    qd.FreqOffset = compute_frequency_offset(mFftBuffer, mPhaseReference);
+    qd.PhaseCorr = -iPhaseCorr * 180.0f / (float)M_PI;
+    emit showQuality(&qd);
+    mShowCntStatistics = 0;
   }
 
   memcpy(mPhaseReference.data(), mFftBuffer.data(), mDabPar.T_u * sizeof(cmplx));

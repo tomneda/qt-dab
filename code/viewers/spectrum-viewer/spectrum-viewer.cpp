@@ -247,16 +247,18 @@ void spectrumViewer::showIQ(int amount)
   myIQDisplay->display_iq(Values, (float)scopeWidth, avg);
 }
 
-void spectrumViewer::showQuality(float q, float timeOffset, float freqOffset)
+void spectrumViewer::showQuality(int32_t iOfdmSymbNo, float iStdDev, float iTimeOffset, float iFreqOffset, float iPhaseCorr)
 {
   if (myFrame.isHidden())
   {
     return;
   }
 
-  quality_display->display(q);
-  timeOffsetDisplay->display(timeOffset);
-  frequencyOffsetDisplay->display(freqOffset);
+  ofdmSymbNo->display(iOfdmSymbNo);
+  quality_display->display(QString("%1").arg(iStdDev, 0, 'f', 2));
+  timeOffsetDisplay->display(QString("%1").arg(iTimeOffset, 0, 'f', 2));
+  frequencyOffsetDisplay->display(QString("%1").arg(iFreqOffset, 0, 'f', 2));
+  phaseCorrection->display(QString("%1").arg(iPhaseCorr, 0, 'f', 2));
 }
 
 void spectrumViewer::show_snr(float snr)

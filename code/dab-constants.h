@@ -121,6 +121,18 @@ static inline float get_db(float x)
 #define  MINIMUM(x, y)  ((x) < (y) ? x : y)
 #define  MAXIMUM(x, y)  ((x) > (y) ? x : y)
 
+template<typename T> inline void limit(T & ioVal, const T iLimitLeft, const T iLimitRight)
+{
+  if (ioVal < iLimitLeft)
+  {
+    ioVal = iLimitLeft;
+  }
+  else if (ioVal > iLimitRight)
+  {
+    ioVal = iLimitRight;
+  }
+}
+
 static inline float jan_abs(cmplx z)
 {
   float re = real(z);

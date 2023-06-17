@@ -96,7 +96,7 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
 {
   (void)amount;
 
-  double temp = (double)INPUT_RATE / 2 / SP_DISPLAYSIZE;
+  constexpr double temp = (double)INPUT_RATE / 2 / SP_DISPLAYSIZE;
   int16_t averageCount = 5;
 
   if (spectrumBuffer->GetRingBufferReadAvailable() < SP_SPECTRUMSIZE)
@@ -113,10 +113,13 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
     return;
   }
 
-  //	first X axis labels
-  for (int i = 0; i < SP_DISPLAYSIZE; i++)
+  if (vfoFrequency != lastVcoFreq) // same a bit time
   {
-    X_axis[i] = ((double)vfoFrequency - (double)(int)(INPUT_RATE / 2) + (double)((i) * (double)2 * temp)) / 1000.0;
+    lastVcoFreq = vfoFrequency;
+    for (int i = 0; i < SP_DISPLAYSIZE; i++)
+    {
+      X_axis[i] = ((double)vfoFrequency - (double)(int)(INPUT_RATE / 2) + (double)((i) * (double)2 * temp)) / 1000.0;
+    }
   }
 
   //
@@ -135,7 +138,7 @@ void spectrumViewer::showSpectrum(int32_t amount, int32_t vfoFrequency)
   }
 
   fft.fft(spectrum.data());
-  //
+  //spectrum = {std::array<std::complex<float>, 2048>}
   //	and map the SP_SPECTRUMSIZE values onto SP_DISPLAYSIZE elements
   for (int i = 0; i < SP_DISPLAYSIZE / 2; i++)
   {

@@ -101,9 +101,9 @@ private:
   std::array<cmplx, SP_SPECTRUMSIZE> spectrum{ 0 };
   std::array<double, SP_SPECTRUMSIZE> displayBuffer{ 0 };
   std::array<float, SP_SPECTRUMSIZE> Window{ 0 };
-  std::array<double, SP_SPECTRUMSIZE> X_axis{ 0 };
-  std::array<double, SP_SPECTRUMSIZE> Y_values{ 0 };
-  std::array<double, SP_SPECTRUMSIZE> Y2_values{ 0 };
+  std::array<double, SP_DISPLAYSIZE> X_axis{ 0 };
+  std::array<double, SP_DISPLAYSIZE> Y_values{ 0 };
+  std::array<double, SP_DISPLAYSIZE> Y2_values{ 0 };
 
   //QwtPlotMarker * Marker{};
   QwtPlot * plotgrid{};
@@ -113,7 +113,8 @@ private:
   //int32_t indexforMarker{};
   //void ViewSpectrum(double *, double *, double, int);
   [[nodiscard]] float get_db(float) const;
-  int32_t normalizer{};
+  int32_t normalizer = 0;
+  int32_t lastVcoFreq = 0;
 
   IQDisplay * myIQDisplay;
   spectrumScope * mySpectrumScope;

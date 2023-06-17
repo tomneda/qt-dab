@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>./i18n/de_DE.qm</file>
-        <file>qt-dab-5.ico</file>
+        <file>icon.png</file>
         <file>./AUTHORS</file>
         <file>./COPYING</file>
     </qresource>

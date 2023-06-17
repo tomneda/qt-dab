@@ -129,7 +129,7 @@ int main(int argc, char ** argv)
   qDebug() << "main:"
            << "Detected system language" << locale;
   setTranslator(&theTranslator, locale);
-  a.setWindowIcon(QIcon("./qt-dab-5.ico"));
+  a.setWindowIcon(QIcon(":icon.png"));
 
   MyRadioInterface = new RadioInterface(dabSettings, presets, freqExtension, error_report, dataPort, clockPort, fmFrequency, nullptr);
   MyRadioInterface->show();

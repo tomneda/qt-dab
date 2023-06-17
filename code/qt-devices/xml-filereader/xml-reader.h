@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,65 +20,63 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  */
-#ifndef	__XML_READER_H
-#define	__XML_READER_H
+#ifndef  XML_READER_H
+#define  XML_READER_H
 
 #include "dab-constants.h"
-#include	<QThread>
-#include	<QMessageBox>
-#include	<cstdio>
-#include	"ringbuffer.h"
-#include	<stdint.h>
-#include	<vector>
-#include	<atomic>
+#include  <QThread>
+#include  <QMessageBox>
+#include  <cstdio>
+#include  "ringbuffer.h"
+#include  <stdint.h>
+#include  <vector>
+#include  <atomic>
 
-class	xml_fileReader;
-class	xmlDescriptor;
+class xml_fileReader;
+class xmlDescriptor;
 
-class	xml_Reader:public QThread {
+class xml_Reader : public QThread
+{
 Q_OBJECT
 public:
-			xml_Reader (xml_fileReader	*mr,
-	                            FILE		*f,
-	                            xmlDescriptor	*fd,
-	                            uint32_t		filePointer,
-	                            RingBuffer<cmplx> *b);
-			~xml_Reader	();
-	void		stopReader	();
-	bool		handle_continuousButton	();
+  xml_Reader(xml_fileReader * mr, FILE * f, xmlDescriptor * fd, uint32_t filePointer, RingBuffer<cmplx> * b);
+  ~xml_Reader();
+  void stopReader();
+  bool handle_continuousButton();
+
 private:
-	std::atomic<bool>	continuous;
-	FILE		*file;
-	xmlDescriptor	*fd;
-	uint32_t	filePointer;
-	RingBuffer<cmplx> *sampleBuffer;
-	xml_fileReader	*parent;
-	int		nrElements;
-	int		samplesToRead;
-	std::atomic<bool> running;
-	void		run ();
-	int		compute_nrSamples 	(FILE *f, int blockNumber);
-	int		readSamples		(FILE *f, 
-	                                       void(xml_Reader::*)(FILE *,
-	                                          cmplx *, int));
-	void		readElements_IQ		(FILE *f,
-	                                         cmplx *, int amount);
-	void		readElements_QI		(FILE *f, 
-	                                         cmplx *, int amount);
-	void		readElements_I		(FILE *f, 
-	                                         cmplx *, int amount);
-	void		readElements_Q		(FILE *f, 
-	                                         cmplx *, int amount);
-//
-//	for the conversion - if any
-	int16_t         convBufferSize;
-        int16_t         convIndex;
-        std::vector <cmplx>   convBuffer;
-        int16_t         mapTable_int   [2048];
-        float           mapTable_float [2048];
+  union UCnv // to avoid warnings "dereferencing type-punned pointer will break strict-aliasing rules"
+  {
+    int32_t int32Data;
+    float   floatData;
+  };
+
+  std::atomic<bool> continuous;
+  FILE * file;
+  xmlDescriptor * fd;
+  uint32_t filePointer;
+  RingBuffer<cmplx> * sampleBuffer;
+  xml_fileReader * parent;
+  int nrElements;
+  int samplesToRead;
+  std::atomic<bool> running;
+  void run();
+  int compute_nrSamples(FILE * f, int blockNumber);
+  int readSamples(FILE * f, void(xml_Reader::*)(FILE *, cmplx *, int));
+  void readElements_IQ(FILE * f, cmplx *, int amount);
+  void readElements_QI(FILE * f, cmplx *, int amount);
+  void readElements_I(FILE * f, cmplx *, int amount);
+  void readElements_Q(FILE * f, cmplx *, int amount);
+  //
+  //	for the conversion - if any
+  int16_t convBufferSize;
+  int16_t convIndex;
+  std::vector<cmplx> convBuffer;
+  int16_t mapTable_int[2048];
+  float mapTable_float[2048];
 
 signals:
-	void		setProgress		(int, int);
+  void setProgress(int, int);
 };
 
 #endif

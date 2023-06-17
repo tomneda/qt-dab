@@ -495,7 +495,7 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
   epgTimer.setSingleShot(true);
   connect(&epgTimer, SIGNAL (timeout()), this, SLOT (epgTimer_timeOut()));
 
-  QString historyFile = QDir::homePath() + "/.qt-history.xml";
+  QString historyFile = QDir::toNativeSeparators(QDir::homePath() + "/.config/" APP_NAME "/stationlist.xml");
   historyFile = dabSettings->value("history", historyFile).toString();
   historyFile = QDir::toNativeSeparators(historyFile);
   my_history = new historyHandler(this, historyFile);

@@ -67,6 +67,10 @@ private:
   std::vector<cmplx> mFftBuffer;
   std::vector<cmplx> mDataVector;
 
+  // mQD has always be visible due to address access in another thread.
+  // It isn't even thread safe but due to slow access this shouldn't be any matter
+  SQualityData mQD{};
+
   float compute_mod_quality(const std::vector<cmplx> & v) const;
   float compute_time_offset(const std::vector<cmplx> & r, const std::vector<cmplx> & v) const;
   float compute_clock_offset(const cmplx * r, const cmplx * v) const;

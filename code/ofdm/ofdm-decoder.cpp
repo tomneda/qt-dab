@@ -144,13 +144,12 @@ void OfdmDecoder::decode(const std::vector<cmplx> & buffer, uint16_t iCurSymbolN
 
   if (++mShowCntStatistics > 10 * mDabPar.L)
   {
-    SQualityData qd;
-    qd.CurOfdmSymbolNo = iCurSymbolNo;
-    qd.StdDeviation = compute_mod_quality(mDataVector);
-    qd.TimeOffset = compute_time_offset(mFftBuffer, mPhaseReference);
-    qd.FreqOffset = compute_frequency_offset(mFftBuffer, mPhaseReference);
-    qd.PhaseCorr = -iPhaseCorr * 180.0f / (float)M_PI;
-    emit showQuality(&qd);
+    mQD.CurOfdmSymbolNo = iCurSymbolNo;
+    mQD.StdDeviation = compute_mod_quality(mDataVector);
+    mQD.TimeOffset = compute_time_offset(mFftBuffer, mPhaseReference);
+    mQD.FreqOffset = compute_frequency_offset(mFftBuffer, mPhaseReference);
+    mQD.PhaseCorr = -iPhaseCorr * 180.0f / (float)M_PI;
+    emit showQuality(&mQD);
     mShowCntStatistics = 0;
   }
 

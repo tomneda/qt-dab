@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>542</width>
+    <width>554</width>
     <height>439</height>
    </rect>
   </property>
@@ -142,7 +142,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The (name:channel) of each service found is stored in the history list. Selecting a service from this list is possible (but only makes sense if the (name:channel) is in reach of the decoder).&lt;/p&gt;&lt;p&gt;Clearing the list is by touching the right hand mouse click&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>history</string>
+        <string>Station List</string>
        </property>
       </widget>
      </item>
@@ -277,7 +277,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Hide or  show the configuration-control widget&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>controls</string>
+          <string>Controls</string>
          </property>
         </widget>
        </item>
@@ -287,7 +287,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start (or stop) a simple webserver for showing a map on which the locations of the transmitters found are shown&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>http</string>
+          <string>Open Map</string>
          </property>
         </widget>
        </item>
@@ -297,7 +297,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Start or stop a scan. The scanMode can be selected in the configuration-control widget&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>scan</string>
+          <string>Scan</string>
          </property>
         </widget>
        </item>
@@ -307,7 +307,7 @@
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show or hide a widget showing details of the currently selected service&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="text">
-          <string>details</string>
+          <string>Details</string>
          </property>
         </widget>
        </item>

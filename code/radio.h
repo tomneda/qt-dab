@@ -37,7 +37,7 @@
 #include  <QLabel>
 #include  <QTimer>
 #include  <sndfile.h>
-#include  "ui_dabradio-5.h"
+#include  "ui_dabradio.h"
 #include  "dab-processor.h"
 #include  "ringbuffer.h"
 #include  "band-handler.h"

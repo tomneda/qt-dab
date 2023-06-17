@@ -244,7 +244,7 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
   int cCount = 0;
   cmplx freqCorr = cmplx(0, 0);
 
-  for (int16_t ofdmSymbolCount = 1; ofdmSymbolCount < mDabPar.L; ofdmSymbolCount++)
+  for (int16_t ofdmSymbCntIdx = 1; ofdmSymbCntIdx < mDabPar.L; ofdmSymbCntIdx++)
   {
     mSampleReader.getSamples(mOfdmBuffer, 0, mDabPar.T_s, mCoarseOffset + mFineOffset);
     ioSampleCount += mDabPar.T_s;
@@ -256,25 +256,25 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
     }
     cCount += 2 * mDabPar.T_g; // 2 times because 2 values are added in cLevel
 
-    //if ((ofdmSymbolCount <= 3) || mEti_on)
+    //if ((ofdmSymbCntIdx <= 3) || mEti_on)
     {
-      mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbolCount, mPhaseOffset, ibits);
+      mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbCntIdx, mPhaseOffset, ibits);
     }
 
-    if (ofdmSymbolCount <= 3)
+    if (ofdmSymbCntIdx <= 3)
     {
-      mFicHandler.process_ficBlock(ibits, ofdmSymbolCount);
+      mFicHandler.process_ficBlock(ibits, ofdmSymbCntIdx);
     }
 
     if (mEti_on)
     {
-      mEtiGenerator.processBlock(ibits, ofdmSymbolCount);
+      mEtiGenerator.processBlock(ibits, ofdmSymbCntIdx);
     }
 
-    if (ofdmSymbolCount > 3 && !mScanMode)
+    if (ofdmSymbCntIdx > 3 && !mScanMode)
     {
-      mMscHandler.process_mscBlock(ibits, ofdmSymbolCount);
-      //mMscHandler.process_Msc(&(mOfdmBuffer[mDabPar.T_g]), ofdmSymbolCount);
+      mMscHandler.process_mscBlock(ibits, ofdmSymbCntIdx);
+      //mMscHandler.process_Msc(&(mOfdmBuffer[mDabPar.T_g]), ofdmSymbCntIdx);
     }
   }
 

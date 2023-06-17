@@ -77,7 +77,7 @@ void OfdmDecoder::processBlock_0(std::vector<cmplx> buffer)
  *	only to spare a test. The mapping code is the same
  */
 
-void OfdmDecoder::decode(const std::vector<cmplx> & buffer, uint16_t iCurSymbolNo, float iPhaseCorr, std::vector<int16_t> & oBits)
+void OfdmDecoder::decode(const std::vector<cmplx> & buffer, uint16_t iCurOfdmSymbIdx, float iPhaseCorr, std::vector<int16_t> & oBits)
 {
   memcpy(mFftBuffer.data(), &(buffer[mDabPar.T_g]), mDabPar.T_u * sizeof(cmplx));
 
@@ -142,15 +142,17 @@ void OfdmDecoder::decode(const std::vector<cmplx> & buffer, uint16_t iCurSymbolN
     mShowCntIqScope = 0;
   }
 
-  if (++mShowCntStatistics > 10 * mDabPar.L)
+  if (++mShowCntStatistics > 5 * mDabPar.L && iCurOfdmSymbIdx == mNextShownOfdmSymbIdx)
   {
-    mQD.CurOfdmSymbolNo = iCurSymbolNo;
+    mQD.CurOfdmSymbolNo = iCurOfdmSymbIdx + 1; // as "idx" goes from 0...(L-1)
     mQD.StdDeviation = compute_mod_quality(mDataVector);
     mQD.TimeOffset = compute_time_offset(mFftBuffer, mPhaseReference);
     mQD.FreqOffset = compute_frequency_offset(mFftBuffer, mPhaseReference);
     mQD.PhaseCorr = -iPhaseCorr * 180.0f / (float)M_PI;
     emit showQuality(&mQD);
     mShowCntStatistics = 0;
+    mNextShownOfdmSymbIdx = (mNextShownOfdmSymbIdx + 1) % mDabPar.L;
+    if (mNextShownOfdmSymbIdx == 0) mNextShownOfdmSymbIdx = 1; // as iCurSymbolNo can never be zero here
   }
 
   memcpy(mPhaseReference.data(), mFftBuffer.data(), mDabPar.T_u * sizeof(cmplx));

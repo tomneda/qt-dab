@@ -50,7 +50,7 @@ public:
   };
 
   void processBlock_0(std::vector<cmplx>);
-  void decode(const std::vector<cmplx> & buffer, uint16_t iCurSymbolNo, float iPhaseCorr, std::vector<int16_t> & oBits);
+  void decode(const std::vector<cmplx> & buffer, uint16_t iCurOfdmSymbIdx, float iPhaseCorr, std::vector<int16_t> & oBits);
   void stop();
   void reset();
 
@@ -63,6 +63,7 @@ private:
 
   int32_t mShowCntStatistics = 0;
   int32_t mShowCntIqScope = 0;
+  int16_t mNextShownOfdmSymbIdx = 1;
   std::vector<cmplx> mPhaseReference;
   std::vector<cmplx> mFftBuffer;
   std::vector<cmplx> mDataVector;

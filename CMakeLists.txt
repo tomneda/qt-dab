@@ -1,11 +1,18 @@
 cmake_minimum_required(VERSION 3.21)
 #cmake_policy(SET CMP0048 NEW) # use version number in command project()
-
+##############################
 project(Qt-DAB VERSION 5.3.50)
+##############################
 
 set(objectName "qt-dab")
-set(CMAKE_CXX_FLAGS "${CMAKE_XCC_FLAGS} -Wall -std=c++17 -flto")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
+
+# special release version flags
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -flto")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DQT_NO_DEBUG_OUTPUT") # inhibits qDebug outputs in release version
+#set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -flto")  # CMake adds -flto already to release version
+
+# common flags
+set(CMAKE_CXX_FLAGS "${CMAKE_XCC_FLAGS} -Wall -std=c++17")
 
 set(CMAKE_AUTORCC ON)
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -18,8 +25,6 @@ message(STATUS "${PROJECT_NAME} V${PROJECT_VERSION}")
 add_definitions(-DAPP_NAME="${objectName}")
 add_definitions(-DPRJ_NAME="${PROJECT_NAME}")
 add_definitions(-DPRJ_VERS="${PROJECT_VERSION}")
-
-
 
 #	modify if you want
 #	Note that since there are always problems with the rtlsdr interface

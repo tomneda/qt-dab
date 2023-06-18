@@ -150,9 +150,6 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
-        <widget class="QLCDNumber" name="stillMuting"/>
-       </item>
-       <item>
         <widget class="QLabel" name="localTimeDisplay">
          <property name="text">
           <string>local</string>
@@ -176,7 +173,7 @@
        <item>
         <widget class="smallPushButton" name="muteButton">
          <property name="text">
-          <string>mute</string>
+          <string>Mute</string>
          </property>
         </widget>
        </item>

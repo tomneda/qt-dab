@@ -26,12 +26,18 @@
          <item>
           <widget class="QLabel" name="label_7">
            <property name="text">
-            <string>CPU</string>
+            <string>Global CPU Load</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QLCDNumber" name="cpuMonitor">
+           <property name="smallDecimalPoint">
+            <bool>false</bool>
+           </property>
+           <property name="digitCount">
+            <number>7</number>
+           </property>
            <property name="segmentStyle">
             <enum>QLCDNumber::Flat</enum>
            </property>
@@ -40,7 +46,7 @@
          <item>
           <widget class="QLabel" name="label_4">
            <property name="text">
-            <string>freq</string>
+            <string>Frequency</string>
            </property>
           </widget>
          </item>
@@ -48,6 +54,9 @@
           <widget class="QLCDNumber" name="frequencyDisplay">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current frequency (in MHz)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="smallDecimalPoint">
+            <bool>false</bool>
            </property>
            <property name="digitCount">
             <number>7</number>
@@ -82,42 +91,28 @@
        </item>
        <item>
         <layout class="QFormLayout" name="formLayout">
-         <item row="0" column="1">
-          <widget class="smallSpinBox" name="muteTimeSetting">
-           <property name="toolTip">
-            <string>Set here the mute time in minutes</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
+         <item row="0" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>switch time (in seconds)</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
+         <item row="0" column="1">
           <widget class="smallSpinBox" name="switchDelaySetting">
            <property name="toolTip">
             <string>Set here the delay, when searching for data in a channel, in seconds</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>mute time (in minutes)</string>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,2">
          <item>
           <widget class="QLabel" name="label_3">
            <property name="text">
-            <string> service order in list</string>
+            <string>Service order in list</string>
            </property>
           </widget>
          </item>
@@ -536,7 +531,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If set, slides (pictures) appearing during transmissions are being saved&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>save slides</string>
+        <string>Save slides</string>
        </property>
       </widget>
      </item>
@@ -546,7 +541,7 @@
         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When this is set, the transmitter descriptions visible on the map are also stored in a &amp;quot;.csv&amp;quot;  file,&lt;/p&gt;&lt;p&gt;On starting the httpHandler, a file selection menu will appear.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
-        <string>save transmitters</string>
+        <string>Save transmitters</string>
        </property>
       </widget>
      </item>

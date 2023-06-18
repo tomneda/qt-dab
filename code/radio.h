@@ -254,8 +254,7 @@ private:
   QTimer displayTimer;
   QTimer channelTimer;
   QTimer presetTimer;
-  QTimer muteTimer;
-  int muteDelay;
+  bool mutingActive = false;
   int32_t numberofSeconds;
   int16_t ficBlocks;
   int16_t ficSuccess;
@@ -309,8 +308,6 @@ private:
 
   void save_MOTtext(QByteArray &, int, QString);
   void show_MOTlabel(QByteArray &, int, QString, int);
-  void stop_muting();
-
 
   enum direction
   {
@@ -418,7 +415,6 @@ private slots:
   void selectService(QModelIndex);
   void setPresetService();
   void handle_muteButton();
-  void muteButton_timeOut();
   void handle_dlTextButton();
 
   void handle_configButton();
@@ -452,7 +448,6 @@ private slots:
   void color_loadTableButton();
   //
   //	config handlers
-  void handle_muteTimeSetting(int);
   void handle_switchDelaySetting(int);
   void handle_orderAlfabetical();
   void handle_orderServiceIds();

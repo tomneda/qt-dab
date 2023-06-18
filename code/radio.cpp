@@ -337,8 +337,6 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
 
   configWidget.EPGLabel->hide();
   configWidget.EPGLabel->setStyleSheet("QLabel {background-color : yellow}");
-  x = dabSettings->value("muteTime", 2).toInt();
-  configWidget.muteTimeSetting->setValue(x);
 
   x = dabSettings->value("switchDelay", 8).toInt();
   configWidget.switchDelaySetting->setValue(x);
@@ -424,7 +422,6 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
 
   transmitterTags_local = configWidget.transmitterTags->isChecked();
   theTechWindow->hide();  // until shown otherwise
-  stillMuting->hide();
   serviceList.clear();
   model.clear();
   ensembleDisplay->setModel(&model);
@@ -596,10 +593,7 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
   //	presetTimer
   presetTimer.setSingleShot(true);
   connect(&presetTimer, SIGNAL (timeout()), this, SLOT (setPresetService()));
-  //
-  //	timer for muting
-  muteTimer.setSingleShot(true);
-  //
+
   QPalette lcdPalette;
 #ifndef __MAC__
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 2)
@@ -1379,7 +1373,7 @@ void RadioInterface::newAudio(int amount, int rate)
   while (audioBuffer.GetRingBufferReadAvailable() > amount)
   {
     audioBuffer.getDataFromBuffer(vec, amount);
-    if (!muteTimer.isActive())
+    if (!mutingActive)
     {
       soundOut->audioOut(vec, amount, rate);
     }
@@ -2824,7 +2818,6 @@ void RadioInterface::connectGUI()
 
   connect(ensembleDisplay, SIGNAL (clicked(QModelIndex)), this, SLOT (selectService(QModelIndex)));
 
-  connect(configWidget.muteTimeSetting, SIGNAL (valueChanged(int)), this, SLOT (handle_muteTimeSetting(int)));
   connect(configWidget.switchDelaySetting, SIGNAL (valueChanged(int)), this, SLOT (handle_switchDelaySetting(int)));
   connect(configWidget.orderAlfabetical, SIGNAL (clicked()), this, SLOT (handle_orderAlfabetical()));
   connect(configWidget.orderServiceIds, SIGNAL (clicked()), this, SLOT (handle_orderServiceIds()));
@@ -2859,7 +2852,6 @@ void RadioInterface::disconnectGUI()
 
   disconnect(ensembleDisplay, SIGNAL (clicked(QModelIndex)), this, SLOT (selectService(QModelIndex)));
 
-  disconnect(configWidget.muteTimeSetting, SIGNAL (valueChanged(int)), this, SLOT (handle_muteTimeSetting(int)));
   disconnect(configWidget.switchDelaySetting, SIGNAL (valueChanged(int)), this, SLOT (handle_switchDelaySetting(int)));
   disconnect(configWidget.orderAlfabetical, SIGNAL (clicked()), this, SLOT (handle_orderAlfabetical()));
   disconnect(configWidget.orderServiceIds, SIGNAL (clicked()), this, SLOT (handle_orderServiceIds()));
@@ -3177,7 +3169,12 @@ void RadioInterface::stopService(dabService & s)
 {
   presetTimer.stop();
   channelTimer.stop();
-  stop_muting();
+
+  // reset muting if active
+  if (mutingActive)
+  {
+    handle_muteButton();
+  }
 
   if (my_dabProcessor == nullptr)
   {
@@ -4020,57 +4017,11 @@ void RadioInterface::show_for_safety()
   configWidget.contentButton->show();
 }
 
-//
-//	Handling the Mute button
 void RadioInterface::handle_muteButton()
 {
-  if (muteTimer.isActive())
-  {
-    stop_muting();
-    return;
-  }
-
-  connect(&muteTimer, SIGNAL (timeout()), this, SLOT (muteButton_timeOut()));
-  muteDelay = dabSettings->value("muteTime", 2).toInt();
-  muteDelay *= 60;
-  muteTimer.start(1000);
-  setButtonFont(muteButton, "muting", 10);
-  stillMuting->show();
-  stillMuting->display(muteDelay);
+  mutingActive = !mutingActive;
+  setButtonFont(muteButton, (mutingActive ? "Muting" : "Mute"), 10);
 }
-
-void RadioInterface::muteButton_timeOut()
-{
-  muteDelay--;
-  if (muteDelay > 0)
-  {
-    stillMuting->display(muteDelay);
-    muteTimer.start(1000);
-    return;
-  }
-  else
-  {
-    disconnect(&muteTimer, SIGNAL (timeout()), this, SLOT (muteButton_timeOut()));
-    setButtonFont(muteButton, "mute", 10);
-    stillMuting->hide();
-  }
-}
-
-void RadioInterface::stop_muting()
-{
-  if (!muteTimer.isActive())
-  {
-    return;
-  }
-
-  muteTimer.stop();
-  disconnect(&muteTimer, SIGNAL (timeout()), this, SLOT (muteButton_timeOut()));
-  setButtonFont(muteButton, "mute", 10);
-  stillMuting->hide();
-}
-//
-//	End of handling mute button
-//
 
 void RadioInterface::new_presetIndex(int index)
 {
@@ -4356,11 +4307,6 @@ void RadioInterface::set_buttonColors(QPushButton * b, const QString & buttonNam
 
 /////////////////////////////////////////////////////////////////////////
 //	External configuration items				//////
-
-void RadioInterface::handle_muteTimeSetting(int newV)
-{
-  dabSettings->setValue("muteTime", newV);
-}
 
 void RadioInterface::handle_switchDelaySetting(int newV)
 {

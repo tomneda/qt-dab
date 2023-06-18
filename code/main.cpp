@@ -30,8 +30,9 @@
 #include <unistd.h>
 
 static const QString styleSheet =
-  //#include "./stylesheets/Adaptic.qss"
-#include "./stylesheets/Combinear.qss"
+//#include "./stylesheets/Adaptic.qss"
+//#include "./stylesheets/Combinear.qss"
+#include "./stylesheets/CombinearCompact.qss"
 //#include "./stylesheets/Fibers.qss"
 ;
 

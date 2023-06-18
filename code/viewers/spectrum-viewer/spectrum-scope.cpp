@@ -75,23 +75,20 @@ spectrumScope::~spectrumScope()
 
 void spectrumScope::showSpectrum(const double * X_axis, double * Y_value, int amplification, int frequency)
 {
-  uint16_t i;
-  float amp1 = amplification / 100.0;
+  const float factor = (float)amplification / 100.0f; // amplification is between [1..100], so factor ]0..100]
+  const float levelBottomdB = get_db(0); // eg. about -42 (dB)
+  const float levelTopdB = (1.0f - factor) * levelBottomdB;
 
-  amplification = amplification / 100.0 * (-get_db(0));
   plotgrid->setAxisScale(QwtPlot::xBottom, (double)X_axis[0], X_axis[displaySize - 1]);
   plotgrid->enableAxis(QwtPlot::xBottom);
-  plotgrid->setAxisScale(QwtPlot::yLeft, get_db(0), get_db(0) + amplification);
-  //				         get_db (0), 0);
-  for (i = 0; i < displaySize; i++)
+  plotgrid->setAxisScale(QwtPlot::yLeft, levelBottomdB, levelTopdB);
+
+  for (uint16_t i = 0; i < displaySize; i++)
   {
-    Y_value[i] = get_db(amp1 * Y_value[i]);
+    Y_value[i] = get_db(factor * Y_value[i]);
   }
 
-  spectrumCurve.setBaseline(get_db(0));
-  Y_value[0] = get_db(0);
-  Y_value[displaySize - 1] = get_db(0);
-
+  spectrumCurve.setBaseline(levelBottomdB);
   spectrumCurve.setSamples(X_axis, Y_value, displaySize);
   Marker->setXValue(0);
   plotgrid->replot();

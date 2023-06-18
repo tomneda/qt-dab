@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2008, 2009, 2010
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,45 +20,45 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef	__WATERFALLSCOPE_H
-#define	__WATERFALLSCOPE_H
+#ifndef  WATERFALLSCOPE_H
+#define  WATERFALLSCOPE_H
 
-#include	<QObject>
-#include        <qwt.h>
-#include        <qwt_plot.h>
-#include        <qwt_plot_curve.h>
-#include        <qwt_plot_marker.h>
-#include        <qwt_plot_grid.h>
-#include        <qwt_color_map.h>
-#include        <qwt_plot_spectrogram.h>
-#include        <qwt_plot_zoomer.h>
-#include        <qwt_plot_panner.h>
-#include        <qwt_plot_layout.h>
-#include        <qwt_scale_widget.h>
-#include        <QBrush>
-#include        "spectrogramdata.h"
-#include        <QTimer>
-#include        <stdint.h>
+#include <QObject>
+#include <qwt.h>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_plot_marker.h>
+#include <qwt_plot_grid.h>
+#include <qwt_color_map.h>
+#include <qwt_plot_spectrogram.h>
+#include <qwt_plot_zoomer.h>
+#include <qwt_plot_panner.h>
+#include <qwt_plot_layout.h>
+#include <qwt_scale_widget.h>
+#include <QBrush>
+#include "spectrogramdata.h"
+#include <QTimer>
+#include <stdint.h>
 
-class waterfallScope: public QObject, public QwtPlotSpectrogram {
+class waterfallScope : public QObject, public QwtPlotSpectrogram
+{
 Q_OBJECT
 public:
-		waterfallScope	(QwtPlot *, int, int);
-		~waterfallScope	();
-	void	display		(const double *, double *,
-	                         double, int32_t);
+  waterfallScope(QwtPlot *, int, int);
+  ~waterfallScope();
+  void display(const double *, double *, double, int32_t);
 private:
-	QwtPlot		*plotgrid;
-	int		displaySize;
-	int		bitDepth;
-	SpectrogramData	*WaterfallData;
-	int16_t		rasterSize;
-	double		*plotData;
-	QwtPlotMarker	*Marker;
-	int16_t		indexforMarker;
-	int16_t		old_marker;
-	QwtLinearColorMap	*colorMap;
-	QwtScaleWidget		*rightAxis;
+  QwtPlot * plotgrid;
+  int displaySize;
+  int bitDepth;
+  SpectrogramData * WaterfallData;
+  int16_t rasterSize;
+  double * plotData;
+  QwtPlotMarker * Marker;
+  int16_t indexforMarker;
+  int16_t old_marker;
+  QwtLinearColorMap * colorMap;
+  QwtScaleWidget * rightAxis;
 };
 
 #endif

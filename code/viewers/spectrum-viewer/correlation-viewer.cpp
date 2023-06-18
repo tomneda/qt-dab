@@ -201,10 +201,8 @@ void correlationViewer::showCorrelation(int32_t dots, int marker, const QVector<
   plotgrid->enableAxis(QwtPlot::xBottom);
   plotgrid->setAxisScale(QwtPlot::yLeft, get_db(0), mmax);
   plotgrid->enableAxis(QwtPlot::yLeft);
-  spectrumCurve.setBaseline(get_db(0));
 
-  Y_values[0] = get_db(0);
-  Y_values[plotLength - 1] = get_db(0);
+  spectrumCurve.setBaseline(get_db(0));
   spectrumCurve.setSamples(X_axis, Y_values, plotLength);
   plotgrid->replot();
   QString theText;

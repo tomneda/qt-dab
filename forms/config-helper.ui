@@ -32,6 +32,9 @@
          </item>
          <item>
           <widget class="QLCDNumber" name="cpuMonitor">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
            <property name="smallDecimalPoint">
             <bool>false</bool>
            </property>
@@ -54,6 +57,9 @@
           <widget class="QLCDNumber" name="frequencyDisplay">
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Current frequency (in MHz)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
            </property>
            <property name="smallDecimalPoint">
             <bool>false</bool>

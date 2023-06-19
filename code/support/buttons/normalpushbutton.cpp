@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013, 2014, 2015, 2016, 2017, 2018, 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,25 +19,27 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "normalpushbutton.h"
-#include	<QMouseEvent>
+#include <QMouseEvent>
 
-	normalPushButton::normalPushButton (QWidget *parent):
-	                                    QPushButton (parent) {
+normalPushButton::normalPushButton(QWidget * parent) :
+  QPushButton(parent)
+{
 }
 
-	normalPushButton::~normalPushButton () {}
-
-QSize	normalPushButton::sizeHint ()const {
-QSize	temp = QPushButton::sizeHint ();
-	return QSize (temp. rwidth (), 2 * temp. rheight () / 3);
+QSize normalPushButton::sizeHint() const
+{
+  QSize temp = QPushButton::sizeHint();
+  return QSize(temp.rwidth(), 2 * temp.rheight() / 3);
 }
 
-void	normalPushButton::mousePressEvent (QMouseEvent *e) {
-	if (e -> button () == Qt::RightButton) {
-	   emit rightClicked ();
-	}
-	else
-	   emit clicked ();
+void normalPushButton::mousePressEvent(QMouseEvent * e)
+{
+  if (e->button() == Qt::RightButton)
+  {
+    emit rightClicked();
+  }
+  else
+  {
+    emit clicked();
+  }
 }
-
-

@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013, 2014, 2015, 2016, 2017, 2018, 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,26 +19,30 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#include	"verysmallpushbutton.h"
-#include	<QMouseEvent>
+#include  "verysmallpushbutton.h"
+#include  <QMouseEvent>
 
-	verySmallPushButton::verySmallPushButton (QWidget *parent):
-	                                          QPushButton (parent) {
+verySmallPushButton::verySmallPushButton(QWidget * parent) :
+  QPushButton(parent)
+{
 }
 
-	verySmallPushButton::~verySmallPushButton () {}
-
-QSize	verySmallPushButton::sizeHint ()const {
-QSize	temp = QPushButton::sizeHint ();
-	return QSize (temp. rwidth () / 3, 3 * temp. rheight () / 3);
+QSize verySmallPushButton::sizeHint() const
+{
+  QSize temp = QPushButton::sizeHint();
+  return QSize(temp.rwidth() / 3, 3 * temp.rheight() / 3);
 }
 
 
-void    verySmallPushButton::mousePressEvent (QMouseEvent *e) {
-        if (e -> button () == Qt::RightButton) {
-           emit rightClicked ();
-        }
-        else
-           emit clicked ();
+void verySmallPushButton::mousePressEvent(QMouseEvent * e)
+{
+  if (e->button() == Qt::RightButton)
+  {
+    emit rightClicked();
+  }
+  else
+  {
+    emit clicked();
+  }
 }
 

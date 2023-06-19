@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013, 2014, 2015, 2016, 2017, 2018, 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,22 +19,23 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef	__NORMAL_BUTTON__
-#define	__NORMAL_BUTTON__
-#include	<QPushButton>
-#include	<QSize>
+#ifndef  NORMAL_BUTTON_H
+#define  NORMAL_BUTTON_H
 
-//
+#include  <QPushButton>
+#include  <QSize>
+
 //	just redefining sizeHint
-class	normalPushButton : public QPushButton {
+class normalPushButton : public QPushButton
+{
 Q_OBJECT
 public:
-	normalPushButton	(QWidget *);
-	~normalPushButton	();
-QSize	sizeHint		()const;
-void	mousePressEvent (QMouseEvent *e);
+  explicit normalPushButton(QWidget *);
+  ~normalPushButton() override = default;
+  QSize sizeHint() const override;
+  void mousePressEvent(QMouseEvent * e) override;
 signals:
-void	rightClicked		();
+  void rightClicked();
 };
-#endif
 
+#endif

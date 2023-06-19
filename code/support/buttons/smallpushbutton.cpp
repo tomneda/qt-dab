@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013, 2014, 2015, 2016, 2017, 2018, 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,26 +19,27 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "smallpushbutton.h"
-#include	<QMouseEvent>
+#include  <QMouseEvent>
 
-	smallPushButton::smallPushButton (QWidget *parent):
-	                                  QPushButton (parent) {
+smallPushButton::smallPushButton(QWidget * parent) :
+  QPushButton(parent)
+{
 }
 
-	smallPushButton::~smallPushButton () {}
-
-QSize	smallPushButton::sizeHint ()const {
-QSize	temp = QPushButton::sizeHint ();
-	return QSize (2 * temp. rwidth () / 3, temp. rheight ());
-//	return QSize (2 * temp. rwidth () / 3, 2 * temp. rheight () / 3);
+QSize smallPushButton::sizeHint() const
+{
+  QSize temp = QPushButton::sizeHint();
+  return QSize(2 * temp.rwidth() / 3, temp.rheight());
 }
 
-void	smallPushButton::mousePressEvent (QMouseEvent *e) {
-	if (e -> button () == Qt::RightButton) {
-	   emit rightClicked ();
-	}
-	else
-	   emit clicked ();
+void smallPushButton::mousePressEvent(QMouseEvent * e)
+{
+  if (e->button() == Qt::RightButton)
+  {
+    emit rightClicked();
+  }
+  else
+  {
+    emit clicked();
+  }
 }
-
-

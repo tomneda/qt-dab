@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2013, 2014, 2015, 2016, 2017, 2018, 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,22 +19,26 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#ifndef	__SMALL_BUTTON__
-#define	__SMALL_BUTTON__
-#include	<QPushButton>
-#include	<QSize>
+#ifndef  SMALL_BUTTON_H
+#define  SMALL_BUTTON_H
 
-//
+#include  <QPushButton>
+#include  <QSize>
+
 //	just redefining sizeHint
-class	smallPushButton : public QPushButton {
+class smallPushButton : public QPushButton
+{
 Q_OBJECT
 public:
-	smallPushButton		(QWidget *);
-	~smallPushButton	();
-QSize	sizeHint		()const;
-void	mousePressEvent (QMouseEvent *e);
+  explicit smallPushButton(QWidget *);
+  ~smallPushButton() override= default;
+
+  QSize sizeHint() const override;
+  void mousePressEvent(QMouseEvent * e) override;
+
 signals:
-void	rightClicked		();
+  void rightClicked();
 };
+
 #endif
 

@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,9 +19,6 @@
  *    along with Qt-DAB; if not, write to the Free Software
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-#
-
-
 #include  "dab-constants.h"
 #include  "radio.h"
 #include  "msc-handler.h"
@@ -33,25 +29,18 @@
 //	The DabProcessor assumes the existence of an msc-handler, whether
 //	a service is selected or not. 
 
-#define  CUSize  (4 * 16)
-static int cifTable[] = { 18, 72, 0, 36 };
+constexpr uint32_t CUSize = 4 * 16;
+static const int cifTable[] = { 18, 72, 0, 36 };
 
 //	Note CIF counts from 0 .. 3
 //
 mscHandler::mscHandler(RadioInterface * mr, uint8_t dabMode, RingBuffer<uint8_t> * frameBuffer) :
-  params(dabMode),
-  myMapper(dabMode),
-  fft(params.get_T_u(), false)
+  mDabPar(DabParams(dabMode).get_dab_par())
 {
   myRadioInterface = mr;
   this->frameBuffer = frameBuffer;
   cifVector.resize(55296);
-  BitsperBlock = 2 * params.get_K();
-  ibits.resize(BitsperBlock);
-  nrBlocks = params.get_L();
-
-  phaseReference.resize(params.get_T_u());
-
+  BitsperBlock = 2 * mDabPar.K;
   numberofblocksperCIF = cifTable[(dabMode - 1) & 03];
 }
 
@@ -65,60 +54,6 @@ mscHandler::~mscHandler()
   }
   locker.unlock();
   theBackends.resize(0);
-}
-
-//
-//	Input is put into a buffer, a the code in a separate thread
-//	will handle the data from the buffer
-void mscHandler::processBlock_0(cmplx * b)
-{
-  (void)b;
-}
-
-void mscHandler::process_Msc(cmplx * b, int blkno)
-{
-  cmplx fft_buffer[params.get_T_u()];;
-  if (blkno < 3)
-  {
-    return;
-  }
-
-  memcpy(fft_buffer, b, params.get_T_u() * sizeof(cmplx));
-  //
-  //	block 3 and up are needed as basis for demodulation the "mext" block
-  //	"our" msc blocks start with blkno 4
-  fft.fft(fft_buffer);
-  if (blkno >= 4)
-  {
-    for (int i = 0; i < params.get_K(); i++)
-    {
-      int16_t index = myMapper.map_k_to_fft_bin(i);
-      if (index < 0)
-      {
-        index += params.get_T_u();
-      }
-      cmplx r1 = fft_buffer[index] * conj(phaseReference[index]);
-      float ab1 = jan_abs(r1);
-      //      Recall:  the viterbi decoder wants 127 max pos, - 127 max neg
-      //      we make the bits into softbits in the range -127 .. 127
-      ibits[i] = -real(r1) / ab1 * 256.0;
-      ibits[params.get_K() + i] = -imag(r1) / ab1 * 256.0;
-    }
-
-    process_mscBlock(ibits, blkno);
-  }
-  memcpy(phaseReference.data(), fft_buffer, params.get_T_u() * sizeof(cmplx));
-}
-
-//
-//	Note, the set_Channel function is called from within a
-//	different thread than the process_mscBlock method is,
-//	so, a little bit of locking seems wise while
-//	the actual changing of the settings is done in the
-//	thread executing process_mscBlock
-void mscHandler::reset_Buffers()
-{
-  reset_Channel();
 }
 
 void mscHandler::reset_Channel()
@@ -195,29 +130,27 @@ bool mscHandler::set_Channel(descriptorType * d, RingBuffer<int16_t> * audioBuff
 //	gui thread, so some locking is added
 //
 
-void mscHandler::process_mscBlock(std::vector<int16_t> & fbits, int16_t blkno)
+void mscHandler::process_mscBlock(const std::vector<int16_t> & fbits, int16_t blkno)
 {
-  int16_t currentblk;
-
-  currentblk = (blkno - 4) % numberofblocksperCIF;
+  const int16_t currentblk = (blkno - 4) % numberofblocksperCIF;
   //	and the normal operation is:
   memcpy(&cifVector[currentblk * BitsperBlock], fbits.data(), BitsperBlock * sizeof(int16_t));
+
   if (currentblk < numberofblocksperCIF - 1)
   {
     return;
   }
 
-  //	OK, now we have a full CIF and it seems there is some work to
-  //	be done.  We assume that the backend itself
-  //	does the work in a separate thread.
+  // OK, now we have a full CIF and it seems there is some work to be done.
+  // We assume that the backend itself does the work in a separate thread.
   locker.lock();
-  for (auto const & b: theBackends)
+  for (const auto & b: theBackends)
   {
-    int16_t startAddr = b->startAddr;
-    int16_t Length = b->Length;
+    const int16_t startAddr = b->startAddr;
+    const int16_t Length = b->Length;
     if (Length > 0)
     {    // Length = 0? should not happen
-      (void)b->process(&cifVector[startAddr * CUSize], Length * CUSize);
+      b->process(&cifVector[startAddr * CUSize], Length * CUSize);
     }
   }
   locker.unlock();

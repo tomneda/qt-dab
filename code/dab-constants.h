@@ -23,8 +23,8 @@
 //	Common definitions and includes for
 //	the DAB decoder
 
-#ifndef  __DAB_CONSTANTS__
-#define  __DAB_CONSTANTS__
+#ifndef  DAB_CONSTANTS_H
+#define  DAB_CONSTANTS_H
 
 #include  <QString>
 #include  <cmath>

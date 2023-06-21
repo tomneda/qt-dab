@@ -46,39 +46,31 @@ class mscHandler
 public:
   mscHandler(RadioInterface *, uint8_t, RingBuffer<uint8_t> *);
   ~mscHandler();
-  void processBlock_0(cmplx *);
-  void process_mscBlock(std::vector<int16_t> &, int16_t);
-  void process_Msc(cmplx *, int);
+  void process_mscBlock(const std::vector<int16_t> & fbits, int16_t blkno);
   bool set_Channel(descriptorType *, RingBuffer<int16_t> *, RingBuffer<uint8_t> *, FILE *, int);
   //
   //
   void reset_Channel();
   void stop_service(descriptorType *, int);
   void stop_service(int, int);
-  void reset_Buffers();
 private:
   RadioInterface * myRadioInterface;
   RingBuffer<uint8_t> * dataBuffer;
   RingBuffer<uint8_t> * frameBuffer;
-  DabParams params;
-  std::vector<cmplx> phaseReference;
+  DabParams::SDabPar mDabPar;
 
-  FreqInterleaver myMapper;
+  //FreqInterleaver myMapper;
   QMutex locker;
   bool audioService;
-  fftHandler fft;
   std::vector<Backend *> theBackends;
   std::vector<int16_t> cifVector;
   int16_t cifCount;
   int16_t blkCount;
   int16_t BitsperBlock;
-  std::vector<int16_t> ibits;
-
   int16_t numberofblocksperCIF;
   int16_t blockCount;
   void processMsc(int32_t n);
   QMutex helper;
-  int nrBlocks;
 };
 
 #endif

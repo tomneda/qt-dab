@@ -125,6 +125,7 @@ private:
 
   bool mCorrectionNeeded{ true };
   std::vector<cmplx> mOfdmBuffer;
+  std::vector<int16_t> mBits;
 
   void run() override; // the new QThread
 

@@ -58,6 +58,7 @@ DabProcessor::DabProcessor(RadioInterface * const mr, deviceHandler * const inpu
   connect(this, &DabProcessor::show_clockErr, mpRadioInterface, &RadioInterface::show_clockError);
 
   mOfdmBuffer.resize(2 * mDabPar.T_s);
+  mBits.resize(2 * mDabPar.K);
   mTiiDetector.reset();
 }
 
@@ -181,10 +182,6 @@ void DabProcessor::run()
 
 void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32_t & ioSampleCount)
 {
-  std::vector<int16_t> ibits(2 * mDabPar.K);
-  //SyncOnPhase:
-  //mFrameQualityGoodFrames++;
-
   /**
     *	Once here, we are synchronized, we need to copy the data we
     *	used for synchronization for block 0
@@ -258,23 +255,22 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
 
     //if ((ofdmSymbCntIdx <= 3) || mEti_on)
     {
-      mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbCntIdx, mPhaseOffset, ibits);
+      mOfdmDecoder.decode(mOfdmBuffer, ofdmSymbCntIdx, mPhaseOffset, mBits);
     }
 
     if (ofdmSymbCntIdx <= 3)
     {
-      mFicHandler.process_ficBlock(ibits, ofdmSymbCntIdx);
+      mFicHandler.process_ficBlock(mBits, ofdmSymbCntIdx);
     }
 
     if (mEti_on)
     {
-      mEtiGenerator.processBlock(ibits, ofdmSymbCntIdx);
+      mEtiGenerator.processBlock(mBits, ofdmSymbCntIdx);
     }
 
     if (ofdmSymbCntIdx > 3 && !mScanMode)
     {
-      mMscHandler.process_mscBlock(ibits, ofdmSymbCntIdx);
-      //mMscHandler.process_Msc(&(mOfdmBuffer[mDabPar.T_g]), ofdmSymbCntIdx);
+      mMscHandler.process_mscBlock(mBits, ofdmSymbCntIdx);
     }
   }
 

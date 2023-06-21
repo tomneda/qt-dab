@@ -21,11 +21,13 @@
  *
  */
 #
-#ifndef	PROTTABLES
-#define	PROTTABLES
-#include	<cstdint>
 
-int8_t	*get_PCodes (int16_t);
+#ifndef  PROTTABLES_H
+#define  PROTTABLES_H
+
+#include  <cstdint>
+
+const int8_t * get_PCodes(int16_t);
 
 #endif
 

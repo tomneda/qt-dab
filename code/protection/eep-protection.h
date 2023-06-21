@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -20,21 +19,21 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #
-#ifndef	__EEP_PROTECTION__
-#define	__EEP_PROTECTION__
 
-#include	<vector>
-#include	<cstdio>
-#include	<cstdint>
-#include	"protection.h"
+#ifndef  EEP_PROTECTION_H
+#define  EEP_PROTECTION_H
 
-        class eep_protection: public protection {
+#include  <vector>
+#include  <cstdio>
+#include  <cstdint>
+#include  "protection.h"
+
+class eep_protection : public protection
+{
 public:
-                eep_protection          (int16_t, int16_t);
-                ~eep_protection();
-bool            deconvolve              (int16_t *,
-	                                 int32_t,
-	                                 uint8_t *);
+  eep_protection(int16_t, int16_t);
+  ~eep_protection();
+  bool deconvolve(int16_t *, int32_t, uint8_t *);
 };
 
 #endif

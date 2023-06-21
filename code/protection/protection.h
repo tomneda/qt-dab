@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,26 +20,26 @@
  *
  *	Simple base class for combining uep and eep deconvolvers
  */
-#ifndef	__PROTECTION__
-#define	__PROTECTION__
+#ifndef  PROTECTION_H
+#define  PROTECTION_H
 
-#include	<cstdint>
-#include        <vector>
-#include        "viterbi-spiral.h"
-//#include        "viterbi-handler.h"
+#include  <cstdint>
+#include  <vector>
+#include  "viterbi-spiral.h"
 
-extern uint8_t	PI_X [];
+extern uint8_t PI_X[];
 
-class   protection: public viterbiSpiral {
+class protection : public viterbiSpiral
+{
 public:
-                protection      (int16_t, int16_t);
-virtual         ~protection();
-virtual bool    deconvolve      (int16_t *, int32_t, uint8_t *);
+  protection(int16_t, int16_t);
+  virtual         ~protection();
+  virtual bool deconvolve(int16_t *, int32_t, uint8_t *);
 protected:
-        int16_t         bitRate;
-        int32_t         outSize;
-	std::vector<uint8_t> indexTable;
-        std::vector<int16_t> viterbiBlock;
+  int16_t bitRate;
+  int32_t outSize;
+  std::vector<uint8_t> indexTable;
+  std::vector<int16_t> viterbiBlock;
 };
 
 #endif

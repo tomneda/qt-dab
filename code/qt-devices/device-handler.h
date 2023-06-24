@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -24,42 +23,47 @@
  *	want the interface with different devices (including  filehandling)
  *	to be transparent
  */
-#ifndef	__DEVICE_HANDLER__
-#define	__DEVICE_HANDLER__
+#ifndef  DEVICE_HANDLER_H
+#define  DEVICE_HANDLER_H
 
-#include	<cstdint>
-#include	"dab-constants.h"
-#include	<QObject>
-#include	<QThread>
-#include	<QFrame>
-#include	<QPoint>
+#include  <cstdint>
+#include  "dab-constants.h"
+#include  <QObject>
+#include  <QThread>
+#include  <QFrame>
+#include  <QPoint>
 
-
-class	deviceHandler {
+class deviceHandler
+{
 public:
-			deviceHandler	();
-virtual			~deviceHandler	();
-virtual		bool	restartReader	(int32_t freq);
-virtual		void	stopReader	();
-virtual		void	setVFOFrequency	(int32_t);
-virtual		int32_t	getVFOFrequency() {return 0;}
-virtual		int32_t	getSamples	(cmplx *, int32_t);
-virtual		int32_t	Samples		();
-virtual		void	resetBuffer	();
-virtual		int16_t	bitDepth	() { return 10;}
-virtual		void	hide		();
-virtual		void	show		();
-virtual		bool	isHidden	();
-virtual		QString deviceName	();
-virtual		bool	isFileInput	();
-virtual		QPoint	get_coords	();
-virtual		void	moveTo		(QPoint);
-//
+  deviceHandler();
+  virtual      ~deviceHandler();
+  virtual bool restartReader(int32_t freq);
+  virtual void stopReader();
+  virtual void setVFOFrequency(int32_t);
+
+  virtual int32_t getVFOFrequency() { return 0; }
+
+  virtual int32_t getSamples(cmplx *, int32_t);
+  virtual int32_t Samples();
+  virtual void resetBuffer();
+
+  virtual int16_t bitDepth() { return 10; }
+
+  virtual void hide();
+  virtual void show();
+  virtual bool isHidden();
+  virtual QString deviceName();
+  virtual bool isFileInput();
+  virtual QPoint get_coords();
+  virtual void moveTo(QPoint);
+  //
 protected:
-		int32_t	lastFrequency;
-	        int32_t	vfoOffset;
-	        int	theGain;
-		int32_t	coarseOffset;
+  int32_t lastFrequency;
+  int32_t vfoOffset;
+  int theGain;
+  int32_t coarseOffset;
 };
+
 #endif
 

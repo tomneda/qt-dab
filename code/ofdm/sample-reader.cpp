@@ -66,29 +66,15 @@ float SampleReader::get_sLevel() const
 cmplx SampleReader::getSample(int32_t phaseOffset)
 {
   corrector = phaseOffset;
-  if (!running.load())
-  {
-    throw 21;
-  }
+  if (!running.load()) throw 21;
 
   ///	bufferContent is an indicator for the value of ... -> Samples()
   if (bufferContent == 0)
   {
-    bufferContent = theRig->Samples();
-    while ((bufferContent <= 2048) && running.load())
-    {
-      constexpr timespec ts{ 0, 10'000L };
-      while (nanosleep(&ts, nullptr));
-      bufferContent = theRig->Samples();
-    }
+    _wait_for_sample_buffer_filled(2048);
   }
 
-  if (!running.load())
-  {
-    throw 20;
-  }
-  //
-  //	so here, bufferContent > 0
+  if (!running.load()) throw 20;
 
   cmplx temp;
   theRig->getSamples(&temp, 1);
@@ -96,14 +82,7 @@ cmplx SampleReader::getSample(int32_t phaseOffset)
 
   if (dumpfilePointer.load() != nullptr)
   {
-    dumpBuffer[2 * dumpIndex + 0] = fixround<int16_t>(real(temp) * dumpScale);
-    dumpBuffer[2 * dumpIndex + 1] = fixround<int16_t>(imag(temp) * dumpScale);
-
-    if (++dumpIndex >= DUMPSIZE / 2)
-    {
-      sf_writef_short(dumpfilePointer.load(), dumpBuffer.data(), dumpIndex);
-      dumpIndex = 0;
-    }
+    _dump_sample_to_file(temp);
   }
 
   if (localCounter < bufferSize)
@@ -120,17 +99,6 @@ cmplx SampleReader::getSample(int32_t phaseOffset)
   temp *= oscillatorTable[currentPhase];
   sLevel = 0.00001f * jan_abs(temp) + (1.0f - 0.00001f) * sLevel;
 
-  if (++sampleCount > INPUT_RATE / 4)
-  {
-    show_Corrector(corrector);
-    sampleCount = 0;
-    if (spectrumBuffer != nullptr)
-    {
-      spectrumBuffer->putDataIntoBuffer(localBuffer.data(), localCounter);
-      emit show_Spectrum(bufferSize);
-    }
-    localCounter = 0;
-  }
   return temp;
 }
 
@@ -139,32 +107,24 @@ void SampleReader::getSamples(std::vector<cmplx> & v, int index, int32_t n, int3
   std::vector<cmplx> buffer(n);
 
   corrector = phaseOffset;
-  if (!running.load())
-  {
-    throw 21;
-  }
+  if (!running.load()) throw 21;
+
   if (n > bufferContent)
   {
-    bufferContent = theRig->Samples();
-    while ((bufferContent < n) && running.load())
-    {
-      constexpr timespec ts{ 0, 10'000L };
-      while (nanosleep(&ts, nullptr));
-      bufferContent = theRig->Samples();
-    }
+    _wait_for_sample_buffer_filled(n);
   }
 
-  if (!running.load())
-  {
-    throw 20;
-  }
-  //
-  //	so here, bufferContent >= n
+  if (!running.load()) throw 20;
+
   n = theRig->getSamples(buffer.data(), n);
   bufferContent -= n;
+
   if (dumpfilePointer.load() != nullptr)
   {
-    _dump_samples_to_file(v, n);
+    for (int32_t i = 0; i < n; i++)
+    {
+      _dump_sample_to_file(v[i]);
+    }
   }
 
   //	OK, we have samples!!
@@ -199,18 +159,26 @@ void SampleReader::getSamples(std::vector<cmplx> & v, int index, int32_t n, int3
   }
 }
 
-void SampleReader::_dump_samples_to_file(const std::vector<cmplx> & v, int32_t n)
+void SampleReader::_wait_for_sample_buffer_filled(int32_t n)
 {
-  for (int32_t i = 0; i < n; i++)
+  bufferContent = theRig->Samples();
+  while ((bufferContent < n) && running.load())
   {
-    dumpBuffer[2 * dumpIndex + 0] = fixround<int16_t>(real(v[i]) * dumpScale);
-    dumpBuffer[2 * dumpIndex + 1] = fixround<int16_t>(imag(v[i]) * dumpScale);
+    constexpr timespec ts{ 0, 10'000L };
+    while (nanosleep(&ts, nullptr)); // while is very likely obsolete
+    bufferContent = theRig->Samples();
+  }
+}
 
-    if (++dumpIndex >= DUMPSIZE / 2)
-    {
-      sf_writef_short(dumpfilePointer.load(), dumpBuffer.data(), dumpIndex);
-      dumpIndex = 0;
-    }
+void SampleReader::_dump_sample_to_file(const cmplx & v)
+{
+  dumpBuffer[2 * dumpIndex + 0] = fixround<int16_t>(real(v) * dumpScale);
+  dumpBuffer[2 * dumpIndex + 1] = fixround<int16_t>(imag(v) * dumpScale);
+
+  if (++dumpIndex >= DUMPSIZE / 2)
+  {
+    sf_writef_short(dumpfilePointer.load(), dumpBuffer.data(), dumpIndex);
+    dumpIndex = 0;
   }
 }
 

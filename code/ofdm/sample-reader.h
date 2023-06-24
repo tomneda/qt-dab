@@ -76,7 +76,8 @@ private:
   std::array<int16_t, DUMPSIZE> dumpBuffer{};
   std::atomic<SNDFILE *> dumpfilePointer;
 
-  void _dump_samples_to_file(const std::vector<cmplx> & v, int32_t n);
+  void _dump_sample_to_file(const cmplx & v);
+  void _wait_for_sample_buffer_filled(int32_t n);
 
 signals:
   void show_Spectrum(int);

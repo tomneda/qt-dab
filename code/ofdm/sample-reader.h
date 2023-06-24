@@ -37,42 +37,46 @@
 //      Note:
 //      It was found that enlarging the buffersize to e.g. 8192
 //      cannot be handled properly by the underlying system.
-#define DUMPSIZE                4096
-
 class RadioInterface;
 
 class SampleReader : public QObject
 {
 Q_OBJECT
 public:
-  SampleReader(RadioInterface * mr, deviceHandler * theRig, RingBuffer<cmplx> * spectrumBuffer = nullptr);
+  SampleReader(const RadioInterface * mr, deviceHandler * iTheRig, RingBuffer<cmplx> * iSpectrumBuffer = nullptr);
+  ~SampleReader() override = default;
 
-  ~SampleReader();
   void setRunning(bool b);
-  float get_sLevel();
+  float get_sLevel() const;
   cmplx getSample(int32_t);
   void getSamples(std::vector<cmplx> & v, int index, int32_t n, int32_t phase);
   void startDumping(SNDFILE *);
   void stopDumping();
 
 private:
+  static constexpr uint16_t DUMPSIZE = 4096;
+
   RadioInterface * myRadioInterface;
   deviceHandler * theRig;
   RingBuffer<cmplx> * spectrumBuffer;
   std::vector<cmplx> localBuffer;
-  int32_t localCounter;
-  int32_t bufferSize;
-  int32_t currentPhase;
+  std::array<cmplx, INPUT_RATE> oscillatorTable{};
+
+  int32_t localCounter = 0;
+  const int32_t bufferSize  = 32768;
+  int32_t currentPhase = 0;
   std::atomic<bool> running;
-  int32_t bufferContent;
-  float sLevel;
-  int32_t sampleCount;
-  int32_t corrector;
+  int32_t bufferContent = 0;
+  float sLevel = 0.0f;
+  int32_t sampleCount = 0;
+  int32_t corrector = 0;
   bool dumping;
-  int16_t dumpIndex;
+  int16_t dumpIndex = 0;
   int16_t dumpScale;
-  int16_t dumpBuffer[DUMPSIZE];
+  std::array<int16_t, DUMPSIZE> dumpBuffer{};
   std::atomic<SNDFILE *> dumpfilePointer;
+
+  void _dump_samples_to_file(const std::vector<cmplx> & v, int32_t n);
 
 signals:
   void show_Spectrum(int);

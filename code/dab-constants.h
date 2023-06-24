@@ -156,6 +156,11 @@ static inline float jan_abs(cmplx z)
   }
 }
 
+template<typename T> static inline T fixround(float v)
+{
+  return static_cast<T>(std::roundf(v));
+}
+
 #define    BAND_III  0100
 #define    L_BAND    0101
 #define    A_BAND    0102

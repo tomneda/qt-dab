@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>./i18n/de_DE.qm</file>
         <file>icon.png</file>
         <file>./AUTHORS</file>
         <file>./COPYING</file>

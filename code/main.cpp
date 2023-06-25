@@ -36,7 +36,7 @@ static const QString styleSheet =
 //#include "./stylesheets/Fibers.qss"
 ;
 
-void setTranslator(QTranslator *, QString Language);
+//void setTranslator(QTranslator *, QString Language);
 
 int main(int argc, char ** argv)
 {
@@ -55,7 +55,7 @@ int main(int argc, char ** argv)
   bool error_report = false;
   int fmFrequency = 110000;
 
-  QTranslator theTranslator;
+  //QTranslator theTranslator;
   QCoreApplication::setOrganizationName("Lazy Chair Computing");
   QCoreApplication::setOrganizationDomain("Lazy Chair Computing");
   //QCoreApplication::setApplicationName ("qt-dab");
@@ -93,9 +93,9 @@ int main(int argc, char ** argv)
   QApplication a(argc, argv);
   a.setStyleSheet(styleSheet);
   // setting the language
-  QString locale = QLocale::system().name();
-  qDebug() << "main:" << "Detected system language" << locale;
-  setTranslator(&theTranslator, locale);
+//  QString locale = QLocale::system().name();
+//  qDebug() << "main:" << "Detected system language" << locale;
+//  setTranslator(&theTranslator, locale);
   a.setWindowIcon(QIcon(":icon.png"));
 
   MyRadioInterface = new RadioInterface(dabSettings, presetsFileName, freqExtension, error_report, dataPort, clockPort, fmFrequency, nullptr);
@@ -115,25 +115,25 @@ int main(int argc, char ** argv)
   return 1;
 }
 
-void setTranslator(QTranslator * theTranslator, QString Language)
-{
-  // German is special (as always)
-  if ((Language == "de_AT") || (Language == "de_CH"))
-  {
-    Language = "de_DE";
-  }
-  //
-  // what about Dutch?
-  bool translatorLoaded = theTranslator->load(QString(":/i18n/") + Language);
-  qDebug() << "main:" << "Set language" << Language;
-  QCoreApplication::installTranslator(theTranslator);
-
-  if (!translatorLoaded)
-  {
-    qDebug() << "main:" << "Error while loading language specifics" << Language << "use English \"en_GB\" instead";
-    Language = "en_GB";
-  }
-
-  QLocale curLocale(QLocale((const QString &)Language));
-  QLocale::setDefault(curLocale);
-}
+//void setTranslator(QTranslator * theTranslator, QString Language)
+//{
+//  // German is special (as always)
+//  if ((Language == "de_AT") || (Language == "de_CH"))
+//  {
+//    Language = "de_DE";
+//  }
+//  //
+//  // what about Dutch?
+//  bool translatorLoaded = theTranslator->load(QString(":/i18n/") + Language);
+//  qDebug() << "main:" << "Set language" << Language;
+//  QCoreApplication::installTranslator(theTranslator);
+//
+//  if (!translatorLoaded)
+//  {
+//    qDebug() << "main:" << "Error while loading language specifics" << Language << "use English \"en_GB\" instead";
+//    Language = "en_GB";
+//  }
+//
+//  QLocale curLocale(QLocale((const QString &)Language));
+//  QLocale::setDefault(curLocale);
+//}

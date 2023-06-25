@@ -309,7 +309,7 @@
          <item row="9" column="0" colspan="2">
           <widget class="QCheckBox" name="cbLogIqScope">
            <property name="text">
-            <string>IQ scope in log scale</string>
+            <string>IQ scope in log. scale</string>
            </property>
            <property name="checked">
             <bool>true</bool>

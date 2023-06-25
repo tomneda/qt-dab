@@ -42,9 +42,7 @@
 #include  <qwt_plot_layout.h>
 #include  "dab-constants.h"
 
-/*
- *	for the waterfall display
- */
+class SpectrogramData;
 
 class IQDisplay : public QObject, public QwtPlotSpectrogram
 {
@@ -58,6 +56,7 @@ private:
 
   float mLastCircleSize{ 0 };
   QwtPlot * mPlotgrid{ nullptr };
+  SpectrogramData * mIQData = nullptr;
 
   std::vector<std::complex<int32_t>> mPoints;
   std::vector<double> mPlotDataBackgroundBuffer;

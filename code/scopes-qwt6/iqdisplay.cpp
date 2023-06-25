@@ -22,20 +22,18 @@
 #include  "iqdisplay.h"
 #include  "spectrogramdata.h"
 
-SpectrogramData * sIQData = nullptr;
-
 IQDisplay::IQDisplay(QwtPlot * plot)
   : QwtPlotSpectrogram()
 {
-  auto * const colorMap = new QwtLinearColorMap(Qt::darkBlue, Qt::yellow);
+  auto * const colorMap = new QwtLinearColorMap(QColor(0, 0, 255, 20), QColor(255, 255, 178, 255));
 
   setRenderThreadCount(1);
   mPlotgrid = plot;
   setColorMap(colorMap);
   mPlotDataBackgroundBuffer.resize(2 * RADIUS * 2 * RADIUS, 0.0);
   mPlotDataDrawBuffer.resize(2 * RADIUS * 2 * RADIUS, 0.0);
-  sIQData = new SpectrogramData(mPlotDataDrawBuffer.data(), 0, 2 * RADIUS, 2 * RADIUS, 2 * RADIUS, 50.0);
-  setData(sIQData);
+  mIQData = new SpectrogramData(mPlotDataDrawBuffer.data(), 0, 2 * RADIUS, 2 * RADIUS, 2 * RADIUS, 50.0);
+  setData(mIQData);
   plot->enableAxis(QwtPlot::xBottom, false);
   plot->enableAxis(QwtPlot::yLeft, false);
   setDisplayMode(QwtPlotSpectrogram::ImageMode, true);
@@ -45,7 +43,7 @@ IQDisplay::IQDisplay(QwtPlot * plot)
 IQDisplay::~IQDisplay()
 {
   detach();
-  // delete sIQData;
+  // delete mIQData;
 }
 
 inline void IQDisplay::set_point(int x, int y, int val)
@@ -94,7 +92,7 @@ void IQDisplay::display_iq(const std::vector<cmplx> & z, float scale, float ref)
   memcpy(mPlotDataDrawBuffer.data(), mPlotDataBackgroundBuffer.data(), 2 * 2 * RADIUS * RADIUS * sizeof(double));
 
   detach();
-  setData(sIQData);
+  setData(mIQData);
   setDisplayMode(QwtPlotSpectrogram::ImageMode, true);
   attach(mPlotgrid);
   mPlotgrid->replot();
@@ -112,14 +110,14 @@ void IQDisplay::draw_cross()
 {
   for (int32_t i = -(RADIUS - 1); i < RADIUS; i++)
   {
-    set_point(0, i, 10); // vertical line
-    set_point(i, 0, 10); // horizontal line
+    set_point(0, i, 20); // vertical line
+    set_point(i, 0, 20); // horizontal line
   }
 }
 
 void IQDisplay::draw_circle(float scale, int val)
 {
-  constexpr int32_t MAX_CIRCLE_POINTS = 45; // per quarter
+  const int32_t MAX_CIRCLE_POINTS = static_cast<int32_t>(180 * scale); // per quarter
 
   for (int32_t i = 0; i < MAX_CIRCLE_POINTS; ++i)
   {
@@ -146,5 +144,5 @@ void IQDisplay::repaint_circle(float size)
     draw_circle(mLastCircleSize, 0); // clear old circle
     mLastCircleSize = size;
   }
-  draw_circle(size, 10);
+  draw_circle(size, 20);
 }

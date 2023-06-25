@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,33 +20,34 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef	__TII_DETECTOR__
-#define	__TII_DETECTOR__
+#ifndef  TII_DETECTOR_H
+#define  TII_DETECTOR_H
 
 #include "dab-constants.h"
-#include	<cstdint>
-#include	"dab-params.h"
-#include	<vector>
+#include  <cstdint>
+#include  "dab-params.h"
+#include  <vector>
 
-class	TII_Detector {
+class TII_Detector
+{
 public:
-			TII_Detector	(uint8_t dabMode, int16_t);
-			~TII_Detector();
-	void		reset		();
-	void		setMode		(bool);
-	void		addBuffer	(std::vector<cmplx>);
-	uint16_t	processNULL	();
+  TII_Detector(uint8_t dabMode, int16_t);
+  ~TII_Detector();
+  void reset();
+  void setMode(bool);
+  void addBuffer(std::vector<cmplx>);
+  uint16_t processNULL();
 
 private:
-	void			collapse	(cmplx *, float *);
-	bool			detectMode_new;
-	int16_t			depth;
-	uint8_t			invTable [256];
-	DabParams		params;
-	int16_t			T_u;
-	int16_t			carriers;
-	std::vector<cmplx>	theBuffer;
-	std::vector<float>	window;
+  void collapse(cmplx *, float *);
+  bool detectMode_new;
+  int16_t depth;
+  uint8_t invTable[256];
+  DabParams params;
+  int16_t T_u;
+  int16_t carriers;
+  std::vector<cmplx> theBuffer;
+  std::vector<float> window;
 };
 
 #endif

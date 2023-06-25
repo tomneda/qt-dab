@@ -1,4 +1,3 @@
-#
 /*
  *	Copyright (C) 2022
  *	Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,73 +20,65 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef	__HTTP_HANDLER_H
-#define	__HTTP_HANDLER_H
+#ifndef  HTTP_HANDLER_H
+#define  HTTP_HANDLER_H
 
 #include "dab-constants.h"
-#include	<QObject>
-#include	<thread>
-#include	<atomic>
-#include	<string>
-#include	<vector>
-#include	<mutex>
-#include	<QString>
-class	RadioInterface;
+#include  <QObject>
+#include  <thread>
+#include  <atomic>
+#include  <string>
+#include  <vector>
+#include  <mutex>
+#include  <QString>
 
-typedef struct {
-	uint8_t	type;
-	cmplx coords;
-	QString transmitterName;
-	QString channelName;
-	QString	dateTime;
-	int	ttiId;
-	int	distance;
-	int	azimuth;
-	float	power;
+class RadioInterface;
+
+typedef struct
+{
+  uint8_t type;
+  cmplx coords;
+  QString transmitterName;
+  QString channelName;
+  QString dateTime;
+  int ttiId;
+  int distance;
+  int azimuth;
+  float power;
 } httpData;
 
-class	httpHandler: public QObject {
+class httpHandler : public QObject
+{
 Q_OBJECT
 public:
-		httpHandler	(RadioInterface *,
-	                         const QString &mapPort,
-	                         const QString &browserAddress,
-	                         cmplx address,
-	                         const QString &saveName,
-	                         bool	autoBrowse);
-		~httpHandler	();
-	void	start		();
-	void	stop		();
-	void	run		();
-	void	putData		(uint8_t	type,
-	                         cmplx target,
-	                         QString transmittername,
-	                         QString channelName,
-	                         QString dateTime,
-	                         int ttiId,
-	                         int distance, int azimuth, float power);
+  httpHandler(RadioInterface *, const QString & mapPort, const QString & browserAddress, cmplx address, const QString & saveName, bool autoBrowse);
+  ~httpHandler();
+  void start();
+  void stop();
+  void run();
+  void putData(uint8_t type, cmplx target, QString transmittername, QString channelName, QString dateTime, int ttiId, int distance, int azimuth, float power);
 private:
-	FILE			*saveFile;
-	QString			*saveName;
-	RadioInterface		*parent;
-	QString			mapPort;
-	cmplx homeAddress;
-	std::vector<httpData> transmitterVector;
+  FILE * saveFile;
+  QString * saveName;
+  RadioInterface * parent;
+  QString mapPort;
+  cmplx homeAddress;
+  std::vector<httpData> transmitterVector;
 
-#ifdef	__MINGW32__
-	std::wstring	browserAddress;
+#ifdef  __MINGW32__
+  std::wstring	browserAddress;
 #else
-	std::string	browserAddress;
+  std::string browserAddress;
 #endif
-	std::atomic<bool>	running;
-	std::thread	threadHandle;
-	std::string     theMap		(cmplx address);
-	std::string	coordinatesToJson (std::vector<httpData> &t);
-	std::vector<httpData>	transmitterList;
-	std::mutex	locker;
-	bool		autoBrowser_off;
+  std::atomic<bool> running;
+  std::thread threadHandle;
+  std::string theMap(cmplx address);
+  std::string coordinatesToJson(std::vector<httpData> & t);
+  std::vector<httpData> transmitterList;
+  std::mutex locker;
+  bool autoBrowser_off;
 signals:
-	void		terminating	();
+  void terminating();
 };
 
 #endif

@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C)  2014 .. 2017
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -22,63 +21,60 @@
  *
  */
 
-#ifndef __AUDIO_SINK
-#define	__AUDIO_SINK
-#include	<QString>
-#include	<vector>
-#include	"dab-constants.h"
-#include	<portaudio.h>
-#include	<cstdio>
-#include	"audio-base.h"
-#include	"ringbuffer.h"
+#ifndef  AUDIO_SINK_H
+#define  AUDIO_SINK_H
 
-class	QComboBox;
+#include  <QString>
+#include  <vector>
+#include  "dab-constants.h"
+#include  <portaudio.h>
+#include  <cstdio>
+#include  "audio-base.h"
+#include  "ringbuffer.h"
 
-class	audioSink  : public audioBase {
+class QComboBox;
+
+class audioSink : public audioBase
+{
 Q_OBJECT
 public:
-	                audioSink		(int16_t);
-			~audioSink		();
-	bool		setupChannels		(QComboBox *);
-	void		stop			();
-	void		restart			(void);
-	bool		selectDevice		(int16_t);
-	bool		selectDefaultDevice	();
-	int32_t		missed			();
-	bool		hasMissed		();
+  audioSink(int16_t);
+  ~audioSink();
+  bool setupChannels(QComboBox *);
+  void stop();
+  void restart(void);
+  bool selectDevice(int16_t);
+  bool selectDefaultDevice();
+  int32_t missed();
+  bool hasMissed();
 private:
-	int16_t		numberofDevices();
-	QString		outputChannelwithRate	(int16_t, int32_t);
-	int16_t		invalidDevice		(void);
-	bool		isValidDevice		(int16_t);
-	int32_t		cardRate();
+  int16_t numberofDevices();
+  QString outputChannelwithRate(int16_t, int32_t);
+  int16_t invalidDevice(void);
+  bool isValidDevice(int16_t);
+  int32_t cardRate();
 
-	bool		OutputrateIsSupported	(int16_t, int32_t);
-	void		audioOutput		(float *, int32_t);
-	int32_t		CardRate;
-	int16_t		latency;
-	int32_t		size;
-	bool		portAudio;
-	bool		writerRunning;
-	int16_t		numofDevices;
-	int		paCallbackReturn;
-	int16_t		bufSize;
-	PaStream	*ostream;
-	SNDFILE		*dumpFile;
-	RingBuffer<float>	_O_Buffer;
-	PaStreamParameters	outputParameters;
+  bool OutputrateIsSupported(int16_t, int32_t);
+  void audioOutput(float *, int32_t);
+  int32_t CardRate;
+  int16_t latency;
+  int32_t size;
+  bool portAudio;
+  bool writerRunning;
+  int16_t numofDevices;
+  int paCallbackReturn;
+  int16_t bufSize;
+  PaStream * ostream;
+  SNDFILE * dumpFile;
+  RingBuffer<float> _O_Buffer;
+  PaStreamParameters outputParameters;
 
-	int		theMissed;
-	int		totalSamples;
-	std::vector<int16_t>	outTable;
-	QStringList	*InterfaceList;
+  int theMissed;
+  int totalSamples;
+  std::vector<int16_t> outTable;
+  QStringList * InterfaceList;
 protected:
-static	int		paCallback_o	(const void	*input,
-	                                 void		*output,
-	                                 unsigned long	framesperBuffer,
-	                                 const PaStreamCallbackTimeInfo *timeInfo,
-					 PaStreamCallbackFlags statusFlags,
-	                                 void		*userData);
+  static int paCallback_o(const void * input, void * output, unsigned long framesperBuffer, const PaStreamCallbackTimeInfo * timeInfo, PaStreamCallbackFlags statusFlags, void * userData);
 };
 
 #endif

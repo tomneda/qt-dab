@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2019
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -21,28 +20,31 @@
  *    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef	__TIMETABLE_HANDLER__
-#define	__TIMETABLE_HANDLER__
+#ifndef  TIMETABLE_HANDLER_H
+#define  TIMETABLE_HANDLER_H
 
-#include	"radio.h"
-#include	<QListView>
-#include	<QStringList>
-#include	<QStringListModel>
-#include	<QModelIndex>
+#include  "radio.h"
+#include  <QListView>
+#include  <QStringList>
+#include  <QStringListModel>
+#include  <QModelIndex>
 
-class	RadioInterface;
+class RadioInterface;
 
-class	timeTableHandler:public QListView {
+class timeTableHandler : public QListView
+{
 Q_OBJECT
 public:
-		timeTableHandler	(RadioInterface *radio);
-		~timeTableHandler	();
-	void	addElement		(int,  int, const QString &, const QString &);
-	void	clear			();
+  timeTableHandler(RadioInterface * radio);
+  ~timeTableHandler();
+
+  void addElement(int, int, const QString &, const QString &);
+  void clear();
+
 private:
-	QStringList		timeTableList;
-	QStringListModel	displayList;
-	RadioInterface	*radio;
+  QStringList timeTableList;
+  QStringListModel displayList;
+  RadioInterface * radio;
 };
 
 #endif

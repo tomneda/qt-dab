@@ -1,4 +1,3 @@
-#
 /*
  *    Copyright (C) 2018, 2019, 2020
  *    Jan van Katwijk (J.vanKatwijk@gmail.com)
@@ -28,173 +27,209 @@
  *	Definition of the "configuration" as maintained during reception of
  *	a channel
  */
-#ifndef	__FIB_CONFIG__
-#define	__FIB_CONFIG__
+#ifndef  FIB_CONFIG_H
+#define  FIB_CONFIG_H
 
-class	service {
+class service
+{
 public:
-	service() {
-	   reset	();
-	}
-	~service() {
-		reset	();
-	}
-void	reset		() {
-	inUse		= false;
-	SId		= 0;
-	SCIds		= 0;
-	hasName		= false;
-	serviceLabel	= "";
-	language	= 0;
-	programType	= 0;
-	is_shown	= false;
-	fmFrequency	= -1;
-	epgData. resize (0);
-}
-bool		inUse;
-uint32_t	SId;
-int		SCIds;
-bool		hasName;
-QString		serviceLabel;
-int		language;
-int		programType;
-bool		is_shown;
-int32_t		fmFrequency;
-std::vector<epgElement> epgData;
+  service()
+  {
+    reset();
+  }
+
+  ~service()
+  {
+    reset();
+  }
+
+  void reset()
+  {
+    inUse = false;
+    SId = 0;
+    SCIds = 0;
+    hasName = false;
+    serviceLabel = "";
+    language = 0;
+    programType = 0;
+    is_shown = false;
+    fmFrequency = -1;
+    epgData.resize(0);
+  }
+
+  bool inUse;
+  uint32_t SId;
+  int SCIds;
+  bool hasName;
+  QString serviceLabel;
+  int language;
+  int programType;
+  bool is_shown;
+  int32_t fmFrequency;
+  std::vector<epgElement> epgData;
 };
 
-class ensembleDescriptor {
+class ensembleDescriptor
+{
 public:
-	ensembleDescriptor	() {
-	   reset	();
-	}
-	~ensembleDescriptor	() {}
-void	reset		() {
-	namePresent	= false;
-	ecc_Present	= false;
-	countryId	= 0;
-	isSynced	= false;
-	for (int i = 0; i < 64; i ++) 
-	   services [i]. reset ();
-}
+  ensembleDescriptor()
+  {
+    reset();
+  }
 
-QString ensembleName;
-int32_t ensembleId;
-bool    namePresent;
-bool	ecc_Present;
-uint8_t	ecc_byte;
-uint8_t	countryId;
-bool	isSynced;
-service	services [64];
+  ~ensembleDescriptor()
+  {}
+
+  void reset()
+  {
+    namePresent = false;
+    ecc_Present = false;
+    countryId = 0;
+    isSynced = false;
+    for (int i = 0; i < 64; i++)
+    {
+      services[i].reset();
+    }
+  }
+
+  QString ensembleName;
+  int32_t ensembleId;
+  bool namePresent;
+  bool ecc_Present;
+  uint8_t ecc_byte;
+  uint8_t countryId;
+  bool isSynced;
+  service services[64];
 };
 
-class	subChannelDescriptor {
+class subChannelDescriptor
+{
 public:
-	subChannelDescriptor() {
-	   reset	();
-	}
-	~subChannelDescriptor() {}
+  subChannelDescriptor()
+  {
+    reset();
+  }
 
-void	reset		() {
-	inUse	= false;
-	language	= 0;
-	FEC_scheme	= 0;
-	SCIds		= 0;
-}
-bool		inUse;
-int32_t		SubChId;
-int32_t		startAddr;
-int32_t		Length;
-bool		shortForm;
-int32_t		protLevel;
-int32_t		bitRate;
-int16_t		language;
-int16_t		FEC_scheme;
-int16_t		SCIds;		// for audio channels
+  ~subChannelDescriptor()
+  {}
+
+  void reset()
+  {
+    inUse = false;
+    language = 0;
+    FEC_scheme = 0;
+    SCIds = 0;
+  }
+
+  bool inUse = false;
+  int32_t SubChId  = 0;
+  int32_t startAddr = 0;
+  int32_t Length = 0;
+  bool shortForm = false;
+  int32_t protLevel = 0;
+  int32_t bitRate = 0;
+  int16_t language = 0;
+  int16_t FEC_scheme = 0;
+  int16_t SCIds = 0;    // for audio channels
 };
 
 //      The service component describes the actual service
 //      It really should be a union, the component data for
 //      audio and data are quite different
-class	serviceComponentDescriptor {
+class serviceComponentDescriptor
+{
 public:
-	serviceComponentDescriptor() {
-	   reset	();
-	}
-	~serviceComponentDescriptor() {}
+  serviceComponentDescriptor()
+  {
+    reset();
+  }
 
-void	reset		() {
-	inUse		= false;
-	is_madePublic	= false;
-	SCIds		= -1;
-	componentNr	= -1;
-	SCId		= -1;
-	subchannelId	= -1;
-}
+  ~serviceComponentDescriptor()
+  {}
 
-bool		inUse;		// field in use
-int8_t		TMid;		// the transport mode
-uint32_t	SId;
-int16_t		SCIds;		// component within service
-int16_t		subchannelId;	// used in both audio and packet
-int16_t		componentNr;    // component
-int16_t		ASCTy;          // used for audio
-int16_t		DSCTy;		// used in packet
-int16_t		PS_flag;	// use for both audio and packet
-uint16_t	SCId;           // Component Id (12 bit, unique)
-uint8_t		CAflag;         // used in packet (or not at all)
-uint8_t		DGflag;         // used for TDC
-int16_t		packetAddress;  // used in packet
-int16_t		appType;        // used in packet and Xpad
-int16_t		language;
-bool		is_madePublic;  // used to make service visible
+  void reset()
+  {
+    inUse = false;
+    is_madePublic = false;
+    SCIds = -1;
+    componentNr = -1;
+    SCId = -1;
+    subchannelId = -1;
+  }
+
+  bool inUse;    // field in use
+  int8_t TMid;    // the transport mode
+  uint32_t SId;
+  int16_t SCIds;    // component within service
+  int16_t subchannelId;  // used in both audio and packet
+  int16_t componentNr;    // component
+  int16_t ASCTy;          // used for audio
+  int16_t DSCTy;    // used in packet
+  int16_t PS_flag;  // use for both audio and packet
+  uint16_t SCId;           // Component Id (12 bit, unique)
+  uint8_t CAflag;         // used in packet (or not at all)
+  uint8_t DGflag;         // used for TDC
+  int16_t packetAddress;  // used in packet
+  int16_t appType;        // used in packet and Xpad
+  int16_t language;
+  bool is_madePublic;  // used to make service visible
 };
 
 //
 //	cluster is for announcement handling
-class	Cluster {
+class Cluster
+{
 public:
-uint16_t flags;
-std::vector<uint16_t> services;
-bool	inUse;
-int	announcing;
-int	clusterId;
+  uint16_t flags;
+  std::vector<uint16_t> services;
+  bool inUse;
+  int announcing;
+  int clusterId;
 
-	Cluster () {
-	   flags	= 0;
-	   services. resize (0);
-	   inUse	= false;
-	   announcing	= 0;
-	   clusterId	= -1;
-	}
-	~Cluster () {
-	   flags	= 0;
-	   services. resize (0);
-	   inUse	= false;
-	   announcing	= 0;
-	   clusterId	= -1;
-	}
+  Cluster()
+  {
+    flags = 0;
+    services.resize(0);
+    inUse = false;
+    announcing = 0;
+    clusterId = -1;
+  }
+
+  ~Cluster()
+  {
+    flags = 0;
+    services.resize(0);
+    inUse = false;
+    announcing = 0;
+    clusterId = -1;
+  }
 };
 
-class	dabConfig {
+class dabConfig
+{
 public:
-	dabConfig	() {
-	reset	();
-}
-	~dabConfig	() {
-}
+  dabConfig()
+  {
+    reset();
+  }
 
-void	reset	() {
-	int i;
-	for (i = 0; i < 64; i ++) {
-	   subChannels  [i]. reset ();
-	   serviceComps [i]. reset ();
-	}
-}
+  ~dabConfig()
+  {
+  }
 
-subChannelDescriptor		subChannels [64];
-serviceComponentDescriptor      serviceComps [64];
-Cluster				clusterTable [128];
+  void reset()
+  {
+    int i;
+    for (i = 0; i < 64; i++)
+    {
+      subChannels[i].reset();
+      serviceComps[i].reset();
+    }
+  }
+
+  subChannelDescriptor subChannels[64];
+  serviceComponentDescriptor serviceComps[64];
+  Cluster clusterTable[128];
 };
 
 #endif

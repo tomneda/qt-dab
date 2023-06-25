@@ -356,13 +356,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="2" column="0">
-      <widget class="QLabel" name="aacErrorLabel">
-       <property name="text">
-        <string>AAC</string>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="2">
       <widget class="QProgressBar" name="aacError_display">
        <property name="toolTip">
@@ -404,6 +397,13 @@
       <widget class="QLabel" name="rsErrorLabel">
        <property name="text">
         <string>RS</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0" colspan="2">
+      <widget class="QLabel" name="aacErrorLabel">
+       <property name="text">
+        <string>AAC</string>
        </property>
       </widget>
      </item>

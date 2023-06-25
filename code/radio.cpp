@@ -1516,10 +1516,12 @@ void RadioInterface::updateTimeDisplay()
   }
 
   numberofSeconds++;
+
   int16_t numberHours = numberofSeconds / 3600;
   int16_t numberMinutes = (numberofSeconds / 60) % 60;
-  QString text = QString("runtime ") + QString::number(numberHours) + " hr, " + QString::number(numberMinutes) + " min";
+  QString text = QString("Runtime: ") + QString::number(numberHours).rightJustified(2, '0') + ":" + QString::number(numberMinutes).rightJustified(2, '0');
   runtimeDisplay->setText(text);
+
   if ((numberofSeconds % 2) == 0)
   {
     size_t idle_time, total_time;
@@ -1961,10 +1963,6 @@ void RadioInterface::handle_devicewidgetButton()
 //	to be displayed
 ///////////////////////////////////////////////////////////////////////////
 
-static const char * monthTable[] = {
-  "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
-
-//
 //	called from the fibDecoder
 void RadioInterface::clockTime(int year, int month, int day, int hours, int minutes, int d2, int h2, int m2, int seconds)
 {
@@ -2009,15 +2007,11 @@ void RadioInterface::clockTime(int year, int month, int day, int hours, int minu
 
 QString RadioInterface::convertTime(int year, int month, int day, int hours, int minutes)
 {
-  char dayString[3];
-  char hourString[3];
-  char minuteString[3];
-  sprintf(dayString, "%.2d", day);
-  sprintf(hourString, "%.2d", hours);
-  sprintf(minuteString, "%.2d", minutes);
-  QString result = QString::number(year) + "-" + monthTable[month - 1] + "-" + QString(dayString) + "  " + QString(hourString) + ":" + QString(
-    minuteString);
-  return result;
+  return QString::number(year).rightJustified(4, '0') + "-" +
+         QString::number(month).rightJustified(2, '0') + "-" +
+         QString::number(day).rightJustified(2, '0') + "  " +
+         QString::number(hours).rightJustified(2, '0') + ":" +
+         QString::number(minutes).rightJustified(2, '0');
 }
 
 //

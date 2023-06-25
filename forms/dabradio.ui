@@ -154,12 +154,24 @@
          <property name="text">
           <string>local</string>
          </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="margin">
+          <number>5</number>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="runtimeDisplay">
          <property name="text">
           <string>runtime</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="margin">
+          <number>5</number>
          </property>
         </widget>
        </item>

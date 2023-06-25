@@ -336,7 +336,7 @@ RadioInterface::RadioInterface(QSettings * Si, const QString & presetFile, const
   }
 
   configWidget.EPGLabel->hide();
-  configWidget.EPGLabel->setStyleSheet("QLabel {background-color : yellow}");
+  configWidget.EPGLabel->setStyleSheet("QLabel {background-color : yellow; color : black}");
 
   x = dabSettings->value("switchDelay", 8).toInt();
   configWidget.switchDelaySetting->setValue(x);
@@ -4353,19 +4353,23 @@ void RadioInterface::epgTimer_timeOut()
   }
   for (auto serv: serviceList)
   {
-    if (serv.name.contains("-EPG ", Qt::CaseInsensitive) || serv.name.contains(" EPG   ", Qt::CaseInsensitive) || serv.name.contains(
-      "Spored",
-      Qt::CaseInsensitive) || serv.name.contains("NivaaEPG", Qt::CaseInsensitive) || serv.name.contains("SPI",
-                                                                                                        Qt::CaseSensitive) || serv.name.contains(
-      "BBC Guide",
-      Qt::CaseInsensitive) || serv.name.contains("EPG_", Qt::CaseInsensitive) || serv.name.startsWith("EPG ", Qt::CaseInsensitive))
+    if (serv.name.contains("-EPG ", Qt::CaseInsensitive) ||
+        serv.name.contains(" EPG   ", Qt::CaseInsensitive) ||
+        serv.name.contains("Spored", Qt::CaseInsensitive) ||
+        serv.name.contains("NivaaEPG", Qt::CaseInsensitive) ||
+        serv.name.contains("SPI", Qt::CaseSensitive) ||
+        serv.name.contains("BBC Guide", Qt::CaseInsensitive) ||
+        serv.name.contains("EPG_", Qt::CaseInsensitive) ||
+        serv.name.startsWith("EPG ", Qt::CaseInsensitive))
     {
       packetdata pd;
       my_dabProcessor->dataforPacketService(serv.name, &pd, 0);
+
       if ((!pd.defined) || (pd.DSCTy == 0) || (pd.bitRate == 0))
       {
         continue;
       }
+
       if (pd.DSCTy == 60)
       {
         LOG("hidden service started ", serv.name);
@@ -4393,26 +4397,27 @@ void RadioInterface::epgTimer_timeOut()
       }
     }
 #ifdef  __DABDATA__
-                                                                                                                            else {
-	      packetdata pd;
-	      my_dabProcessor -> dataforPacketService (serv. name, &pd, 0);
-	      if ((pd. defined)  && (pd. DSCTy == 59)) {
-	         LOG ("hidden service started ", serv. name);
-	         configWidget. EPGLabel  -> show ();
-	         fprintf (stderr, "Starting hidden service %s\n",
-	                                serv. name. toUtf8 (). data ());
-	         my_dabProcessor -> set_dataChannel (&pd, &dataBuffer, BACK_GROUND);
-	         dabService s;
-	         s. channel     = channel. channelName;
-	         s. serviceName = pd. serviceName;
-	         s. SId         = pd. SId;
-	         s. SCIds       = pd. SCIds;
-	         s. subChId     = pd. subchId;
-	         s. fd          = nullptr;
-	         channel. backgroundServices. push_back (s);
-	         break;
-	      }
-	   }
+    else
+    {
+      packetdata pd;
+      my_dabProcessor->dataforPacketService(serv.name, &pd, 0);
+      if ((pd.defined) && (pd.DSCTy == 59))
+      {
+        LOG("hidden service started ", serv.name);
+        configWidget.EPGLabel->show();
+        fprintf(stderr, "Starting hidden service %s\n", serv.name.toUtf8().data());
+        my_dabProcessor->set_dataChannel(&pd, &dataBuffer, BACK_GROUND);
+        dabService s;
+        s.channel = channel.channelName;
+        s.serviceName = pd.serviceName;
+        s.SId = pd.SId;
+        s.SCIds = pd.SCIds;
+        s.subChId = pd.subchId;
+        s.fd = nullptr;
+        channel.backgroundServices.push_back(s);
+        break;
+      }
+    }
 #endif
   }
 }

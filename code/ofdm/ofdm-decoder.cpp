@@ -81,8 +81,8 @@ void OfdmDecoder::decode(const std::vector<cmplx> & buffer, uint16_t iCurOfdmSym
 {
   memcpy(mFftBuffer.data(), &(buffer[mDabPar.T_g]), mDabPar.T_u * sizeof(cmplx));
 
-  constexpr float MAX_PHASE_ANGLE = 10.0f / 360.0f * 2.0f * M_PI;
-  limit(iPhaseCorr, -MAX_PHASE_ANGLE, MAX_PHASE_ANGLE);
+//  constexpr float MAX_PHASE_ANGLE = 10.0f / 360.0f * 2.0f * M_PI;
+//  limit(iPhaseCorr, -MAX_PHASE_ANGLE, MAX_PHASE_ANGLE);
 
   // const cmplx phaseRotator = cmplx(cosf(iPhaseCorr), -sinf(iPhaseCorr));
   const cmplx phaseRotator = std::exp(cmplx(0.0f, -iPhaseCorr));

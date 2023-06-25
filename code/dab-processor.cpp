@@ -352,7 +352,10 @@ void DabProcessor::_state_process_rest_of_frame(const int32_t iStartIndex, int32
   //     existing frequency error.
   //
   mPhaseOffset = arg(freqCorr);
-  mFineOffset += (int32_t)(0.10 * mPhaseOffset / (2 * M_PI) * mDabPar.CarrDiff); // formerly 0.05
+  constexpr float MAX_PHASE_ANGLE = 20.0f / 360.0f * 2.0f * M_PI;
+  limit(mPhaseOffset, -MAX_PHASE_ANGLE, MAX_PHASE_ANGLE);
+
+  mFineOffset += (int32_t)(1.00 * mPhaseOffset / (2 * M_PI) * mDabPar.CarrDiff); // formerly 0.05
 
   if (mFineOffset > mDabPar.CarrDiff / 2)
   {
